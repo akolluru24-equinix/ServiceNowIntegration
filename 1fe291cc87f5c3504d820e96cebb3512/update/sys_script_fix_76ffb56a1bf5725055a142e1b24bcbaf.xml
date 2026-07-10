@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description>u_acc_number_mdm2 and u_ucmid_legacy initial values after creation of field&#13;
+</description>
+        <name>LTC Billing accoutns legacy fields</name>
+        <record_for_rollback>true</record_for_rollback>
+        <script><![CDATA[/**
+ * Fix Script / Background Script:
+ * Copy u_ucm_id -> u_ucmid_legacy for customer_account records
+ * without triggering business rules, workflows, or auditing.
+ *
+ * Safe for large volumes; includes dry-run and progress logging.
+ */
+
+(function() {
+    var TABLE = 'customer_account';
+    var SOURCE_FIELD = 'u_ucm_id';
+    var TARGET_FIELD = 'u_ucmid_legacy';
+    var BATCH_LOG_EVERY = 1000;   // log progress every N processed records
+    var SLEEP_MS = 50;            // tiny pause to keep node healthy during long runs
+    var DRY_RUN = false;          // set true to preview counts without updating
+
+    var processed = 0;
+    var candidates = 0;
+    var updated = 0;
+    var skipped_equal = 0;
+    var skipped_empty_source = 0;
+    var errors = 0;
+
+    // Pre-scan query: only fetch records where SOURCE_FIELD is not empty
+    var gr = new GlideRecord(TABLE);
+    gr.setWorkflow(false);       // disable business rules/workflows/engines
+    gr.autoSysFields(false);     // don't touch sys fields
+    gr.addQuery("u_account_category=ban^u_ucm_idISNOTEMPTY^u_ucmid_legacy=NULL^NQu_account_category=ban^u_account_numberISNOTEMPTY^u_acc_number_mdm2ISEMPTY"); // exclude blank strings
+    gr.query();
+
+    gs.info('[FixScript] Starting copy from ' + SOURCE_FIELD + ' to ' + TARGET_FIELD + ' on table ' + TABLE);
+
+    while (gr.next()) {
+        processed++;
+
+
+
+        candidates++; // would be updated
+
+        if (!DRY_RUN) {
+            try {
+                gr.setValue('u_ucmid_legacy', gr.getValue('u_ucm_id'));
+				gr.setValue('u_acc_number_mdm2',gr.getValue('u_account_number'));
+                gr.update();
+                updated++;
+            } catch (e) {
+                errors++;
+                gs.error('[FixScript] Update failed for sys_id=' + gr.getUniqueValue() + ' error=' + e);
+            }
+        }
+
+        if (processed % BATCH_LOG_EVERY === 0) {
+            gs.info('[FixScript] Progress: processed=' + processed +
+                    ' candidates=' + candidates + ' updated=' + updated +
+                    ' skipped_equal=' + skipped_equal +
+                    ' skipped_empty_source=' + skipped_empty_source +
+                    ' errors=' + errors);
+            gs.sleep(SLEEP_MS);
+        }
+    }
+
+    gs.info('[FixScript] Completed. ' +
+            'processed=' + processed +
+            ' candidates=' + candidates +
+            ' updated=' + updated +
+            ' skipped_equal=' + skipped_equal +
+            ' skipped_empty_source=' + skipped_empty_source +
+            ' errors=' + errors +
+            (DRY_RUN ? ' (DRY RUN: no writes performed)' : ''));
+})();
+]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-16 20:36:03</sys_created_on>
+        <sys_id>76ffb56a1bf5725055a142e1b24bcbaf</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>LTC Billing accoutns legacy fields</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_fix_76ffb56a1bf5725055a142e1b24bcbaf</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:20</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137595230000001</claim_timestamp>
+        <metadata_update_name>sys_script_fix_76ffb56a1bf5725055a142e1b24bcbaf</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:20</sys_created_on>
+        <sys_id>cf752cd98775c7904d820e96cebb358b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:20</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>76ffb56a1bf5725055a142e1b24bcbaf</id>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-16 20:36:02</sys_created_on>
+        <sys_id>4a30c66a1bf5725055a142e1b24bcbd3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-12-16 20:36:02</sys_updated_on>
+        <table>sys_script_fix</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

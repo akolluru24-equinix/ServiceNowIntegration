@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="u_db_last_upd" label="db_last_upd" language="en" table="u_ltc_ci_for_poe">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>u_db_last_upd</element>
+            <help/>
+            <hint/>
+            <label>db_last_upd</label>
+            <language>en</language>
+            <name>u_ltc_ci_for_poe</name>
+            <plural>db_last_upds</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>sgudimalla1@equinix.com</sys_created_by>
+            <sys_created_on>2026-06-01 07:37:59</sys_created_on>
+            <sys_mod_count>1</sys_mod_count>
+            <sys_name>db_last_upd</sys_name>
+            <sys_package display_value="Global" source="global">global</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+            <sys_update_name>sys_documentation_u_ltc_ci_for_poe_u_db_last_upd_en</sys_update_name>
+            <sys_updated_by>oneto@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-06-29 13:04:52</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137b8e4b0000001</claim_timestamp>
+        <metadata_update_name>sys_documentation_u_ltc_ci_for_poe_u_db_last_upd_en</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:52</sys_created_on>
+        <sys_id>a6f66c1987b5c7904d820e96cebb359a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:52</sys_updated_on>
+    </sys_claim>
+</record_update>

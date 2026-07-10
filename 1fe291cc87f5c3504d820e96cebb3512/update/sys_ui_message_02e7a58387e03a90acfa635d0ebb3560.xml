@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_message">
+    <sys_ui_message action="INSERT_OR_UPDATE">
+        <application/>
+        <code/>
+        <commented_message/>
+        <key>Location(IBX)</key>
+        <language>fq</language>
+        <message>Emplacement (IBX)</message>
+        <sys_class_name>sys_ui_message</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:48:21</sys_created_on>
+        <sys_id>02e7a58387e03a90acfa635d0ebb3560</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Location(IBX)</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_ui_message_02e7a58387e03a90acfa635d0ebb3560</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:53</sys_updated_on>
+    </sys_ui_message>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137aaa750000001</claim_timestamp>
+        <metadata_update_name>sys_ui_message_02e7a58387e03a90acfa635d0ebb3560</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:53</sys_created_on>
+        <sys_id>dcc6689587b5c7904d820e96cebb353b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:53</sys_updated_on>
+    </sys_claim>
+</record_update>

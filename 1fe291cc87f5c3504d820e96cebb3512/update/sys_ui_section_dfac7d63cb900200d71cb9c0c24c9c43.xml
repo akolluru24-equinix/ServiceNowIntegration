@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_section caption="Closure Information" section_id="dfac7d63cb900200d71cb9c0c24c9c43" sys_domain="global" table="change_request" version="3" view="">
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>close_code</element>
+            <position>0</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>8bc0c593871ff2546a1feb1e3fbb3512</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>close_notes</element>
+            <position>1</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>47c0c593871ff2546a1feb1e3fbb3513</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_verification_output</element>
+            <position>2</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>03c0c593871ff2546a1feb1e3fbb3514</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_second_question_review</element>
+            <position>3</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>cbc0c593871ff2546a1feb1e3fbb3514</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_describe_the_rollback_reason</element>
+            <position>4</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>87c0c593871ff2546a1feb1e3fbb3515</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_5_expedited_changes_justification</element>
+            <position>5</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>43c0c593871ff2546a1feb1e3fbb3516</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_implementation_start_delayed_justification</element>
+            <position>6</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>0fc0c593871ff2546a1feb1e3fbb3516</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_element action="INSERT_OR_UPDATE">
+            <element>u_implementation_end_delayed_justification</element>
+            <position>7</position>
+            <sys_created_by>fadedoni@equinix.com</sys_created_by>
+            <sys_created_on>2026-03-03 13:28:34</sys_created_on>
+            <sys_id>c7c0c593871ff2546a1feb1e3fbb3517</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_ui_formatter/>
+            <sys_ui_section caption="Closure Information" display_value="Closure Information" name="change_request" sys_domain="global" view="Default view">dfac7d63cb900200d71cb9c0c24c9c43</sys_ui_section>
+            <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-03-03 13:28:34</sys_updated_on>
+            <sys_user/>
+            <type/>
+        </sys_ui_element>
+        <sys_ui_section action="INSERT_OR_UPDATE">
+            <caption>Closure Information</caption>
+            <header>false</header>
+            <name>change_request</name>
+            <roles/>
+            <sys_class_name>sys_ui_section</sys_class_name>
+            <sys_created_by>admin</sys_created_by>
+            <sys_created_on>2015-06-03 09:48:23</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>dfac7d63cb900200d71cb9c0c24c9c43</sys_id>
+            <sys_mod_count>1</sys_mod_count>
+            <sys_name>change_request</sys_name>
+            <sys_overrides/>
+            <sys_package display_value="Change Management - Core" source="com.snc.change_management">db61c9414fa10300fe09e28d0210c796</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+            <sys_update_name>sys_ui_section_dfac7d63cb900200d71cb9c0c24c9c43</sys_update_name>
+            <sys_updated_by>oneto@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-06-29 12:58:03</sys_updated_on>
+            <sys_user/>
+            <title>false</title>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_section>
+    </sys_ui_section>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137552180000002</claim_timestamp>
+        <metadata_update_name>sys_ui_section_dfac7d63cb900200d71cb9c0c24c9c43</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:03</sys_created_on>
+        <sys_id>766564d98775c7904d820e96cebb3530</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:03</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137552180000001</claim_timestamp>
+        <metadata_update_name>sys_ui_section_dfac7d63cb900200d71cb9c0c24c9c43</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.change_management</previous_claim_name>
+        <previous_claim_scope>com.snc.change_management</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:03</sys_created_on>
+        <sys_id>ba6564d98775c7904d820e96cebb3530</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:03</sys_updated_on>
+    </sys_claim>
+</record_update>

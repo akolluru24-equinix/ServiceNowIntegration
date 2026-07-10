@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>global.EQIX_AccountContact_Util</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Script include used to get/create Company for Account and Contact integrations.</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_AccountContact_Util</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_AccountContact_Util = Class.create();
+EQIX_AccountContact_Util.prototype = {
+    initialize: function() {},
+
+    /*
+    Get a SN Language based on UCM language information. Case not found, return en
+    @param String {languageSpoken} - Preferred Spoken Language from (customer_contact table)
+    @return String {u_sn_language} - SN Language from (u_ucm_languages_map table)
+    */
+    getServiceNowLanguageMap: function(languageSpoken) {
+        var grUCMLanguage = new GlideRecord('u_ucm_languages_map');
+        if (grUCMLanguage.get('u_ucm_language', languageSpoken)) {
+            return grUCMLanguage.u_sn_language;
+        }
+        return 'en';
+    },
+
+    /*
+     * Queries for a company with the org id and returns its sys_id. If no
+     * Company is found, then it calls a function to create a new company with that org id and org name
+     *
+     * @param string {id}      - org id from the account in UCM
+     * @param string {name}    - org name from the account in UCM
+     * @return string {sys_id} - sys_id of the company found or created
+     */
+    getCompany: function(id, name) {
+
+        var comp = new GlideRecord("core_company");
+        comp.addQuery("sys_class_name", "core_company");
+        comp.addQuery("u_org_id", id);
+        comp.query();
+
+        if (comp.next()) {
+            return comp.sys_id;
+        }
+        return this._createCompany(id, name);
+    },
+
+    //MSENGG-1080 Get Country from the ISO Country code
+    getCountry: function(countryCode) {
+        var countryName = '';
+        if (countryCode == 'GB') //manipulating the cntry cd due to a customization in the core_country table for the Global use case
+            countryCode = 'UK';
+        var cntryGR = new GlideRecord("core_country");
+        cntryGR.addQuery("iso3166_2", countryCode);
+        cntryGR.query();
+        if (cntryGR.next()) {
+            countryName = cntryGR.name;
+        }
+        return countryName;
+    },
+
+    //MSENGG-1080 Get employee details
+    getEmployeeDetails: function(empId, empParam) {
+        var empParamValue = '';
+        var userGR = new GlideRecord('sys_user');
+        if (userGR.get('employee_number', empId)) {
+            if (empParam == 'name')
+                empParamValue = userGR.name;
+            //else if (empParam == 'user_name')
+            //  empParamValue = userGR.user_name;
+        }
+        return empParamValue;
+    },
+
+    //Update User UCM ID 
+    updateUser: function(userid, ucmid) {
+        var user = new GlideRecord('sys_user');
+        if (user.get('employee_number', userid)) {
+            user.u_ucm_id = ucmid;
+            user.update();
+        }
+
+    },
+
+    /**
+	* Generate a nickname following the rules:
+	  - Count Account Number characters and subtract the count from 29 (e.g: 6 characters on account number => 29 - 6 = 23)
+      - With the result below: Get the first X characters from Name field
+      - Format: {NAME}{ACCOUNTNUMBER}  (
+	  - Nickname must be uppercase, without space and special characters
+	* @param {obj} - Account record.
+	* @return {obj.nickname} - formatted nickname.
+ 	*/
+    getNickname: function(obj, newAccountName) {
+        var accountNumberCharacters = 29 - obj.getValue("u_account_number").length;
+        var auxName;
+
+        if (!gs.nil(newAccountName)) {
+            auxName = newAccountName.replace(/\s/g, '');
+        } else {
+            auxName = obj.getValue("name").replace(/\s/g, '');
+        }
+
+        var name = auxName.substring(0, accountNumberCharacters);
+
+        var regex = /\`|\~|\!|\@|\#|\$|\%|\^|\&|\*|\(|\)|\+|\=|\[|\{|\]|\}|\||\\|\'|\<|\,|\.|\>|\?|\/|\""|\;|\:|\´|\_|\-|\¡|\™|\£|\¢|\∞|\§|\¶|\•|\ª|\º|\–|\≠|\"|\÷|\≥|\≤|\…|\æ|\«|\»|\¨|\s/g;
+        var nickname = obj.getValue("u_account_number");
+        var actualName = name;
+
+        actualName = actualName.replace(/[ÀÁÂÃÄàáâãä]/g, "A");
+        actualName = actualName.replace(/[ÈÉÊËèéêë]/g, "E");
+        actualName = actualName.replace(/[ÍÌÏìíï]/g, "I");
+        actualName = actualName.replace(/[ÓÒÕÔÖóòõôö]/g, "O");
+        actualName = actualName.replace(/[ÚÙÛÜúùûü]/g, "U");
+        actualName = actualName.replace(/[Çç]/g, "C");
+        obj.u_nickname = (actualName + nickname).replace(regex, "").substring(0, 29).toUpperCase();
+        return obj.u_nickname;
+    },
+
+    //create Company/Organization record
+    _createCompany: function(id, name) {
+        var org = new GlideRecord("core_company");
+        org.initialize();
+        org.sys_class_name = "core_company";
+        org.u_org_id = id;
+        org.u_org_name = name;
+        org.name = name;
+        return org.insert();
+    },
+
+    hasOneActiveContract: function(account, subAccount) {
+        var gr = new GlideRecord('sn_customerservice_contract_item');
+
+        gr.addActiveQuery();
+        gr.addQuery('account', account);
+        if (subAccount) {
+            gr.addQuery('u_sub_account', subAccount);
+        }
+        gr.setLimit(1);
+        gr.query();
+        gr.next();
+        return gr.getRowCount() > 0;
+    },
+
+
+    /**
+     * Resolve account sys_id by MDM ID first, then by Name.
+     * @param {String} accountMdmId
+     * @returns {Array} sys_id or '' if not found
+     */
+
+    resolveAccountSysId: function(accountMdmId) {
+        // Prefer MDM ID
+        if (accountMdmId) {
+            var accounts = [];
+            var grByMdm = new GlideRecord('customer_account');
+            grByMdm.addEncodedQuery('u_mdm_id=' + accountMdmId + '^ORu_ucm_id=' + accountMdmId);
+            grByMdm.query();
+            while (grByMdm.next()) {
+                accounts.push(grByMdm.getUniqueValue());
+            }
+            return accounts;
+        } else {
+            return '';
+        }
+    },
+
+    resolveContactSysId: function(contactMdmId) {
+        // Prefer MDM ID
+        if (contactMdmId) {
+            var grByMdm = new GlideRecord('customer_contact');
+            grByMdm.addQuery('u_ucm_id', contactMdmId);
+            grByMdm.setLimit(1);
+            grByMdm.query();
+            if (grByMdm.next()) {
+                return grByMdm.getUniqueValue();
+            }
+        }
+
+        return '';
+    },
+
+
+    insertCustomerPermission: function(accountSysIds, contactSysId) {
+        var newIds = [];
+        accountSysIds.forEach(function(accountSysId) {
+            var permGA = new GlideAggregate('u_customer_permission');
+            permGA.addEncodedQuery('u_contact=' + contactSysId + '^u_account=' + accountSysId);
+            permGA.addAggregate('COUNT');
+            permGA.query();
+            if (permGA.next() && permGA.getAggregate('COUNT') > 0) {
+                //do nothing;
+            } else {
+                for (var i = 0; i < 2; i++) {
+                    var permGR = new GlideRecord('u_customer_permission');
+                    permGR.initialize();
+                    permGR.setValue('u_account', accountSysId);
+                    permGR.setValue('u_contact', contactSysId);
+                    if (i == 1) {
+                        permGR.setValue('u_module', 'ticket');
+                        permGR.setValue('u_permission', 'manage');
+                    }
+                    newIds.push(permGR.insert());
+                }
+
+            }
+        });
+
+        this._removePermissions(contactSysId, accountSysIds);
+
+        if (newIds.length == 0) newIds = '';
+        return newIds;
+    },
+
+    //Remove Permissions accounts that are not listed in payload anymore
+    _removePermissions: function(contactSysId, accountSysIds) {
+        var grp = new GlideRecord('u_customer_permission');
+        grp.addEncodedQuery('u_contact=' + contactSysId + '^u_accountNOT IN' + accountSysIds);
+        grp.query();
+        grp.deleteMultiple();
+    },
+
+    permissionExists: function(accountSysIds, contactSysId) {
+        var permGA = new GlideAggregate('u_customer_permission');
+        permGA.addEncodedQuery('u_contact=' + contactSysId + '^u_accountIN' + accountSysIds.join(','));
+        permGA.addAggregate('COUNT');
+        permGA.query();
+        return permGA.next() && permGA.getAggregate('COUNT') == accountSysIds.length;
+    },
+
+
+    type: 'EQIX_AccountContact_Util'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>organize.gabriel</sys_created_by>
+        <sys_created_on>2018-02-08 23:53:53</sys_created_on>
+        <sys_id>203d7ce7db4c5300448b01a3ca9619cd</sys_id>
+        <sys_mod_count>45</sys_mod_count>
+        <sys_name>EQIX_AccountContact_Util</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_203d7ce7db4c5300448b01a3ca9619cd</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:12</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137bdb450000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_203d7ce7db4c5300448b01a3ca9619cd</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:12</sys_created_on>
+        <sys_id>9f07285987b5c7904d820e96cebb35f4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:12</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>203d7ce7db4c5300448b01a3ca9619cd</id>
+        <sys_created_by>syahmad@equinix.com</sys_created_by>
+        <sys_created_on>2024-10-31 10:58:26</sys_created_on>
+        <sys_id>8e969786dba99a90f850633fd39619b5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-10-31 10:58:26</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>false</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

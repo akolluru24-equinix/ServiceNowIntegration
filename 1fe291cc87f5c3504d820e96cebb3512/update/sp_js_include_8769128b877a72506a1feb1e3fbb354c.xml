@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_js_include">
+    <sp_js_include action="INSERT_OR_UPDATE">
+        <display_name>Amplitude</display_name>
+        <source>local</source>
+        <sys_class_name>sp_js_include</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-06 04:46:01</sys_created_on>
+        <sys_id>8769128b877a72506a1feb1e3fbb354c</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Amplitude</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_ui_script display_value="Amplitude">a2a85687877a72506a1feb1e3fbb35df</sys_ui_script>
+        <sys_update_name>sp_js_include_8769128b877a72506a1feb1e3fbb354c</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:32</sys_updated_on>
+        <url/>
+    </sp_js_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a55840000001</claim_timestamp>
+        <metadata_update_name>sp_js_include_8769128b877a72506a1feb1e3fbb354c</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:32</sys_created_on>
+        <sys_id>8fa6209587b5c7904d820e96cebb3508</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:32</sys_updated_on>
+    </sys_claim>
+</record_update>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_documentation element="account_parent" label="Parent Account" language="en" table="customer_account">
+        <sys_documentation action="INSERT_OR_UPDATE">
+            <element>account_parent</element>
+            <help/>
+            <hint>If Legal account is related parentMdmId from MDM3.0, or &#8232;&#8232;If billing ultimateSalesAccountLegacySourceId from MDM2.0 (Billing accounts)&#8232;&#8232;</hint>
+            <label>Parent Account</label>
+            <language>en</language>
+            <name>customer_account</name>
+            <plural>Parent Accounts</plural>
+            <sys_class_name>sys_documentation</sys_class_name>
+            <sys_created_by>system</sys_created_by>
+            <sys_created_on>2017-11-14 17:10:52</sys_created_on>
+            <sys_mod_count>3</sys_mod_count>
+            <sys_name>Parent Account</sys_name>
+            <sys_package display_value="Customer Service Base Entities" source="com.snc.cs_base">e6d8e4f34f5e8300f5e08e1f0210c73f</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+            <sys_update_name>sys_documentation_customer_account_account_parent_en</sys_update_name>
+            <sys_updated_by>oneto@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-06-29 12:57:50</sys_updated_on>
+            <url/>
+            <url_target/>
+        </sys_documentation>
+    </sys_documentation>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f13751f470000001</claim_timestamp>
+        <metadata_update_name>sys_documentation_customer_account_account_parent_en</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:50</sys_created_on>
+        <sys_id>2b55ec998775c7904d820e96cebb355f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:50</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f13751f460000001</claim_timestamp>
+        <metadata_update_name>sys_documentation_customer_account_account_parent_en</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.cs_base</previous_claim_name>
+        <previous_claim_scope>com.snc.cs_base</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:50</sys_created_on>
+        <sys_id>6f55ec998775c7904d820e96cebb355f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:50</sys_updated_on>
+    </sys_claim>
+</record_update>

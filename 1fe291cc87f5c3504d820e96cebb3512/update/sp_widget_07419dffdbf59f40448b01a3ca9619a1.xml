@@ -1,0 +1,2787 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>standard</category>
+        <client_script><![CDATA[function($scope, $rootScope, $timeout, $location, spModal, spUtil, $window, $interval) {
+    var c = this;
+    c.modalStep = 1;
+    c.p1ticket = 0;
+    c.category = null;
+    c.submited = false;
+    c.hasSubmited = false;
+    c.disableSubmit = false
+    c.forceDisableNextButton = false;
+
+    c.serviceSupportType = 'Basic';
+    c.ticketOptionsStep = 1;
+    c.ticket = {};
+    c.showEstimativeMessage = true;
+    c.showEditStep = false;
+    $scope.data.notSureForm = false;
+    $scope.loading = false;
+    c.selectedProductIsMDR = c.data.selectedProductIsMDR;
+    $scope.variables = false;
+    //----------------
+
+
+    if ($scope.data.autofill) {
+        $scope.loading = true;
+        c.modalStep = 3; // jump to form step
+    }
+
+    c.selectType = function(item) {
+        if (item.sys_id == $scope.data.request_category_sys_id) { // Request category
+            c.selectedType = 'request';
+            c.ticketOptionsStep = 1;
+			$scope.troubleTicketInfo.visible = false;
+        } else { // trouble
+            c.selectedType = 'incident';
+			$scope.troubleTicketInfo.visible = true;
+        }
+        // reset
+        c.ticket.urgency = null;
+        c.ticket.impact = null;
+        c.getCategories();
+		EQIX.notifyApply($scope);
+    };
+
+    c.selectImpact = function() {
+        c.ticket.urgency = "";
+        if (c.ticket.impact == '1')
+            c.p1ticket = 1;
+        else
+            c.p1ticket = 0;
+        c.ticketOptionsStep = 3;
+    };
+
+    c.selectUrgency = function() {
+        c.ticket.impact = "";
+    };
+
+    $('#createTicketModal').on('hide.bs.modal', function() {
+        $scope.$emit("createTicketModalClosed", { ticketCreated: c.modalStep == 5});
+        c.resetModal();
+    });
+
+    c.selectCategory = function(category) {
+        c.category = category;
+        $scope.data.notSureForm = false;
+    };
+    c.selectNotSure = function() {
+        c.category = null;
+        $scope.data.notSureForm = true;
+    };
+
+    $scope.triggerOnSubmit = function() {
+        $("#amount").hide();
+        if (c.receiveEstimative == false || c.serviceSupportType == 'Basic' || c.serviceSupportType == '') {
+            $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_estimate_requested'].value = "no";
+        }
+
+
+        /*	else if(c.data.country == 'NL' && (c.receiveEstimative == true  || c.receiveEstimative == false || c.receiveEstimative == null || c.receiveEstimative == '' || c.serviceSupportType == 'Basic' || c.serviceSupportType == 'Additional')){
+        	$scope.data.catalogItemWidget.data.sc_cat_item._fields['u_estimate_requested'].value = "yes";
+        } */
+
+        // Edit Component Step
+        $scope.$broadcast('updateHosts');
+
+        if ($scope.data.notSureForm == false)
+            var serviceValue = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].value;
+
+        //
+
+        // 		$scope.track('select ticket service', {
+        //                 'flow': 'submit support ticket',
+        //                 'step': 'form',
+        // 				'service': $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].value
+        //             });
+
+        c.submited = true;
+        $scope.$broadcast('submitTicket');
+    };
+
+	$scope.troubleTicketInfo = {	
+		dismissible: false,
+		visible: false,
+		type:'info',
+		showIcon: true,
+		events: {
+			'request-close': function() {
+				$scope.server.get({
+					action: 'closeBanner'
+				}).then(function(resp) {
+					$scope.data.bannerSession = resp.data.bannerSession;
+				})
+			},
+		}
+	};
+
+
+
+    c.resetModal = function() {
+        //Added to fix INC3692433
+        /*	$scope.track('User clicks on the Create New Ticket button on the Tickets Wizard confirmation step', {
+        	'Event': 'start support ticket wizard',
+        	'source': 'confirmation step'
+        })*/
+		$scope.troubleTicketInfo.visible = false;
+        c.server.refresh().then(function() {
+            $scope.track('start support ticket wizard', {
+                'source': 'confirmation step'
+            });
+            // reset the variables for re-submission
+            c.modalStep = 1;
+            c.p1ticket = 0;
+            c.submited = false;
+            c.hasSubmited = false;
+            c.disableSubmit = false
+            c.forceDisableNextButton = false;
+
+            c.serviceSupportType = 'Basic';
+            c.ticketOptionsStep = 1;
+            c.category = null;
+            c.ticket = {};
+            c.ticketFields = {};
+            c.showEstimativeMessage = true;
+            c.showEditStep = false;
+            $scope.selectedItem = null;
+            $scope.data.notSureForm = false;
+            $scope.data.categories = {};
+            $scope.data.items = {};
+        });
+
+
+    };
+
+    c.cloneTicket = function() {
+        c.submited = false;
+        c.hasSubmited = false;
+        c.disableSubmit = false
+        c.forceDisableNextButton = false;
+
+        c.showEstimativeMessage = true;
+        c.showEditStep = false;
+        $scope.track('clone ticket', {
+            'source': 'confirmation step'
+        })
+
+        if ($scope.data.notSureForm) {
+            c.notSure();
+        } else {
+            c.openItem($scope.selectedItem);
+            c.moveToNext();
+        }
+    };
+
+    c.nextText = function() {
+        if (c.modalStep < 3) {
+            return '${Next}';
+        } else {
+            if (c.serviceSupportType == 'Additional' && !$scope.loadingData && c.showNextButton()) {
+                return '${Next}';
+            }
+        }
+        return '${Submit}';
+    };
+
+    c.moveToNextDisabled = function() {
+        if (c.modalStep == 1) {
+            if (!c.selectedType) {
+                return true;
+            }
+            if (!c.ticket.impact && !c.ticket.urgency) {
+                return true;
+            }
+
+            if (c.selectedType == 'incident' && !c.category && !$scope.data.notSureForm) {
+                return true;
+            }
+        }
+        if (c.modalStep == 2 && !$scope.selectedItem) {
+            return true;
+        }
+		if ((c.modalStep == 3) && (c.submited || c.disableNextButton())) {
+			return true;
+        }
+		if(c.modalStep == 4 && ((c.receiveEstimative == null || (c.receiveEstimative == false && c.userAgreement == false)) || c.submited)){
+			return true;
+		}
+        return false;
+    };
+
+    c.btnNextIsVisible = function() {
+        return ((c.serviceSupportType == 'Basic' || !c.serviceSupportType || c.modalStep == 4 && !c.onEdit) && !$scope.loadingData && c.modalStep != 6) || (c.serviceSupportType == 'Additional' && !$scope.loadingData && c.showNextButton());
+    }
+
+    c.moveToNext = function() {
+        switch (c.modalStep) {
+            case 1:
+                if (c.selectedType == 'request') {
+                    c.modalStep = 2;
+                    $scope.loadGrid(c.category);
+                } else if (c.selectedType == 'incident') {
+                    if (c.category) {
+                        c.modalStep = 2;
+                        // selected a category
+                        $scope.loadGrid(c.category);
+                    } else {
+                        if ($(".form-widget").children()[0])
+                            $(".form-widget").children()[0].remove();
+                        $scope.selectedItem = null;
+                        $scope.loading = true;
+                        $scope.data.notSureForm = true;
+                        $scope.data.catalogItemWidget = false;
+                        $scope.server.get({
+                            action: "loadNotSureForm",
+                            type: c.ticket.type,
+                            impact: c.ticket.impact,
+                            urgency: c.ticket.urgency
+                        }).then(function(response) {
+                            $scope.data.catalogItemWidget = response.data.catalogItemWidget;
+                            c.modalStep = 3;
+                            $scope.loading = false;
+                        });
+                    }
+                }
+                break;
+            case 2:
+            case 5:
+                if ($scope.selectedItem.isAvailable) {
+                    c.selectedProduct = $scope.selectedItem.name;
+                    $scope.loading = true;
+                    $scope.data.catalogItemWidget = false;
+                    if ($(".form-widget").children()[0])
+                        $(".form-widget").children()[0].remove();
+                    $scope.server.get({
+                        action: "loadForm",
+                        catalog_item_sys_id: $scope.selectedItem.sys_id,
+                        type: c.ticket.type,
+                        category_sys_id: $scope.selectedItem.category.sys_id,
+                        isAvailable: $scope.selectedItem.isAvailable,
+                        product_name: $scope.selectedItem.name,
+                        impact: c.ticket.impact,
+                        urgency: c.ticket.urgency
+                    }).then(function(response) {
+                        c.selectedProductIsMDR = response.data.selectedProductIsMDR;
+
+                        // Check if the disaster is already declared
+                        if (response.data.disasterDeclared) {
+                            c.modalStep = 6;
+                            $scope.loading = false;
+                        } else {
+                            if ($scope.data.notSureForm == false) {
+                                $scope.variables = true;
+                                $scope.track('step - submit support ticket - form', {
+                                    'flow': 'submit support ticket'
+                                });
+                            }
+                            $scope.data.catalogItemWidget = response.data.catalogItemWidget;
+                            c.modalStep = 3;
+                        }
+                    });
+                } else {
+                    c.modalStep = 3;
+                    $scope.data.catalogItemWidget = true;
+                }
+                break;
+            case 3: // form page
+            case 4: // additional support confirm page
+                if (c.serviceSupportType == 'Additional' && !$scope.loadingData && c.showNextButton()) {
+                    c.showWidget();
+                } else {
+                    $scope.triggerOnSubmit();
+                    $scope.trackSubmit(c.modalStep);
+                }
+
+                break;
+        }
+    };
+
+    c.openItem = function(item) {
+        $scope.track('select ticket product category', {
+            'flow': 'submit support ticket',
+            'step': 'product category'
+        });
+
+        if ($(".form-widget").children()[0]) {
+            if (!$($(".form-widget").children()[0]).hasClass("unavailable-product"))
+                $(".form-widget").children()[0].remove();
+        }
+        $scope.selectedItem = item;
+
+    };
+
+    c.notSure = function() {
+        if ($(".form-widget").children()[0])
+            $(".form-widget").children()[0].remove();
+        $scope.selectedItem = null;
+        $scope.loading = true;
+        $scope.data.notSureForm = true;
+        $scope.data.catalogItemWidget = false;
+        $scope.server.get({
+            action: "loadNotSureForm",
+            type: c.ticket.type,
+            impact: c.ticket.impact,
+            urgency: c.ticket.urgency
+        }).then(function(response) {
+            $scope.data.catalogItemWidget = response.data.catalogItemWidget;
+            c.modalStep = 3;
+            $scope.loading = false;
+        });
+    };
+
+
+    c.back = function() {
+        // console.log('c.back', c.modalStep, c.showEditStep);
+        if (c.modalStep == 6) {
+            c.modalStep = 3;
+        } else if (c.showEditStep == true) {
+            if (c.modalStep >= 4 && c.onEdit == false) {
+                c.onEdit = true;
+                return;
+            } else {
+                c.modalStep = c.modalStep - 1;
+                if (c.modalStep == 2) {
+                    c.serviceSupportType = 'Basic';
+                    $scope.loadGrid(c.category);
+                }
+                return;
+            }
+        } else if (!$scope.data.autofill) {
+            c.modalStep = c.modalStep - 1;
+            if (c.modalStep == 2) {
+                c.serviceSupportType = 'Basic';
+                $scope.loadGrid(c.category);
+            }
+            if (c.modalStep == 1 && c.ticket.urgency) {
+                // request
+                c.category = null;
+            }
+
+            return;
+        } else if ($scope.data.showOnlyFormPage) {
+            c.modalStep = 3;
+        } else {
+            c.data.reload = true;
+            c.data.action = null;
+            $scope.loading = true;
+            c.server.update().then(function() {
+                c.modalStep = 1;
+                $scope.loading = false;
+            });
+        }
+
+    };
+
+    $scope.$watch(function() {
+        return c.modalStep
+    }, function(newValue, oldValue) {
+        if (c.modalStep != 3 && c.modalStep != 4) {
+            return;
+        }
+
+        var interval = setInterval(function() {
+            if ($("#createTicketModal #sp_formfield_description").length > 0) {
+                clearInterval(interval);
+                $("#createTicketModal #sp_formfield_short_description").attr('maxlength', '70');
+                $("#createTicketModal #sp_formfield_description").removeClass('form-control');
+                $("#createTicketModal #sp_formfield_description")[0].style.setProperty('height', 'auto', 'important');
+                $("#createTicketModal #sp_formfield_description").off('keydown').on('keyup', function() {
+                    var scrollHeight = $(this).prop('scrollHeight');
+                    var height = $("#createTicketModal #sp_formfield_description").outerHeight();
+                    if (scrollHeight < 100) {
+                        scrollHeight = 100;
+                    }
+                    if (scrollHeight == height)
+                        return;
+                    //this.style.setProperty('height', scrollHeight+'px', 'important');
+                    $(this).attr('style', 'height: ' + (scrollHeight + 2) + 'px !important');
+                })
+            }
+        }, 500)
+
+    })
+
+    c.getCategories = function() {
+        if (!$scope.data.categories)
+            $scope.data.categories = {};
+
+        if (!$scope.data.items)
+            $scope.data.items = {};
+
+        if (!$scope.data.categories[c.ticket.type]) { // persist categories loaded before
+            $scope.loading = true;
+            $scope.server.get({
+                action: "getCategoriesAndItems",
+                ticket: c.ticket
+            }).then(function(response) {
+                $scope.data.categories[c.ticket.type] = response.data.categories;
+                $scope.data.items[c.ticket.type] = response.data.items;
+                $scope.loading = false;
+                // Show Urgency selection
+                c.ticketOptionsStep = 2;
+            });
+
+        } else {
+            // Show Urgency selection
+            c.ticketOptionsStep = 2;
+        }
+
+
+    };
+
+    $scope.loadGrid = function(category) {
+        $timeout(function() {
+            if (c.$grid) {
+                c.$grid.isotope("reloadItems");
+            } else {
+                c.$grid = $('.catalog-items__row').isotope({
+                    itemSelector: '.catalog-items__item',
+                    layoutMode: 'fitRows'
+                });
+            }
+            if (category) {
+                $scope.applyFilter(category);
+            } else {
+                $scope.applyFilter('');
+            }
+
+        }, 200);
+    };
+
+    $scope.keywordFilter = function(filter) {
+        if (filter) {
+            $scope.applyFilter('');
+            var filterVal = new RegExp(filter, 'gi');
+            c.$grid.isotope({
+                filter: function() {
+                    var $this = $(this);
+                    var searchResult = filterVal ? $this.html().match(filterVal) : true;
+                    return searchResult;
+                }
+            });
+        }
+    };
+
+    $scope.applyFilter = function(filter) {
+        // console.log('applyFilter', filter)
+        c.category = filter;
+
+        if (!filter) {
+            c.$grid.isotope({
+                filter: ''
+            });
+        } else {
+            c.$grid.isotope({
+                filter: '.' + filter
+            });
+        }
+    };
+
+    $scope.$on('evt-clone-ticket', function(e, data) {
+        if (data.type === '0') {
+            c.selectedType = 'request';
+            c.ticketOptionsStep = 1;
+            c.ticket.type = c.data.requestCategory;
+            c.ticket.urgency = data.urgency;
+			$scope.troubleTicketInfo.visible = false;	
+        } else if (data.type === '1') {
+            c.selectedType = 'incident';
+            c.ticket.type = c.data.incidentCategory;
+            c.ticket.impact = data.urgency;		
+			$scope.troubleTicketInfo.visible = true;	
+        }
+        c.getCategories();
+        var cb = function() {
+            if (data.type === '0') {
+                // Service Request
+                c.selectUrgency();
+            } else if (data.type === '1') {
+                // Trouble
+                c.selectImpact();
+            }
+
+            if (data.u_product_line) {
+
+                var theItem = null;
+                for (var i in $scope.data.items) {
+                    for (var j in $scope.data.items[i]) {
+                        if ($scope.data.items[i][j].sys_id === data.u_product_line) {
+                            theItem = $scope.data.items[i][j]
+                        }
+                    }
+                }
+                if (theItem) {
+                    // find product line
+                    c.category = theItem.category.sys_id;
+                    c.modalStep = 2;
+                    c.openItem(theItem);
+                    c.moveToNext();
+                } else {
+                    c.notSure();
+                }
+            } else {
+                c.notSure();
+            }
+        }
+        var stop = $interval(function() {
+            if (!$scope.loading) {
+                $interval.cancel(stop);
+                cb();
+                $timeout(function() {
+                    $('#createTicketModal').modal('show');
+                }, 1000);
+            }
+        }, 200);
+    });
+
+    $scope.$on("ticketSubmited", function() {
+        c.submited = false;
+        c.modalStep = 5;
+        c.serviceSupportType = 'Basic';
+        c.hasSubmited = true;
+        $scope.$emit('ticketSubmitedUpdateList');
+
+        $timeout(function() {
+            $scope.cfmScript = $scope.data.cfmScript;
+            var script = document.createElement("script");
+            script.innerHTML = $scope.cfmScript;
+            var theScript = document.getElementById('msp-case-submission-qualtrics').querySelector("script");
+
+            if (theScript) {
+                $("#msp-case-submission-qualtrics #pageName").nextAll().remove();
+                if (QSI && QSI.API) {
+                    QSI.API.unload();
+                    QSI.API.load();
+                    QSI.API.run();
+                }
+                return;
+            }
+            document.getElementById('msp-case-submission-qualtrics').appendChild(script);
+        })
+
+    });
+
+    if ($location.search().action && $location.search().action == 'new') {
+        $('#createTicketModal').modal("show");
+    }
+
+
+    $scope.$on("stopLoading", function() {
+        $scope.loading = false;
+    });
+
+    $scope.$on("setAddOnsSelection", function() {
+        $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_add_ons_selection'].value = $rootScope.addOnsSelection;
+    });
+
+
+    c.showWidget = function() {
+        if (c.showEditStep == true && c.modalStep == 3) {
+            c.onEdit = true;
+        }
+        if (c.showEditStep == true && c.modalStep == 4 && c.onEdit == true) {
+            var serviceValue = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].value;
+
+            if ($scope.data.removeAddOnID.indexOf(serviceValue) != -1) { // Remove Add-Ons
+                $scope.$broadcast('getAddOnsToRemove');
+            } else if ($scope.data.addOnSetupID.indexOf(serviceValue) != -1) { // Add Add-On
+                $scope.$broadcast('getAddOnsToAdd');
+            } else if ($scope.data.componentWithAddOnID.indexOf(serviceValue) != -1) {
+                $scope.$broadcast('getAddOnsToAdd');
+            }
+
+            c.onEdit = false;
+        }
+
+        if (c.showEditStep == true && c.onEdit == true && c.modalStep == 3) {
+            c.showEditComponentsStep();
+        } else {
+            c.showPremierSupportStep();
+        }
+    }
+
+    c.showPremierSupportStep = function() {
+        // console.log('=== showPremierSupportStep');
+        c.modalStep = 4;
+        $scope.getSupportHoursInfo();
+        var service = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].displayValue;
+        var serviceValue = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].value;
+
+        if ($scope.data.reassociationIDs.indexOf(serviceValue) != -1) {
+            c.ticketFields = [{
+                    "label": "${Service/Product}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].displayValue
+                },
+                {
+                    "label": "${Source Device}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['source_device'].displayValue
+                },
+                {
+                    "label": "${Target Device}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['target_device'].displayValue
+                },
+                {
+                    "label": "${Subject}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['short_description'].displayValue
+                },
+                {
+                    "label": "${Description}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['description'].displayValue
+                }
+            ];
+        } else if ($scope.data.reassociationAddOnServiceID.indexOf(serviceValue) != -1) {
+            c.ticketFields = [{
+                    "label": "${Service/Product}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].displayValue
+                },
+                {
+                    "label": "${Source Device}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['source_device'].displayValue
+                },
+                {
+                    "label": "${Target Device}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['target_device'].displayValue
+                },
+                {
+                    "label": "Add-ons",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_add_ons'].displayValue
+                },
+                {
+                    "label": "${Subject}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['short_description'].displayValue
+                },
+                {
+                    "label": "${Description}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['description'].displayValue
+                }
+            ];
+        } else {
+            c.ticketFields = [{
+                    "label": "${Service/Product}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].displayValue
+                },
+                {
+                    "label": "${Server, Apliance or Link}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['cmdb_ci'].displayValue
+                },
+                {
+                    "label": "${Subject}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['short_description'].displayValue
+                },
+                {
+                    "label": "${Description}",
+                    "value": $scope.data.catalogItemWidget.data.sc_cat_item._fields['description'].displayValue
+                }
+            ];
+
+
+        }
+
+        $scope.agreementText = "<small><p>${MS Premier Support terms and conditions}</p></small>"
+
+        if (!c.data.isMasterAdmin && !c.data.isMSAdmin && !c.data.premierSupportPermission) {
+            c.receiveEstimative = true;
+        } else
+            c.receiveEstimative = null;
+        c.agreeToTerms = false;
+        c.userAgreement = false;
+    };
+
+    c.showEditComponentsStep = function() {
+        // console.log('=== showEditComponentsStep');
+        c.receiveEstimative = null;
+        c.modalStep = 4;
+        $scope.getEditComponentsWidget();
+    }
+
+    c.showNextButton = function() {
+        if (c.showEditStep == true && c.modalStep >= 3) {
+            if (c.modalStep == 3) {
+                return true;
+            } else if (c.modalStep == 4) {
+                if (c.onEdit == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            if (c.modalStep == 3) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    $scope.$on("disableNextButton", function(evt, arg) {
+        c.disableNextButtonFlag = arg;
+        c.disableNextButton();
+    });
+
+    c.disableNextButton = function() {
+        if (c.showEditStep == true && c.modalStep >= 3) {
+            if (c.modalStep == 3) {
+                return c.hasMandatory;
+            } else {
+                if (c.disableNextButtonFlag == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+        } else {
+            return c.hasMandatory;
+        }
+    }
+
+    c.disableCreateTicketButton = function() {
+        if ((c.modalStep == 4 && c.showEditStep == true) || (c.modalStep == 4 && c.isReassociation == true)) {
+            if (!c.userAgreement) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return c.showEstimativeMessage == true && (c.modalStep < 3 || ($scope.selectedItem && $scope.selectedItem.isAvailable == false) || (c.modalStep == 4 && c.receiveEstimative == null) || (c.modalStep == 4 && c.receiveEstimative == false && !c.userAgreement) || (c.modalStep == 3 && c.hasMandatory)) || c.disableSubmit;
+        }
+    }
+
+    c.showBackButton = function() {
+        if (c.showEditStep) {
+            if ($scope.data.autofill && c.modalStep == 3) {
+                return false;
+            } else {
+                return true;
+            }
+
+        } else if ($scope.data.showOnlyFormPage && c.modalStep == 3) {
+            return false;
+        } else {
+            return c.modalStep > 1;
+        }
+    }
+
+    $scope.selectedComponents = [];
+    //Start/Stop Managed Components
+    $scope.$on("eqix.resourceGroupDetails", function(evt, arg) {
+        $scope.selectedComponents = arg;
+    });
+
+    //When mandatory fields are not filled, disable Create Ticket/Next Step buttons
+    $scope.$on("hasMandatory", function(evt, arg) {
+        c.hasMandatory = arg;
+    });
+
+    //When service support type is additional, switch Create Ticket button for Next Step Button
+    $scope.$on("serviceSupportType", function(evt, arg) {
+        c.serviceSupportType = arg;
+        $scope.loadingData = false;
+    });
+
+    //Loading service type, switch button Create Ticket/Next Step for Loading indicator
+    $scope.$on("loading", function() {
+        $scope.loadingData = true;
+    });
+
+    $scope.$on("stopLoading", function() {
+        $scope.loadingData = false;
+    })
+
+    $scope.$watch("data.catalogItemWidget.data.sc_cat_item._fields.u_service.value", function() {
+        var serviceValue = $scope.data.catalogItemWidget.data.sc_cat_item._fields.u_service.value;
+
+        // MPE 284 - [Relax CI] - Uninstall Component 1:N
+        if ($scope.data.deleteComponentesIDs.indexOf(serviceValue) > -1) {
+            c.isDelComp = true;
+        } else {
+            c.isDelComp = false;
+        }
+
+        if ($scope.data.reassociationIDs.indexOf(serviceValue) > -1 || $scope.data.reassociationAddOnServiceID.indexOf(serviceValue) > -1) {
+            c.isReassociation = true;
+        } else {
+            c.isReassociation = false;
+        }
+
+        if ($scope.data.reassociationIDs.indexOf(serviceValue) > -1) {
+            c.showEstimativeMessage = false;
+            c.showEditStep = false;
+        } else if ($scope.data.addComponentesIDs.indexOf(serviceValue) > -1) {
+            c.showEstimativeMessage = false;
+            c.showEditStep = true;
+        } else if ($scope.data.removeAddOnID.indexOf(serviceValue) > -1) {
+            c.showEstimativeMessage = false;
+            c.showEditStep = true;
+        } else if ($scope.data.addOnSetupID.indexOf(serviceValue) > -1) {
+            c.showEstimativeMessage = false;
+            c.showEditStep = true;
+        } else if (c.isDelComp) {
+            //MPE 284 - [Relax CI] - Uninstall Component 1:N
+            c.showEstimativeMessage = false;
+            c.showEditStep = false;
+        } else if ($scope.data.newManagementIDs.indexOf(serviceValue) > -1) {
+            //NP-463 - [Cloud Management]
+            c.showEstimativeMessage = false;
+            c.showEditStep = false;
+
+        } else if ($scope.data.reassociationAddOnServiceID.indexOf(serviceValue) > -1) {
+            c.showEstimativeMessage = false;
+            c.showEditStep = false;
+        } else {
+            c.showEstimativeMessage = true;
+            c.showEditStep = false;
+        }
+
+        c.onEdit = false;
+
+        // MSP-42-hide the field if not resseler account contact 
+        //populates hidden catalog variable used on UI police condition
+        // console.log("DEBUG 02");
+        // console.log($scope.data.catalogItemWidget.data.sc_cat_item._fields['ticket_for_sub_account']);
+        //  $scope.data.catalogItemWidget.data.sc_cat_item._fields['ticket_for_sub_account'].isVisible = false; 
+        if ($scope.data.isResellerContact == true) {
+            $scope.data.catalogItemWidget.data.sc_cat_item._fields['is_reseller_contact'].value = true;
+        } else {
+            $scope.data.catalogItemWidget.data.sc_cat_item._fields['is_reseller_contact'].value = false;
+        }
+
+    });
+
+    //CMDB CI
+    $scope.$watch("data.catalogItemWidget.data.sc_cat_item._fields.cmdb_ci.value", function() {
+        console.log('VALOR SERVICE: ' + $scope.data.catalogItemWidget.data.sc_cat_item._fields.cmdb_ci.value);
+        if ($scope.data.catalogItemWidget.data.sc_cat_item._fields.cmdb_ci.value.length > 2) {
+            $scope.track('select ticket CI', {
+                'flow': 'submit support ticket',
+                'step': 'form'
+            });
+        }
+    });
+
+    //SERVICE
+    $scope.$watch("data.catalogItemWidget.data.sc_cat_item._fields.u_service.displayValue", function() {
+        if ($scope.data.catalogItemWidget.data.sc_cat_item._fields.u_service.displayValue.length > 2) {
+            $scope.track('select ticket service', {
+                'flow': 'submit support ticket',
+                'step': 'form',
+                'service': $scope.data.catalogItemWidget.data.sc_cat_item._fields.u_service.displayValue
+            });
+        }
+    });
+
+
+    // get/update avaliable support hours widget
+    $scope.getSupportHoursInfo = function() {
+        var service = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].value;
+        $scope.server.get({
+            action: "getSupportHours",
+            cmdb_ci: $scope.data.catalogItemWidget.data.sc_cat_item._fields['cmdb_ci'].value,
+            service: service
+        }).then(function(response) {
+            $scope.data.premierSupportHoursWidget = response.data.premierSupportHoursWidget;
+            $scope.data.hasSupportPlan = response.data.hasSupportPlan;
+            $scope.data.selectAddOnsSummaryWidget = response.data.selectAddOnsSummaryWidget;
+        });
+
+    };
+
+    // get edit components widget
+    $scope.getEditComponentsWidget = function() {
+        var service = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_service'].value;
+        var product = $scope.data.catalogItemWidget.data.sc_cat_item._fields['u_product_line'].value;
+        var selectedHosts = $scope.data.catalogItemWidget.data.sc_cat_item._fields['hosts_assigned'].value;
+
+        $scope.server.get({
+            action: "getEditComponents",
+            host_list: selectedHosts,
+            service: service,
+            product: product
+        }).then(function(response) {
+            $scope.data.editComponentsWidget = response.data.editComponentsWidget;
+            $scope.data.selectAddOnsWidget = response.data.selectAddOnsWidget;
+        });
+    };
+
+    //Disable Submit Button
+    $scope.$on("catalog.disableSubmitButton", function(e, toggle) {
+        if (toggle != null) {
+            c.submited = toggle;
+            c.disableSubmit = toggle
+        }
+    });
+
+
+    $scope.getDisplayValue = function(value) {
+        //console.log('VALUE IMPACT: ' + value);
+        if (value == c.data.incidentCategory) { //I have an issue
+            $scope.track('select ticket type', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'type': 'trouble'
+            });
+        } else if (value == c.data.requestCategory) { //I need to request something
+            $scope.track('select ticket type', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'type': 'request'
+            });
+        }
+
+    }
+
+    $scope.trackImpact = function(value) {
+        if (value == 1) { //Impact High : 1
+            $scope.track('select ticket impact', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'impact': 'high'
+            });
+        } else if (value == 2) { //Impact Medium : 2
+            $scope.track('select ticket impact', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'impact': 'medium'
+            });
+        } else if (value == 3) { //Impact Low : 3
+            $scope.track('select ticket impact', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'impact': 'low'
+            });
+        }
+    }
+
+    $scope.trackUrgency = function(value) {
+        if (value == 1) { //Impact High : 1
+            $scope.track('select ticket impact', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'impact': 'high'
+            });
+            //Category All Items
+            $scope.track('select ticket product category', {
+                'flow': 'submit support ticket',
+                'step': 'product category'
+            });
+        } else if (value == 2) { //Impact Medium : 2
+            $scope.track('select ticket impact', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'impact': 'medium'
+            });
+            //Category All Items
+            $scope.track('select ticket product category', {
+                'flow': 'submit support ticket',
+                'step': 'product category'
+            });
+        } else if (value == 3) { //Impact Low : 3
+            $scope.track('select ticket impact', {
+                'flow': 'submit support ticket',
+                'step': 'type',
+                'impact': 'low'
+            });
+            //Category All Items
+            $scope.track('select ticket product category', {
+                'flow': 'submit support ticket',
+                'step': 'product category'
+            });
+        }
+    }
+
+    //Cancel type Modal
+    $scope.trackTypeModal = function(value) {
+        if (value == 1) { //Modal : 1
+            $scope.track('cancel support ticket wizard', {
+                'flow': 'submit support ticket',
+                'step': 'type'
+            });
+        } else if (value == 2) { //Modal : 2
+            $scope.track('cancel support ticket wizard', {
+                'flow': 'submit support ticket',
+                'step': 'product category'
+            });
+        } else if (value == 3 && $scope.variables == true) { //Modal : 4
+            $scope.track('cancel support ticket wizard', {
+                'flow': 'submit support ticket',
+                'step': 'form'
+            });
+        } else if (value == 3 && $scope.variables == false) { //Modal : 3
+            $scope.track('cancel support ticket wizard', {
+                'flow': 'submit support ticket',
+                'step': 'simple form'
+            });
+        }
+    }
+
+    //Submit type Modal
+    $scope.trackSubmit = function(value) {
+        if (value == 3 && $scope.variables == false) { //Modal : 3
+            $scope.track('submit support ticket', {
+                'flow': 'submit support ticket',
+                'step': 'simple form'
+            });
+        } else if (value == 3 && $scope.variables == true) { //Modal : 4
+            $scope.track('submit support ticket', {
+                'flow': 'submit support ticket',
+                'step': 'form'
+            });
+        }
+    }
+
+    $scope.trackNotSure = function() {
+        $scope.$emit("formNotSure");
+        $scope.track('go to simple form', {
+            'flow': 'submit support ticket',
+            'step': 'type',
+            'source': 'family list'
+        });
+        $scope.track('step - submit support ticket - simple form', {
+            'flow': 'submit support ticket',
+            'step': 'type',
+            'source': 'wizard'
+        });
+
+
+
+    }
+
+    //Tracking functions
+    $scope.track = function(event, properties) {
+        properties.category = 'customer support';
+        createTracking(event, properties, c.data.trackingEnabled, c.data.categoriesTrackingEnabled);
+    }
+
+    var hosturl = 'https://' + $window.location.host;
+
+    $scope.openLink = function() {
+        $window.location.href = hosturl + "/msp?id=msp_track_order_modify";
+    }
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.QSIUserDefinedHTML {&#13;
+   position: relative !important;&#13;
+   top: 0 !important;&#13;
+   width: 600px;&#13;
+   height: 500px !important;&#13;
+   .scrollable {&#13;
+     height: 570px !important;&#13;
+     width: 480px !important;&#13;
+   }&#13;
+ }&#13;
+.QSIUserDefinedHTML div {&#13;
+   overflow: visible !important;&#13;
+ }&#13;
+&#13;
+&#13;
+#sp_formfield_equinix_policy + .ng-binding {&#13;
+  width: 779px;&#13;
+  //float: left;&#13;
+}&#13;
+&#13;
+input[type="text"] + a {&#13;
+  background: url(icon-hide-password.png);&#13;
+  margin-right: 226px;&#13;
+  display: table-column-group;&#13;
+  width: 17px;&#13;
+  height: 17px;&#13;
+  background-repeat: no-repeat;&#13;
+  text-indent: -9999px;&#13;
+  top: -25px;&#13;
+}&#13;
+input[type="password"] + a {&#13;
+  background: url(icon-show-password.png);&#13;
+  margin-right: 226px;&#13;
+  display: table-column-group;&#13;
+  width: 17px;&#13;
+  height: 17px;&#13;
+  background-repeat: no-repeat;&#13;
+  text-indent: -9999px;&#13;
+  top: -25px;&#13;
+}&#13;
+&#13;
+#sp_formfield_source_ip_address{&#13;
+  width: 52% !important;&#13;
+}&#13;
+#sp_formfield_source_user{&#13;
+  width: 52% !important;&#13;
+}&#13;
+#sp_formfield_source_password{&#13;
+  width: 52% !important;&#13;
+}&#13;
+#sp_formfield_target_ip_address{&#13;
+  width: 52% !important;&#13;
+}&#13;
+#sp_formfield_target_user{&#13;
+  width: 52% !important;&#13;
+}&#13;
+#sp_formfield_target_password{&#13;
+  width: 52% !important;&#13;
+}&#13;
+&#13;
+#sp_formfield_u_start_date{&#13;
+  width: 100% !important;&#13;
+}&#13;
+#sp_formfield_u_end_date{&#13;
+  width: 100% !important;&#13;
+}&#13;
+&#13;
+&#13;
+h4 {&#13;
+  margin: 0;&#13;
+}&#13;
+&#13;
+.loading{&#13;
+  bottom: 0;&#13;
+  color: #1a1d1d;&#13;
+  left: 0;&#13;
+  margin: -4rem auto 0;&#13;
+  position: absolute;&#13;
+  right: 0;&#13;
+  text-align: center;&#13;
+  top: 50%;&#13;
+  font-size: 50px;&#13;
+}&#13;
+&#13;
+.backdrop {&#13;
+  bottom: 0;&#13;
+  left: 0;&#13;
+  position: absolute;&#13;
+  right: 0;&#13;
+  top: 0;&#13;
+  background: #FFF;&#13;
+  opacity: 0.5;&#13;
+}&#13;
+&#13;
+.form-widget {&#13;
+  min-height: 80vh;&#13;
+  legend {&#13;
+    border-bottom: none;&#13;
+  }&#13;
+}&#13;
+&#13;
+.modal-dialog {&#13;
+  width: 90vw;&#13;
+}&#13;
+&#13;
+.modal {&#13;
+  overflow-y: hidden !important;&#13;
+}&#13;
+&#13;
+.modal-body {&#13;
+  padding: 15px 20px;&#13;
+  height: calc(95vh - 120px);&#13;
+  overflow: auto;&#13;
+&#13;
+  h3 {&#13;
+    margin-top: 8px;&#13;
+  }&#13;
+&#13;
+  .step-indicator {&#13;
+    margin: auto;&#13;
+    margin-top: 10px;&#13;
+    width: 12px;&#13;
+    height: 12px;&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+    background: #fff;&#13;
+    border: 1px solid #e5e5e5;&#13;
+    border-radius: 50%;&#13;
+    z-index: 2;&#13;
+&#13;
+    &amp;.active {&#13;
+      background: $info;&#13;
+      border-color: $info;&#13;
+    }&#13;
+&#13;
+    &amp;:before {&#13;
+      content: "";&#13;
+      width: 50%;&#13;
+      height: 1px;&#13;
+      display: block;&#13;
+      left: -6px;&#13;
+      background: #e5e5e5;&#13;
+      position: absolute;&#13;
+      z-index: 1;&#13;
+    }&#13;
+&#13;
+    &amp;:after {&#13;
+      content: "";&#13;
+      width: 50%;&#13;
+      height: 1px;&#13;
+      display: block;&#13;
+      right: -6px;&#13;
+      background: #e5e5e5;&#13;
+      position: absolute;&#13;
+      z-index: 1;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  .steps {&#13;
+    padding: 30px 30px 20px 30px;&#13;
+    margin-top: -15px;&#13;
+    margin-left: -15px;&#13;
+    margin-right: -15px;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-semibold);&#13;
+&#13;
+    ul {&#13;
+      margin-left: -18.2%;&#13;
+      margin-bottom: 0;&#13;
+      padding-left: 0;&#13;
+      list-style: none;&#13;
+&#13;
+      li {&#13;
+        width: 29.4%;&#13;
+        display: inline-block;&#13;
+        position: relative;&#13;
+        text-align: center;&#13;
+&#13;
+        &amp;:first-of-type .step-indicator:before {&#13;
+          display: none;&#13;
+        }&#13;
+&#13;
+        &amp;:last-of-type .step-indicator:after {&#13;
+          display: none;&#13;
+        }&#13;
+      }&#13;
+    }&#13;
+  }&#13;
+&#13;
+  @media screen and (min-width: 992px) {&#13;
+    .separator {&#13;
+      border-left: 1px solid #cbd0d8;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  .content {&#13;
+    margin-top: 30px;&#13;
+&#13;
+    h4 {&#13;
+      margin-top: 0;&#13;
+      margin-bottom: 10px;&#13;
+    }&#13;
+&#13;
+    p {&#13;
+      margin: 10px 0;&#13;
+      display: inline-block;&#13;
+    }&#13;
+&#13;
+    .form-inline {&#13;
+      display: flex;&#13;
+      align-items: center;&#13;
+&#13;
+      .addon {&#13;
+        margin: 0 5px;&#13;
+        font-size: 18px;&#13;
+      }&#13;
+    }&#13;
+&#13;
+    &amp;.success {&#13;
+      padding: 100px 0;&#13;
+&#13;
+      i {&#13;
+        color: $success;&#13;
+        font-size: 36px;&#13;
+      }&#13;
+&#13;
+      h4 {&#13;
+        margin-top: 15px;&#13;
+        margin-bottom: 0;&#13;
+      }&#13;
+&#13;
+      p {&#13;
+        margin-top: 5px;&#13;
+      }&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.modal-dialog {&#13;
+  @media screen and (min-width: 992px) {&#13;
+    width: 85%;&#13;
+  }&#13;
+}&#13;
+&#13;
+.select-options {&#13;
+  padding: 0 60px 100px 60px;&#13;
+}&#13;
+&#13;
+.ticket-options {&#13;
+  margin-top: 36px;&#13;
+}&#13;
+&#13;
+.ticket-options__option {&#13;
+  margin: 12px 0;&#13;
+  input[type="radio"] {&#13;
+    display: none;&#13;
+&#13;
+    &amp; + label {     &#13;
+      padding: 0 30px;&#13;
+      width: 100%;&#13;
+      height: 85px;&#13;
+      display: flex;&#13;
+      align-items: center;&#13;
+      border: 1px solid #e5e5e5;&#13;
+      line-height: 1.3;&#13;
+      margin: 0;&#13;
+&#13;
+&#13;
+      &gt; span {&#13;
+        width: 100%;&#13;
+        color: $info;&#13;
+        font-size: 16px;&#13;
+      }&#13;
+&#13;
+      small {&#13;
+        font-size: 12px;&#13;
+      }&#13;
+    }&#13;
+&#13;
+    &amp;:checked + label,&#13;
+    &amp;:hover + label {&#13;
+      background-color: $info;&#13;
+      border-color: $info;&#13;
+&#13;
+      span, &#13;
+      .text-muted {&#13;
+        color: #fff;&#13;
+      }&#13;
+    }&#13;
+  }&#13;
+&#13;
+  .ticket-options-warning {   &#13;
+    padding: 0px 30px;&#13;
+    width: 100%;&#13;
+    height: 50px;      &#13;
+    align-items: center;&#13;
+    border: 1px solid #ececea;&#13;
+    display: flex;&#13;
+&#13;
+    label {&#13;
+      &gt; span {&#13;
+        width: 70%;&#13;
+        color: $info;&#13;
+        font-size: 9px;&#13;
+      }     &#13;
+    }&#13;
+&#13;
+  }&#13;
+}&#13;
+&#13;
+.catalog-categories {&#13;
+  margin-top: 36px;&#13;
+  padding-left: 0;&#13;
+  list-style: none;&#13;
+&#13;
+  &gt; li {&#13;
+    margin: 12px 0;&#13;
+    padding: 16px;&#13;
+    display: table;&#13;
+    border-radius: 4px;&#13;
+    border: solid 1px #edeff2;&#13;
+&#13;
+    a {&#13;
+      color: $text-color;&#13;
+      font-weight: var(--eq-font-weight-light);&#13;
+    }&#13;
+&#13;
+    &amp;:hover, &amp;.selected {&#13;
+      background-color: $info;&#13;
+&#13;
+      a {&#13;
+        color: #fff;&#13;
+      }&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.select-item {&#13;
+  .catalog-categories {&#13;
+    margin: 8px -6px;&#13;
+&#13;
+    &gt; li {&#13;
+      margin: 0 6px;&#13;
+      display: inline-block;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.select-item__header {&#13;
+  margin-bottom: 16px;&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+&#13;
+  .search-filter {&#13;
+    margin: 8px 0 8px auto;&#13;
+    width: 250px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.catalog-items {&#13;
+  margin: 0 -20px;&#13;
+  padding: 20px;&#13;
+  background-color: #F4F6F8;&#13;
+  border-top: 1px solid #edeff2;&#13;
+  border-bottom: 1px solid #edeff2;&#13;
+  height: calc(80vh - 125px);&#13;
+  overflow: auto;&#13;
+}&#13;
+&#13;
+.catalog-items__row {&#13;
+  margin: -9px;&#13;
+  width: 100%;&#13;
+  display: table;&#13;
+}&#13;
+&#13;
+.catalog-items__item {&#13;
+  margin: 9px;&#13;
+  padding: 24px;&#13;
+  width: 274px;&#13;
+  height: 164px;&#13;
+  float: left;&#13;
+  background: #fff;&#13;
+  border: 1px solid #fbfbfb;&#13;
+  border-radius: 4px;&#13;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);&#13;
+  cursor: pointer;&#13;
+&#13;
+  &amp;.unavailable {&#13;
+    background: #FCFCFC;&#13;
+    h4,p {&#13;
+      color: #BFBFBF;&#13;
+    }&#13;
+    img{&#13;
+      opacity: 0.2;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  &amp;:hover, &amp;.selected {&#13;
+    border: 1px solid $info;&#13;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);&#13;
+  }&#13;
+&#13;
+  h4 {&#13;
+    margin-bottom: 8px;&#13;
+    color: $info;&#13;
+    font-size: 1.6rem;&#13;
+    font-family: var(--eq-font-family);&#13;
+  }&#13;
+&#13;
+  p {&#13;
+    color: #666;&#13;
+    font-size: 1.2rem;&#13;
+  }&#13;
+}&#13;
+&#13;
+.button-select.selected {&#13;
+  background: $info;&#13;
+&#13;
+  a {&#13;
+    color: #fff;&#13;
+  }&#13;
+}&#13;
+&#13;
+.modal-footer&#13;
+{&#13;
+  padding: 5px 20px 20px;&#13;
+}&#13;
+&#13;
+.icon-check-eqx-icon{&#13;
+  margin-top: 50px;&#13;
+  display: block;&#13;
+  color: #58ad25;&#13;
+  font-size: 36px;&#13;
+}&#13;
+&#13;
+.buttons-center .btn {&#13;
+  margin: 0 4px;&#13;
+}&#13;
+&#13;
+.ticket-created {&#13;
+  padding: 50px 0 120px 0;&#13;
+&#13;
+  i {&#13;
+    margin-bottom: 24px;&#13;
+  }&#13;
+&#13;
+  p {&#13;
+    margin-bottom: 0;&#13;
+    font-size: 1.5rem;&#13;
+  }&#13;
+&#13;
+  .buttons-center {&#13;
+    margin-top: 36px;&#13;
+  }&#13;
+}&#13;
+#sc_cat_item input:not([type="checkbox"]) {&#13;
+  width: 50% !important;&#13;
+}&#13;
+#sc_cat_item .select2-container {&#13;
+  width: 50% !important;&#13;
+  max-width: 300px;&#13;
+}&#13;
+&#13;
+// INC3893790 &#13;
+#sc_cat_item .select2-container-multi {     &#13;
+  width: 100% !important;                   &#13;
+  max-width: 100% !important;&#13;
+}&#13;
+#sc_cat_item textarea {&#13;
+  width: 100% !important;&#13;
+  min-height: 100px;&#13;
+  padding: 6px 10px !important;&#13;
+  border-radius: 0 !important;&#13;
+  box-shadow: none !important;&#13;
+  border-color: #C8D0D8 !important;&#13;
+  color: #2a303c !important;&#13;
+}&#13;
+.item-icon {&#13;
+  float: right;&#13;
+}&#13;
+#sc_cat_item #sp_formfield_short_description{&#13;
+  width: 100% !important;&#13;
+  resize: both;&#13;
+}&#13;
+#sc_cat_item #sp_formfield_description{&#13;
+  width: 100% !important;&#13;
+  resize: none;&#13;
+}&#13;
+&#13;
+.estimate-hours {&#13;
+  margin-left: -20px;&#13;
+  margin-right: -20px;&#13;
+  margin-top: -15px;&#13;
+&#13;
+  .component-section {&#13;
+    border-bottom: 1px solid #E1E1E1;&#13;
+    padding: 10px 0px;&#13;
+  }&#13;
+  .component-info {&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+    width: 100%;&#13;
+    padding: 0px 20px;&#13;
+    font-weight: 600;&#13;
+  }  &#13;
+  .component-detail {&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+    width: 100%;&#13;
+    border: 0px;&#13;
+    padding: 5px 0px;&#13;
+&#13;
+    :first-child{&#13;
+      padding-left: 20px;&#13;
+      width: 18%;&#13;
+    }&#13;
+&#13;
+    :last-child {&#13;
+      width: 80%;&#13;
+      color: #BBBBBB;&#13;
+    }&#13;
+  }&#13;
+  .ticket-info {&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+    width: 100%;&#13;
+    padding-top: 10px;&#13;
+    padding-bottom: 10px;&#13;
+    border-bottom: 1px solid #E1E1E1;&#13;
+&#13;
+    :first-child{&#13;
+      padding-left: 20px;&#13;
+      width: 18%;&#13;
+    }&#13;
+&#13;
+    :last-child {&#13;
+      width: 80%;&#13;
+      color: #BBBBBB;&#13;
+    }&#13;
+&#13;
+  }&#13;
+  .estimative-request {&#13;
+    padding: 20px;&#13;
+    border-bottom: 1px solid #E1E1E1;&#13;
+&#13;
+    .btn {&#13;
+      border: 1px solid rgb(216, 216, 216) !important;&#13;
+      margin-top: 15px;&#13;
+      margin-right: 10px;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  .estimative-request-warning {&#13;
+    padding: 20px;&#13;
+&#13;
+    span {&#13;
+      color: #FFC70D;&#13;
+      font-size: 20px;&#13;
+      padding: 10px;&#13;
+      vertical-align: middle;&#13;
+    }&#13;
+&#13;
+    small {&#13;
+      vertical-align: middle;&#13;
+    }&#13;
+  }&#13;
+&#13;
+}&#13;
+&#13;
+.popover {&#13;
+  width: 250px;&#13;
+  border-radius: 0px;&#13;
+}&#13;
+&#13;
+.user-agreement {&#13;
+  margin-right: 10px;&#13;
+}&#13;
+&#13;
+.modal-footer {&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  justify-content: flex-end;&#13;
+&#13;
+  input, label {&#13;
+    margin-top: 0;&#13;
+    margin-bottom: 0;&#13;
+  }&#13;
+}&#13;
+&#13;
+&#13;
+//Edgar Gomes&#13;
+#u_start_date, #u_end_date {&#13;
+  max-width: 300px;&#13;
+}&#13;
+&#13;
+.input-group-btn {&#13;
+  border: 1px solid #bdc0c4 !important;&#13;
+}&#13;
+&#13;
+//MPE 284 - [Relax CI] - Uninstall Component 1:N&#13;
+.delComponent{&#13;
+  top: 391px;&#13;
+  left: 488px;&#13;
+  width: 502px;&#13;
+  height: 54px;&#13;
+  background: var(--highlights-soapstone) 0% 0% no-repeat padding-box;&#13;
+  border: 1px solid var(--accents-buckthorn);&#13;
+  background: #FFFBF8 0% 0% no-repeat padding-box;&#13;
+  border: 1px solid #F69F2A;&#13;
+  border-radius: 2px;&#13;
+  opacity: 1;&#13;
+  padding-left:20px;&#13;
+  padding-top:10px;&#13;
+&#13;
+}&#13;
+&#13;
+////MPE 284 - [Relax CI] - Uninstall Component 1:N&#13;
+#alertID{&#13;
+  color: #F69F2A;&#13;
+  padding-left:00px;&#13;
+}&#13;
+&#13;
+.add-on &gt; button.lookup {&#13;
+  display:none !important;&#13;
+}&#13;
+&#13;
+.link-upgrade {&#13;
+  position: absolute;&#13;
+  bottom: 30px;&#13;
+  left: 80px;&#13;
+  color: var(--eq-color-blue-500);&#13;
+}&#13;
+&#13;
+.link-upgrade__content {&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-style: normal;&#13;
+  font-weight: 600;&#13;
+  font-size: 15px;&#13;
+  line-height: 24px;&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  gap: 5px;&#13;
+    &#13;
+  img {&#13;
+    width:12px;&#13;
+    height:12px;&#13;
+  }&#13;
+}&#13;
+&#13;
+div.link-upgrade:hover, div.link-upgrade:active {&#13;
+	text-decoration: underline;&#13;
+}&#13;
+&#13;
+// Victor Brito - Re-align Cancel button to left corner of tickets wizard pages &amp; make it a secondary button&#13;
+button.btn.btn-cancel.m-r-xs {&#13;
+  position: absolute;&#13;
+  left: 20px;&#13;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description>Ticket Modal</description>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>msp-create-ticket-modal</id>
+        <internal>false</internal>
+        <link><![CDATA[function(scope) {
+	$(document).ready(function() {
+
+		$('#createTicketModal').on('hide.bs.modal', function () {
+			scope.data.categories = null;
+			scope.data.items = null;
+			
+				
+		//Dismiss remove autofill url if aplicable
+		if(window.location.toString().indexOf("autofill=true") != -1){
+			window.location.href = "?id="+ scope.data.page;
+		}
+			
+			
+			
+		});
+		
+		$('[data-toggle="popover"]').popover();
+
+
+	});
+}]]></link>
+        <name>MSP Create Ticket Modal</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+
+    data.cfmScript = gs.getProperty("case.feedback.module");
+
+    data.trackingEnabled = gs.getProperty('EQIX_ANALYTICS_SEGMENT_ENABLED');
+    data.categoriesTrackingEnabled = gs.getProperty('EQIX_ANALYTICS_CATEGORIES_ENABLED');
+
+    data.page = $sp.getParameter("id");
+    data.country = '';
+    data.reassociationIDs = gs.getProperty("EQUIX_Reassociation_Services");
+    data.reassociationAddOnServiceID = gs.getProperty("EQIX_MH_Transfer_Add-on_Service");
+
+    data.assignAddOnSummaryWidget = $sp.getWidget('assign_addon_summary', '');
+    data.requestCategory = gs.getProperty("EQIX_Managed_Services_Catalog_Request");
+    data.incidentCategory = gs.getProperty("EQIX_Managed_Services_Catalog_Trouble");
+
+    data.instanceProd = gs.getProperty('glide.servlet.uri').includes("https://equinixcsm.service-now.com/") ? false : true;
+    //
+    var _ = new EQIX_Lodash();
+
+    var relaxCiPortal = new EQUIX_RelaxCI();
+    data.addComponentesIDs = relaxCiPortal.getAddComponentsServices();
+
+
+    var managedCloudUtils = new EQX_Cloud_Management();
+
+
+    //MPE 284 - [Relax CI] - Uninstall Component 1:N
+    data.deleteComponentesIDs = relaxCiPortal.getdeleteComponentsServices();
+
+    //NP-463 - [Cloud Management] - New Management Services
+    data.newManagementIDs = managedCloudUtils.newManagementServices();
+
+    var managedHostingUtils = new EQIX_ManagedHosting_Utils();
+    data.removeAddOnID = managedHostingUtils.getRemoveAddOnService();
+    data.addOnSetupID = managedHostingUtils.getAddOnSetupService();
+    data.componentWithAddOnID = managedHostingUtils.getComponentWithAddOnService();
+
+    if (input && input.action == "getSupportHours") {
+        var premierSupportHoursWidgetOptions = {
+            cmdb_ci: input.cmdb_ci,
+            title: gs.getMessage("This service is part of Additional Support and you may be charged for that.")
+        };
+        data.premierSupportHoursWidget = $sp.getWidget('msp-premier-support-information', premierSupportHoursWidgetOptions);
+
+        var account = new EQIX_Customer_Permissions().getActiveAccountSysId();
+        data.hasSupportPlan = new EQIX_GSD_PremierSupport().getSupportPlans(account, input.cmdb_ci).length > 0;
+
+        if (data.removeAddOnID.indexOf(input.service) != -1 || data.addOnSetupID.indexOf(input.service) != -1) {
+            data.selectAddOnsSummaryWidget = $sp.getWidget('msp-mh-add-on-selection-summary', {
+                service: input.service
+            });
+        }
+        return;
+    }
+
+    if (input && input.action == "getEditComponents") {
+        var widgetOptions = {
+            host_list: input.host_list,
+            field_list: input.field_list,
+            service: input.service,
+            product: input.product
+        };
+
+
+        if (data.removeAddOnID.indexOf(input.service) != -1 || data.addOnSetupID.indexOf(input.service) != -1) {
+            data.selectAddOnsWidget = $sp.getWidget('msp-mh-add-on-selection', widgetOptions);
+            data.selectAddOnsSummaryWidget = $sp.getWidget('msp-mh-add-on-selection-summary', {});
+        } else {
+            data.editComponentsWidget = $sp.getWidget('msp-edit-component', widgetOptions);
+        }
+
+        return;
+    }
+
+    // Catalog sys id
+    var catalog_sys_id = gs.getProperty("equix.msp.active.catalog");
+    var catalogPortal = new EQUIX_CatalogPortal();
+
+    var customerPermission = new EQIX_Customer_Permissions();
+    var account = customerPermission.getActiveAccountSysId();
+
+    var ou = new GlideRecord('customer_account');
+    ou.addQuery('sys_id', account);
+    ou.query();
+    if (ou.next()) {
+        //MSP - 42 User Story
+        //gs.addInfoMessage("(ou.u_partner_type: "+ ou.u_partner_type);//Reseller contact
+        if (ou.u_partner_type == "Reseller") {
+            data.isResellerContact = true;
+            //gs.addInfoMessage("data.isResellerContact: "+ data.isResellerContact);
+        }
+        if (checkOffBusinessHours() && ou.u_operating_unit.toString() == 'NL') {
+            data.cnt = 'Yes';
+
+            data.country = ou.u_operating_unit.toString();
+            data.sales_rep = ou.u_sales_rep.name.toString();
+            data.sales_rep_contact = ou.u_sales_rep.phone.toString();
+        } else {
+
+            data.cnt = 'No';
+
+            data.country = ou.u_operating_unit.toString();
+            data.sales_rep = ou.u_sales_rep.name.toString();
+            data.sales_rep_contact = ou.u_sales_rep.phone.toString();
+        }
+
+    }
+    var operatingUnit = ou.getValue('u_operating_unit');
+    data.isMasterAdmin = customerPermission.hasPermission('master_admin');
+    data.isMSAdmin = customerPermission.hasPermission('manage', 'global', account);
+
+    data.premierSupportPermission = customerPermission.hasPermission('support_hours_approval', 'ticket', account);
+
+    data.request_category_sys_id = gs.getProperty("EQIX_Managed_Services_Catalog_Request"); // I need to request something Category sys ID
+
+    if (input && input.action == "getCategoriesAndItems") {
+        data.categories = catalogPortal.getCatalogCategories(catalog_sys_id, [input.ticket.type]);
+        var category_ids = data.categories.map(function(obj) {
+            return obj.sys_id;
+        });
+        data.items = catalogPortal.getCatalogItems(catalog_sys_id, category_ids);
+        data.items = _.orderBy(data.items, ['isAvailable'], ['desc']); // Sort the items with Avaialbe
+        // Get category
+        data.u_type = getParentCategoryType(input.ticket.type);
+        return;
+    }
+    if (options.showOnlyFormPage) {
+        data.showOnlyFormPage = options.showOnlyFormPage;
+    }
+    if ($sp.getParameter("autofill") == "true" || options.autofill == "true") {
+        data.autofill = true;
+    }
+
+    //----------------------------------------------------------------------------------
+    //MDR - Enhancement MDR-673
+    //----------------------------------------------------------------------------------
+    var vUservice = gs.getProperty('EQIX.SERVICE.MDR.MANAGED_SERVICE.CHANGEPLAN.SYS_ID');
+    //console.log("CHANGE_PLAN_SYS_ID:" + vUservice);
+
+    if ((input && input.action == "loadForm") || data.autofill && !input.reload) {
+
+        verifyMDRProduct(input.catalog_item_sys_id, $sp.getParameter("u_product_line"));
+
+        if (input.action == "loadForm")
+            data.selectedProductIsMDR = gs.getProperty('EQIX.PRODUCT.MDR.CATALOG.TROUBLE.SYS_ID') == input.catalog_item_sys_id ? true : false;
+
+        if ($sp.getParameter("u_product_line"))
+            data.selectedProductIsMDR = gs.getProperty('EQIX.PRODUCT.MDR.CATALOG.TROUBLE.SYS_ID') == $sp.getParameter("u_product_line") ? true : false;
+
+        //Verify Disaster already created
+        // Check if the disaster is already declared
+        var itemIdMDR = gs.getProperty('EQIX.PRODUCT.MDR.CATALOG.TROUBLE.SYS_ID');
+        if (input && input.catalog_item_sys_id == itemIdMDR) {
+
+            var utilAccount = new EQIX_Customer_Permissions();
+            data.currentAccount = utilAccount.getActiveAccountSysId();
+            var searchDisaster = new EQIX_MDR_ValidateTrouble();
+            data.disasterDeclared = searchDisaster.searchActiveDisaster(data.currentAccount);
+            if (data.disasterDeclared) {
+                return;
+            }
+        }
+
+        var catalogItemWidgetOptions = {
+            autofill: {}
+        };
+
+        /* Auto Fill From URL */
+        if (data.autofill) {
+
+            if (data.country) {
+                catalogItemWidgetOptions.autofill.u_operating_unit = data.country;
+            }
+
+            if ($sp.getParameter("u_product_category") || options.u_product_category)
+                catalogItemWidgetOptions.autofill.u_product_category = $sp.getParameter("u_product_category") || options.u_product_category;
+
+            if ($sp.getParameter("u_product_line") || options.u_product_line)
+                catalogItemWidgetOptions.autofill.u_product_line = $sp.getParameter("u_product_line") || options.u_product_line;
+
+            data.product = $sp.getParameter("u_product_line") || options.u_product_line;
+            var type = $sp.getParameter("u_type") || options.u_type
+            if (type == 0 || type == 1) {
+                data.u_type = $sp.getParameter("u_type") || options.u_type; // 0 to request or 1 to trouble
+            }
+
+            if ($sp.getParameter("description")) {
+                //for avoiding issues with URL size, only identifier is sent on description parameter
+                var texthybridCloud = gs.getMessage('Please grant access in the Hybrid Cloud Manager for this customer.');
+                texthybridCloud += '\r\n\n ' + gs.getMessage('********* Any further information, please write below this line. *********');
+                var description = {
+                    'default': "O erro técnico foi anexado a este case, mas fique a vontade para colocar informações adicionais neste campo.",
+                    "hybridCloud-newpwd": texthybridCloud
+                };
+                catalogItemWidgetOptions.autofill.description = description[$sp.getParameter("description")];
+            }
+
+            if ($sp.getParameter("short_description")) {
+                //for avoiding issues with URL size, only identifier is sent on description parameter
+                var short_description = {
+                    //EXCHANGE
+                    "mailbox-createEntry": '[Hosted Exchange] - Erro ao criar uma caixa postal',
+                    "mailbox-updateEntry": '[Hosted Exchange] - Erro ao editar uma caixa postal',
+                    "mailbox-removeEntry": '[Hosted Exchange] - Erro ao excluir uma caixa postal',
+                    "contact-createEntry": '[Hosted Exchange] - Erro ao criar um contato',
+                    "contact-updateEntry": '[Hosted Exchange] - Erro ao editar um contato',
+                    "contact-removeEntry": '[Hosted Exchange] - Erro ao excluir um contato',
+                    "meeting_rooms-createEntry": '[Hosted Exchange] - Erro ao criar uma sala de reunião',
+                    "meeting_rooms-updateEntry": '[Hosted Exchange] - Erro ao editar uma sala de reunião',
+                    "meeting_rooms-removeEntry": '[Hosted Exchange] - Erro ao excluir uma sala de reunião',
+                    "equipments-createEntry": '[Hosted Exchange] - Erro ao criar um equipamento',
+                    "equipments-updateEntry": '[Hosted Exchange] - Erro ao editar um equipamento',
+                    "equipments-removeEntry": '[Hosted Exchange] - Erro ao excluir um equipamento',
+                    "list-createEntry": '[Hosted Exchange] - Erro ao criar uma lista de distribuição',
+                    "list-updateEntry": '[Hosted Exchange] - Erro ao editar uma lista de distribuição',
+                    "list-removeEntry": '[Hosted Exchange] - Erro ao excluir uma lista de distribuição',
+                    //FIREWALL
+                    "firewall-apply": '[Firewall] - Erro ao aplicar regra de firewall.',
+                    //MONITORING
+                    "extend-maintenance": '[Monitoramento] - Erro ao estender manutenção.',
+                    "delete-maintenance": '[Monitoramento] - Erro ao concluir manutenção.',
+                    "create-maintenance": '[Monitoramento] - Erro ao criar manutenção.',
+                    "graph-monitoring": '[Monitoramento] - Erro ao gerar gráfico.',
+                    //HYPER-V
+                    "hyperV-turnOn": '[Hyper-v] - Erro ao ligar o hyper-v.',
+                    "hyperV-turnOff": '[Hyper-v] - Erro ao desligar o hyper-v.',
+                    "hyperV-disaster": '[Hyper-v] - Erro ao reportar um desastre.',
+                    "hyperV-createSnapshot": '[Hyper-v] - Erro ao criar o Snapshot.',
+                    "hyperV-editSnapshot": '[Hyper-v] - Erro ao editar o Snapshot.',
+                    "hyperV-applySnapshot": '[Hyper-v] - Erro ao aplicar o Snapshot.',
+                    "hyperV-revertSnapshot": '[Hyper-v] - Erro ao reverter o Snapshot.',
+                    "hyperV-removeSnapshot": '[Hyper-v] - Erro ao remover o Snapshot.',
+                    //BACKUP
+                    "backup-manage": '[Backup] - Erro ao gerenciar o conteúdo',
+                    "backup-restore": '[Backup] - Erro ao restaurar um job de backup',
+                    "backup-agent": '[Backup] - Erro ao adicionar um agente',
+                    //VPN
+                    'removeUser': '[VPN] - Erro ao excluir um usuário de VPN',
+                    'insertUser': '[VPN] - Erro ao criar um usuário de VPN',
+                    'updateUser': '[VPN] - Erro ao editar um usuário de VPN',
+                    'updateVpnPrefix': '[VPN] - Erro ao editar o prefixo de VPN',
+                    //MRTG
+                    'mrtg-createEntry': '[MRTG] - Erro ao criar um gráfico de MRTG',
+                    'mrtg-updateEntry': '[MRTG] - Erro ao atualizar um gráfico de MRTG',
+                    'mrtg-deleteMeasurement': '[MRTG] - Erro ao remover um gráfico de MRTG ',
+                    //HC
+                    'hc-create-reset-psw': gs.getMessage('MSPortal - Hybrid Cloud - Access Request')
+                };
+
+
+                if (short_description[$sp.getParameter("short_description")])
+                    catalogItemWidgetOptions.autofill.short_description = short_description[$sp.getParameter("short_description")];
+                else
+                    catalogItemWidgetOptions.autofill.short_description = $sp.getParameter("short_description");
+            }
+
+
+
+            if ($sp.getParameter("u_service") || options.u_service)
+                catalogItemWidgetOptions.autofill.u_service = $sp.getParameter("u_service") || options.u_service;
+
+            if ($sp.getParameter("cmdb_ci") || options.cmdb_ci)
+                catalogItemWidgetOptions.autofill.cmdb_ci = $sp.getParameter("cmdb_ci");
+
+            if ($sp.getParameter("impact") || options.impact)
+                catalogItemWidgetOptions.autofill.impact = $sp.getParameter("impact");
+
+            // MSSI-644: Set Urgency for BR
+            if ($sp.getParameter("urgency") || options.urgency)
+                catalogItemWidgetOptions.autofill.urgency = $sp.getParameter("urgency");
+
+            if ($sp.getParameter("worknotes") || options.worknotes)
+                catalogItemWidgetOptions.autofill.worknotes = $sp.getParameter("worknotes");
+
+            if ($sp.getParameter("current_amount") || options.current_amount) {
+                data.current_amount = $sp.getParameter("current_amount") || options.current_amount;
+                catalogItemWidgetOptions.autofill.current_amount = $sp.getParameter("current_amount");
+            }
+
+        } else {
+
+            // Get type
+            data.u_type = getParentCategoryType(input.type);
+
+            catalogItemWidgetOptions = {
+                // test sys_id, should be dynamic according to the selected catalog item
+                autofill: {
+                    u_product_category: input.category_sys_id,
+                    u_product_line: input.catalog_item_sys_id,
+                    u_type: data.u_type,
+                    u_operating_unit: data.country
+
+                }
+            };
+        }
+
+        var recordProducerId = "";
+        if (data.u_type == 0) { // Request
+            recordProducerId = gs.getProperty("EQIX_RecordProducerCreateRequestTicket");
+            // MSSI-644: Set Urgency for BR
+            if (!catalogItemWidgetOptions.autofill.urgency) {
+                catalogItemWidgetOptions.autofill.urgency = input.urgency;
+            }
+        } else if (data.u_type == 1) { // Incident
+            recordProducerId = gs.getProperty("EQIX_RecordProducerCreateTroubleTicket");
+
+            if (!catalogItemWidgetOptions.autofill.impact) {
+                catalogItemWidgetOptions.autofill.impact = input.impact;
+            }
+        }
+
+        if (input.isAvailable == false) { // Request Product Information
+            recordProducerId = gs.getProperty("EQIX_RecordProducerProductInformation");
+            catalogItemWidgetOptions.autofill.short_description = input.product_name;
+
+        }
+
+        catalogItemWidgetOptions.sys_id = recordProducerId;
+        data.catalogItemWidget = $sp.getWidget('msp-catalog-item', catalogItemWidgetOptions);
+        return;
+    }
+
+    if (input && input.action == "loadNotSureForm") {
+        data.u_type = getParentCategoryType(input.type);
+        data.u_impact = input.impact;
+
+        var country = '';
+
+        var gr = new GlideRecord('customer_account');
+        gr.addQuery('sys_id', account);
+        gr.query();
+        if (gr.next()) {
+            country = gr.u_operating_unit;
+        }
+        catalogItemWidgetOptions = {};
+        if (country == 'NL' || country == 'UK' || country == 'IE' || country == 'FI') {
+            if (data.u_type == 0) { // Request
+                catalogItemWidgetOptions = {
+                    // test sys_id, should be dynamic according to the selected catalog item
+                    'sys_id': gs.getProperty("EQIX_RecordProducerCreateNotSureTicket") || input.catalog_item_sys_id,
+                    autofill: {
+                        u_type: data.u_type.toString(),
+                        impact: data.u_impact,
+                        urgency: input.urgency
+                    }
+                };
+
+                //catalogItemWidgetOptions.autofill.impact =  input.impact;
+                data.catalogItemWidget = $sp.getWidget('msp-catalog-item', catalogItemWidgetOptions);
+
+            } else if (data.u_type == 1) { // Trouble
+                catalogItemWidgetOptions = {
+                    // test sys_id, should be dynamic according to the selected catalog item
+                    'sys_id': gs.getProperty("EQIX_RecordProducerCreateNotSureTicketNL") || input.catalog_item_sys_id,
+
+                    autofill: {
+                        u_type: data.u_type.toString(),
+                        impact: data.u_impact
+                    }
+                };
+                //catalogItemWidgetOptions.autofill.impact = input.impact || $sp.getParameter("impact");
+                data.catalogItemWidget = $sp.getWidget('msp-catalog-item', catalogItemWidgetOptions);
+
+            }
+        } else {
+
+            catalogItemWidgetOptions = {
+                // test sys_id, should be dynamic according to the selected catalog item
+                'sys_id': gs.getProperty("EQIX_RecordProducerCreateNotSureTicket") || input.catalog_item_sys_id,
+                autofill: {
+                    u_type: data.u_type.toString(),
+                    // MSSI-222, Set Impact on Not Sure Tickets
+                    impact: data.u_impact,
+                    // MSSI-644: Set Urgency for BR
+                    urgency: input.urgency
+                }
+            };
+            data.catalogItemWidget = $sp.getWidget('msp-catalog-item', catalogItemWidgetOptions);
+
+        }
+        return;
+    }
+
+    // Get Catalog Highest Categories
+    data.basic_categories = catalogPortal.getCatalogParentCategories(catalog_sys_id);
+
+    // Preload all categories and items
+    if (!data.categories)
+        data.categories = {};
+    if (!data.items)
+        data.items = {};
+    for (var index in data.basic_categories) {
+        var category = data.basic_categories[index];
+        var categories = catalogPortal.getCatalogCategories(catalog_sys_id, [category.sys_id]);
+        var category_ids = categories.map(function(obj) {
+            return obj.sys_id;
+        });
+        var items = catalogPortal.getCatalogItems(catalog_sys_id, category_ids);
+        var items = _.orderBy(items, ['isAvailable'], ['desc']);
+
+        data.categories[category.sys_id] = categories;
+        data.items[category.sys_id] = items;
+    }
+
+    // Impact list
+    data.impact = [];
+    data.impact.push({
+        title: gs.getMessage("High/P1"),
+        description: gs.getMessage("Affects a large number of users or customer, interrupt business, and affect service delivery"),
+        value: "1"
+    });
+
+    data.impact.push({
+        title: gs.getMessage("Medium/P2"),
+        description: gs.getMessage("Affects a few staff and interrupt work to some degree"),
+        value: "2"
+    });
+
+    data.impact.push({
+        title: gs.getMessage("Low/P3"),
+        description: gs.getMessage("Users and business are impacted but not interrupted"),
+        value: "3"
+    });
+
+    // Urgency list
+    data.urgency = [];
+    data.urgency.push({
+        title: gs.getMessage("High/P1"),
+        description: gs.getMessage("If the service request is not treated quickly a critical service will be unavailable for all users."),
+        value: "1"
+    });
+
+    data.urgency.push({
+        title: gs.getMessage("Medium/P2"),
+        description: gs.getMessage("A service or system might be impacted if the service request is not treated."),
+        value: "2"
+    });
+
+    data.urgency.push({
+        title: gs.getMessage("Low/P3"),
+        description: gs.getMessage("It's a service request that might be planned to be executed. There is a low impact on the business."),
+        value: "3"
+    });
+
+    function getParentCategoryType(sys_id) {
+        var gr = new GlideRecord("sc_category");
+        gr.addActiveQuery();
+        gr.addQuery("sc_catalog", catalog_sys_id);
+        gr.addQuery("sys_id", sys_id);
+        gr.addNullQuery("parent");
+        gr.query();
+        if (gr.next()) {
+            if (gr.getValue("sys_id") != data.request_category_sys_id) {
+                return 1; // Trouble
+            }
+        }
+
+        return 0; // Request
+    }
+
+    function checkOffBusinessHours() { //Nether Land Business Hours
+
+        var gdt = new GlideDateTime();
+        gdt.setTimeZone("Europe/Amsterdam");
+        var gdtcurrent = gdt.getDisplayValue();
+
+        var gdcurrent = gdtcurrent.toString().substring(0, 11);
+        var gdtstart = new GlideDateTime(gdcurrent + ' 08:00:00');
+        var gdtend = new GlideDateTime(gdcurrent + ' 18:00:00');
+        var inRange = (gdtcurrent >= gdtstart && gdtcurrent <= gdtend) ? true : false;
+
+        var gdx = new GlideDateTime(gdtcurrent);
+        var day = gdx.getDayOfWeek(); // Get Day of the week
+
+        if (day == 6 || day == 7) {
+            return true;
+        }
+        if ((day == 1 || day == 2 || day == 3 || day == 4 || day == 5)) {
+            if (!inRange)
+                return true;
+
+        }
+
+    }
+
+
+    function verifyMDRProduct(input_catalog_item_sys_id, product_line_parameter) {
+        if (input_catalog_item_sys_id) {
+            if (gs.getProperty('EQIX.MDR.newCase.productLine') == input_catalog_item_sys_id || gs.getProperty('EQIX.PRODUCT.MDR.CATALOG.TROUBLE.SYS_ID') == input_catalog_item_sys_id)
+                data.selectedProductIsMDR = true;
+            else
+                data.selectedProductIsMDR = false;
+        }
+
+        if (product_line_parameter) {
+            if (gs.getProperty('EQIX.MDR.newCase.productLine') == product_line_parameter || gs.getProperty('EQIX.PRODUCT.MDR.CATALOG.TROUBLE.SYS_ID') == product_line_parameter)
+                data.selectedProductIsMDR = true;
+            else
+                data.selectedProductIsMDR = false;
+        }
+    }
+
+    var grCoreCountry = new GlideRecord("core_country");
+    grCoreCountry.addQuery("iso3166_2", operatingUnit);
+    grCoreCountry.query();
+
+    var country_sys_id = '';
+    if (grCoreCountry.next()) {
+        country_sys_id = grCoreCountry.getValue("sys_id");
+    }
+
+    data.nameLinkUpgrade = gs.getMessage('I want to upgrade one of my services');
+    data.showlinkUpgrade = new EQIX_Sales_Portal_Utils().checkIsAvailableUpgradeProducts(country_sys_id);
+
+    var ibx = "";
+    var grGetIBXbyAtr = new GlideRecord("sn_customerservice_contract_item_attributes");
+    grGetIBXbyAtr.addEncodedQuery("u_attribute=IBX^u_contract_item.account=" + account);
+    grGetIBXbyAtr.setLimit(1);
+    grGetIBXbyAtr.query();
+    if (grGetIBXbyAtr.next()) {
+        ibx = grGetIBXbyAtr.getValue('u_value');
+    } else {
+        var grContractItem = new GlideRecord("sn_customerservice_contract_item");
+        //grContractItem.addEncodedQuery('u_order_line_itemISNOTEMPTY^account='+account); ESS2-145
+        grContractItem.addEncodedQuery('u_order_line_item.u_ibxISNOTEMPTY^account=' + account);
+        grContractItem.setLimit(1);
+        grContractItem.query();
+
+        if (grContractItem.next()) {
+            ibx = grContractItem.u_order_line_item.u_ibx.name;
+        } else {
+			//***ESS2-145***
+            var grContractCI = new GlideRecord("contract_rel_ci");
+            grContractCI.addEncodedQuery('ci_item.locationISNOTEMPTY^contract.account=' + account);
+            grContractCI.setLimit(1);
+            grContractCI.query();
+
+            if (grContractCI.next()) {
+                ibx = grContractCI.ci_item.location.getDisplayValue();
+            }
+        }
+    }
+
+    if (!gs.nil(ibx)) {
+        var grAccount = new GlideRecord("customer_account");
+
+        if (grAccount.get(account)) {
+            var countryGr = grAccount.getValue("country");
+            var account_number = grAccount.getValue("u_account_number");
+
+            var priceResponse = new EQIX_POE_Pricing().getPremierPrice(account_number, ibx);
+
+            if (gs.nil(priceResponse)) {
+                data.service_cost = gs.getMessage('There is no catalog price for this Service request, please raise a "question" request to get the price.');
+                return;
+            }
+
+            if (gs.nil(priceResponse.product)) {
+                data.service_cost = gs.getMessage('There is no catalog price for this Service request, please raise a "question" request to get the price.');
+                return;
+            }
+
+            var currency = priceResponse.product.currency;
+            var priceList = priceResponse.product.price;
+            var price = '';
+
+            priceList.forEach(function(p) {
+                if (p.PartNumber == 'MGD00017.ELEM' && p.ProductDescription == 'Managed Services Premier Support Hour')
+                    if (!gs.nil(p.PriceList)) {
+                        price = p.PriceList[0].amount;
+                    }
+
+            });
+
+            if (!gs.nil(price)) {
+                var currency_symbol = "";
+                //Get Country by AccountID
+
+                //Get Currency
+                var grSysLocale = new GlideRecord('sys_locale');
+                grSysLocale.addEncodedQuery("country=" + countryGr + "^currency_code=" + currency);
+                grSysLocale.query();
+
+                if (grSysLocale.next()) {
+                    currency_symbol = grSysLocale.getValue('currency_symbol');
+                }
+
+                var args = [currency_symbol, price];
+
+                data.service_cost = gs.getMessage("For Service requested, you will be charged", args);
+            } else {
+                data.service_cost = gs.getMessage('There is no catalog price for this Service request, please raise a "question" request to get the price.');
+            }
+
+        } else {
+            data.service_cost = gs.getMessage('There is no catalog price for this Service request, please raise a "question" request to get the price.');
+
+        }
+
+    }
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>organize.gustavo</sys_created_by>
+        <sys_created_on>2018-05-07 19:47:42</sys_created_on>
+        <sys_id>07419dffdbf59f40448b01a3ca9619a1</sys_id>
+        <sys_mod_count>1977</sys_mod_count>
+        <sys_name>MSP Create Ticket Modal</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_07419dffdbf59f40448b01a3ca9619a1</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:26</sys_updated_on>
+        <template><![CDATA[<div class="modal fade noto-regular" id="createTicketModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="trackTypeModal(c.modalStep)" ><span class="icon-close-light-eqx-icon"></span></button>
+        <h4 class="modal-title" id="myModalLabel">${Open a Support Case}</h4>
+      </div>
+
+      <div class="modal-body">
+        <!--- Select Options Beggining --->         
+        <div class="select-options" ng-show="c.modalStep == 1">
+          <eq-page-banner eq-model="troubleTicketInfo">
+    			<div class="m-t-x-small">
+      				${If you are submitting a Trouble Ticket}
+    			</div>
+  				</eq-page-banner>
+          <div class="steps">
+            <ul>
+              <li>
+                <span class="step-indicator step-1 active"></span>
+              </li>
+              <li>
+                <span class="step-indicator step-2" ng-class="{'active': c.ticketOptionsStep > 1}"></span>
+              </li>
+              <li>
+                <span class="step-indicator step-3" ng-class="{'active': c.ticketOptionsStep > 2}"></span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="row">
+            <!--- Step 1 -->
+            <div class="col-sm-12 col-md-4">
+              <h3>
+                ${How can we help you?}
+              </h3>
+
+              <div class="ticket-options">
+                <div class="ticket-options__option" ng-repeat="item in data.basic_categories"> <!--  -->
+                  <input type="radio" name="ticketType" id="ticketType_{{item.sys_id}}" ng-change="c.selectType(item);getDisplayValue(item.sys_id)" value="{{item.sys_id}}" ng-model="c.ticket.type">
+                  <label for="ticketType_{{item.sys_id}}">
+                    <span>
+                      {{item.title}}
+
+                      <small class="text-muted block noto-light">{{item.description}}</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+            </div>
+
+            <!--- Step 2  -->
+            <div class="col-sm-12 col-md-4" ng-if="c.ticketOptionsStep > 1 && c.selectedType != 'request'">
+             
+              <h3>
+                ${What is the impact?}
+              </h3>
+
+              <div class="ticket-options">
+                <div class="ticket-options__option" ng-repeat="item in data.impact">
+                  <input type="radio" name="ticketPriority" id="ticketPriority_{{item.value}}" ng-change="c.selectImpact();trackImpact(item.value)" value="{{item.value}}" ng-model="c.ticket.impact">
+                  <label for="ticketPriority_{{item.value}}">
+                    <span>
+                      {{item.title}}
+                      <small class="text-muted block noto-light">
+                        {{item.description}}
+                      </small>
+                    </span>                                      
+                  </label>                  
+                  <label class="ticket-options-warning" ng-show="c.p1ticket == 1 && {{item.value}}==1 && data.cnt=='Yes'">
+                    <i class="fa fa-exclamation-circle fa-1" style ='color: #dfdf2e;padding-right: 20px;'> </i>     
+                    <span style="font-size: 11px;"> ${Be aware that you might be billed in case the issue appears not to be a High Impact (P1) one} </span>
+                  </label>  
+
+                </div>
+              </div>
+            </div>
+            
+            <!--- Step 2 --> <!-- Urgency -->
+            <div class="col-sm-12 col-md-4" ng-if="c.ticketOptionsStep > 1 && c.selectedType == 'request'">
+              <h3>
+                ${What is the urgency?}
+              </h3>
+
+              <div class="ticket-options">
+                <div class="ticket-options__option" ng-repeat="item in data.urgency">
+                  <input type="radio" name="ticketUrgency" id="ticketUrgency_{{item.value}}" 
+                         ng-change="c.selectUrgency();trackUrgency(item.value)" value="{{item.value}}" 
+                         ng-model="c.ticket.urgency">
+                  <label for="ticketUrgency_{{item.value}}">
+                    <span>
+                      {{item.title}}
+                      <small class="text-muted block noto-light">
+                        {{item.description}}
+                      </small>
+                    </span>                                      
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <!--- Step 3 -->
+            <div class="col-sm-12 col-md-4" ng-if="c.ticketOptionsStep > 2">
+              <h3>
+                ${What is the problem related to?}
+              </h3>
+              <ul class="catalog-categories">
+                <li ng-repeat="item in data.categories[c.ticket.type]" ng-click="c.selectCategory(item.sys_id);track('select ticket product family',{'flow': 'submit support ticket', 'step': 'type'});track('step - submit support ticket - category',{'flow': 'submit support ticket'});" ng-class="{selected: item.sys_id == c.category}">
+                  <a href="">
+                    {{item.title}}
+                  </a>
+                </li>
+                <li ng-click="c.selectNotSure()" ng-class="{selected: data.notSureForm}">
+                  <a href="">
+                    ${I'm not sure}
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+        <!--- Select Options End --->
+
+        <!--- Select Item Beggining --->
+        <div class="select-item" ng-show="c.modalStep == 2">
+          <div class="select-item__header">
+            <ul class="catalog-categories">
+              <li ng-repeat="item in data.categories[c.ticket.type]" ng-click="applyFilter(item.sys_id);" class="button-select button-{{item.sys_id}}" ng-class="{selected: c.category === item.sys_id}">
+                <a href="">
+                  {{item.title}}
+                </a>
+              </li>
+              <li ng-click="applyFilter('');" class="button-all" ng-class="{selected: !c.category}">
+                <a href="">
+                  ${View All}
+                </a>
+              </li>
+            </ul>
+
+            <div class="search-filter">
+              <div class="input-group">
+                <input type="text" class="form-control" ng-keydown="$event.keyCode === 13 && keywordFilter(keywords)" ng-model="keywords" placeholder="${Search}">
+                <div class="input-group-btn">
+                  <div class="btn btn-info btn-search" ng-click="keywordFilter(keywords);track('search product category',{'flow': 'submit support ticket', 'step': 'product category'})">
+                    <i class="icon-search-eqx-icon" aria-hidden="true"></i>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="catalog-items">
+            <div class="catalog-items__row">
+              <div ng-repeat="item in data.items[c.ticket.type]" class="catalog-items__item {{item.category.sys_id}}" ng-class="{unavailable: !item.isAvailable, selected: item.sys_id == selectedItem.sys_id}" ng-click="c.openItem(item);">
+                <img class="item-icon" src="{{item.icon}}" height="18" width="18">
+                <h4>
+                  {{item.name}}
+                </h4>
+                <p>
+                  {{item.short_description}}
+                </p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!--- Select Item End --->
+
+        <!--- Item Form Beggining --->
+        <div class="form-widget" ng-show="data.catalogItemWidget && c.modalStep == 3 && !loading" >
+          <div ng-if="selectedItem.isAvailable == false" class="unavailable-product">
+
+            <!--Removed form when product is no avaliable as asked in INC1850246. Create ticket button will be disabled in same condition-->
+
+            <!--<p>
+${You don't have} {{selectedItem.name}} ${as part of your environment}.
+</p>-->
+            <!--<p>
+${Once you submit this ticket, your CSM will reach you to provide more information about this product and how it can improve your environment}.
+</p>-->
+
+            <p><span ng-show="${msp_ticket_unavaliable_product}">${msp_ticket_unavaliable_product} </span>{{selectedItem.name}} ${was not found as part of your environment}.</p>
+            <p>${Please reclassify your request or use the "I'm not sure" option in the lower left corner of the previous page}.</p>     
+            <p>${If you have any questions contact your sales representative via} {{data.sales_rep}} - {{data.sales_rep_contact}} ${or the Customer support (https://www.equinix.com/contact-us/customer-support/?5)}.</p>
+          </div>
+          <sp-widget widget="data.catalogItemWidget" ng-if="(selectedItem.isAvailable == true || selectedItem == null) && (c.modalStep == 3 || c.modalStep == 4)"></sp-widget>
+         
+        </div>
+       <!-- <div id="amount"  style="display: block;background-color: #f3c7d2;border: 1px solid black;border-radius: 5px;"> 
+    <p><strong>{{data.message}}</strong></p>
+     <p>You can proceed with the request anyway (this will be assigned to an Equinix support team member to progress). <br>Alternatively you can adjust the request as per the indication above to allow this to proceed automatically.</p> 
+    </div> -->
+        <!--- Item Form End --->
+
+        <!-- Edit Components Widget -->
+        <div ng-show="data.editComponentsWidget && c.modalStep == 4 && c.showEditStep && c.onEdit">
+          <div>
+            <sp-widget widget="data.editComponentsWidget"></sp-widget>
+          </div>
+        </div>
+        
+         <!-- Add-ons selection for the Remove Add On service -->
+         <div ng-show="data.selectAddOnsWidget && c.modalStep == 4 && c.showEditStep && c.onEdit">
+          <div>
+            <sp-widget widget="data.selectAddOnsWidget"></sp-widget>
+          </div>
+        </div>
+        
+        
+ 		
+        <!-- Step 6-->
+        <div ng-show="c.modalStep == 6">
+          <div class="loading">
+            <h1>
+              ${Disaster already declared for this Account!}
+            </h1>
+          </div>
+        </div>
+        <!-- /Step 6-->
+        
+        <!--- Ask Estimate Hours Step Beggining--->
+        <div class="estimate-hours" ng-show="c.modalStep == 4 && !c.onEdit">
+          <div class="ticket-info" ng-repeat="field in c.ticketFields">
+            <span>{{field.label}}</span>
+            <span>{{field.value}}</span>
+          </div>
+          <div class="component-section" ng-if="selectedComponents.length > 0" ng-repeat="comp in selectedComponents">
+            <div class="component-info">{{comp.name}}</div>
+            <div class="component-detail">
+              <span>${Resource Unique Identifier}</span>
+              <span>{{comp.resource_id}}</span>
+            </div>
+            <div class="component-detail">
+              <span>${Public Cloud Provider}</span>
+              <span>{{comp.csp}}</span>
+            </div>
+            <div class="component-detail">
+              <span>${Group}</span>
+              <span>{{comp.group}}</span>
+            </div>
+          </div>
+           <div ng-show="data.editComponentsWidget">
+            <sp-widget widget="data.assignAddOnSummaryWidget"></sp-widget>
+          </div>
+          
+          <!-- Add-ons selection summary for the Remove Add On service -->
+          <div ng-show="data.selectAddOnsSummaryWidget">
+            <div>
+              <sp-widget widget="data.selectAddOnsSummaryWidget"></sp-widget>
+            </div>
+        	</div>
+          
+          <!--MPE 284 - [Relax CI] - Uninstall Component 1:N - INSERT ng-if="c.isDelComp==false" -->
+          <div clas="support-hours" ng-if="c.isDelComp==false">
+            <sp-widget widget="data.premierSupportHoursWidget"></sp-widget>
+          </div>
+
+          <div ng-if="data.isMasterAdmin || data.isMSAdmin || data.premierSupportPermission" >
+            <div class="estimative-request" ng-show="c.showEstimativeMessage">
+              <h4>${Would you like to receive an estimate of work hours to this request?}</h4>
+              <button type="button" class="btn btn-default" ng-click="c.receiveEstimative = true" ng-class="{'btn-info': c.receiveEstimative == true}" style="text-transform: capitalize">${Yes}</button>
+              <button type="button" class="btn btn-default" ng-click="c.receiveEstimative = false" ng-class="{'btn-info': c.receiveEstimative == false}" style="text-transform: capitalize">${No}</button>
+            </div>
+            
+            
+            <!--MPE 284 - [Relax CI] - Uninstall Component 1:N - INSERT " && c.isDelComp==false" in ng-if -->
+            <div class="estimative-request" ng-if="c.showEstimativeMessage == false && c.isDelComp==false">
+              <h4>${Once you submit this ticket, our analysts will estimate your request.}</h4>
+              <h4>${Your approval will be required.}</h4>
+            </div>
+            
+            <!--MPE 284 - [Relax CI] - Uninstall Component 1:N - INSERT new div class del_compoment-->
+            <div style="left: 10%;padding-left: 18px;">
+              <div class="delComponent" role="alert" ng-if="c.showEstimativeMessage == false && c.isDelComp==true">
+                <p>
+                  <i id="alertID" class="fa fa-warning"></i>
+                  <b>${You are removing components from the Managing Host service}</b>
+                  <br>${This action cannot be undone to include it again you must open a new ticket}
+                </p>
+              </div>
+            </div>
+
+            <div class="estimative-request-warning" ng-if="c.receiveEstimative != null">
+              <span class='glyphicon glyphicon-alert'></span>
+
+              <small ng-show="c.receiveEstimative == true">${Your request will be treated by our analysts. You will receive an estimate for approval soon.}</small>
+
+              <small ng-show="c.selectedProductIsMDR">${For the requested service, hours will be deducted from your support plan or you will be charged if the required execution time exceeds the hours available.}</small>
+              <small ng-show="c.receiveEstimative == false && data.hasSupportPlan && !c.selectedProductIsMDR">${For Service requested, hours will be deducted from your MS Support Plan or you will be charged in a rate of R$ 250/hour if execution time required exceed available hours.}</small>
+              <small ng-show="c.receiveEstimative == false && !data.hasSupportPlan && !c.selectedProductIsMDR">{{data.service_cost}}</small>
+              <p ng-show="data.country == 'JP'">
+                <span class='glyphicon glyphicon-alert'></span>
+                <small style='color: red' ng-show="data.country == 'JP'">${Note: Please note that it will be estimated to be about 1.5 times longer for non-business hours.}</small>
+              </p>
+            </div>
+          </div>
+
+          <div class="estimative-request-warning" ng-if="!data.isMasterAdmin && !data.isMSAdmin && !data.premierSupportPermission">
+            <span class='glyphicon glyphicon-alert'></span>
+            <small>${Your request will be treated by our analysts. The permissioned users will receive an estimate for approval soon}.</small>
+          </div>
+
+        </div>
+        <!--- Ask Estimate Hours Step End--->
+
+
+        <!--- Ticket Created Beggining --->
+        <div class="ticket-created text-center" ng-show="c.modalStep == 5">
+          <i class="icon-check-eqx-icon"></i>
+          <div ng-show="!selectedItem || selectedItem && selectedItem.isAvailable == true">
+            <p style="text-align:center;">
+              ${Your support case was submitted successfully}.
+            </p>
+            <p style="text-align:center;">
+              ${One of our agents will work on it.}
+            </p>
+          </div>
+          <div ng-show="selectedItem && selectedItem.isAvailable == false">
+            <p style="text-align:center;"> ${Thanks for your interest on new Equinix products. Your CSM will contact you soon.}</p>
+          </div>
+          <div class="buttons-center">
+            <div class="btn btn-primary" data-dismiss="modal">
+              ${Close}
+            </div>
+            <div class="btn btn-default" ng-click="c.resetModal()" ng-if="data.autofill != true" style="border: 1px solid #ccc !important;">
+              ${Open a Support Case}
+            </div>
+          </div>
+          
+          <div class="d-flex flex-column align-items-center m-t-medium" ng-if="!data.notSureForm">
+            <button class="btn btn-link d-flex justify-content-center" ng-click="c.cloneTicket()" style="position: relative;margin-left: -16px;">
+			  <eq-icon style="--size: 17px; --fill: #00A0E4;" name="clone" type="outline"></eq-icon>
+              <span class="m-l-small">${Clone Support Case}</span>
+            </button>
+            <div class="color-text-secondary small">
+              ${Open a similar support case with pre-populated fields.}
+            </div>
+          </div>
+          
+          <div style="width: 95%; max-width: 900px; margin: 0 auto; margin-top: 40px;"><eq-divider type="horizontal"></eq-divider></div>
+
+          <div id="msp-case-submission-qualtrics" style="text-align: -webkit-center; max-height: 800px;">
+          </div>
+        </div>
+        
+        <!-- <div class="link-upgrade" ng-if="c.modalStep < 5 || c.modalStep == 6">
+        	<div ng-show="c.modalStep == 1 && data.showlinkUpgrade">
+        		<div class="link-upgrade__content" ng-click="openLink()">
+          		<span>{{data.nameLinkUpgrade}}</span>
+          		<img src="arrow_create_ticket_modal.png" />
+        		</div>
+      		</div>
+        </div> -->
+       
+        <!--- Ticket Created End --->
+        
+      </div>
+
+      <div class="modal-footer" ng-if="c.modalStep < 5 || c.modalStep == 6">
+        
+        <input id="userAgreement" name="userAgreement" ng-model="c.userAgreement" ng-show="(c.modalStep == 4 && c.receiveEstimative == false && !c.showEditStep) || (c.modalStep == 4 && c.showEditStep && !c.onEdit) || (c.modalStep == 4 && c.isReassociation)" type="checkbox">
+        <label for="userAgreement" class="user-agreement" ng-show="(c.modalStep == 4 && c.receiveEstimative == false && !c.showEditStep) || (c.modalStep == 4 && c.showEditStep && !c.onEdit) || (c.modalStep == 4 && c.isReassociation)" style="padding: 0;" 
+               data-toggle="popover" data-trigger="hover" data-html="true" data-placement="top"
+               data-content="{{agreementText}}"
+               >${I agree with the} <span class="text-primary">${terms and conditions}</span></label>
+
+        <button type="button" class="btn btn-secondary-action pull-left" ng-if="c.modalStep == 2" ng-click="c.notSure();track('go to simple form',{'flow': 'submit support ticket', 'step': 'product category', 'source': 'nav bar'});track('step - submit support ticket - simple form',{'flow': 'submit support ticket'})">${I'm not sure}</button>
+        <button type="button" class="btn btn-info m-r-xs" ng-if="c.showBackButton()" ng-click="c.back();">${Back}</button>
+        <button type="button" class="btn btn-cancel btn-secondary-action m-r-xs" data-dismiss="modal" ng-click="trackTypeModal(c.modalStep)">${Cancel}</button>
+
+        <button type="button" id="createTicketButton" class="btn btn-info" 
+                ng-show="false && (c.serviceSupportType == 'Basic' || !c.serviceSupportType || c.modalStep == 4 && !c.onEdit) && !loadingData && c.modalStep != 6" 
+                ng-click="triggerOnSubmit();trackSubmit(c.modalStep)"
+                ng-disabled="c.submited"
+                ng-class="{'disabled': c.disableCreateTicketButton()}">
+          ${Open a Support Case}</button>
+        
+        <button type="button"
+                id="createButton"
+                ng-show="c.btnNextIsVisible()" 
+                class="btn btn-info" ng-click="c.moveToNext()" 
+                ng-disabled="c.moveToNextDisabled()">
+          {{c.nextText()}}
+        </button>
+
+        <button type="button" class="btn btn-info" ng-show="loadingData">${Loading}...<i class="fa fa-refresh fa-spin fa-fw" aria-hidden="true"></i></button>
+
+      </div>
+
+      <div class="backdrop" ng-if="loading"></div>
+      <div class="loading" ng-if="loading">
+        <i class="glyphicon glyphicon-refresh spin fa-spin"></i>
+      </div>
+
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1374c2690000001</claim_timestamp>
+        <metadata_update_name>sp_widget_07419dffdbf59f40448b01a3ca9619a1</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:26</sys_created_on>
+        <sys_id>b54524998775c7904d820e96cebb359f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:26</sys_updated_on>
+    </sys_claim>
+</record_update>

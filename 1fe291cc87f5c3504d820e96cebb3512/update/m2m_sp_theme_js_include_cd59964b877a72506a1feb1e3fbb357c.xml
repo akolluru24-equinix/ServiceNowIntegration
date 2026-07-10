@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="m2m_sp_theme_js_include">
+    <m2m_sp_theme_js_include action="INSERT_OR_UPDATE">
+        <order>100</order>
+        <sp_js_include display_value="Amplitude">8769128b877a72506a1feb1e3fbb354c</sp_js_include>
+        <sp_theme display_value="MSP Theme">51dc04d5db5b4740b3cd73e1ba9619de</sp_theme>
+        <sys_class_name>m2m_sp_theme_js_include</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-06 04:46:04</sys_created_on>
+        <sys_id>cd59964b877a72506a1feb1e3fbb357c</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Amplitude.MSP Theme</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>m2m_sp_theme_js_include_cd59964b877a72506a1feb1e3fbb357c</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:29</sys_updated_on>
+    </m2m_sp_theme_js_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c21010000001</claim_timestamp>
+        <metadata_update_name>m2m_sp_theme_js_include_cd59964b877a72506a1feb1e3fbb357c</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:29</sys_created_on>
+        <sys_id>bb17a09987b5c7904d820e96cebb357f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:29</sys_updated_on>
+    </sys_claim>
+</record_update>

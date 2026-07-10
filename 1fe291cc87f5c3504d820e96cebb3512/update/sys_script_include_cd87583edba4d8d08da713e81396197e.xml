@@ -1,0 +1,371 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>global.EQIX_POE_Pricing</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_POE_Pricing</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_POE_Pricing = Class.create();
+EQIX_POE_Pricing.prototype = {
+    initialize: function() {
+
+        this.tibcoDihEnvironment = gs.getProperty('EQIX.tibco.dih.environment');
+        this.tibcoDihIstance = gs.getProperty('EQIX.tibco.dih.instance');
+        this.tibcoDihToken = gs.getProperty('EQIX.tibco.dih.token');
+		
+		this.tibcoDihDevEnvironment = gs.getProperty('EQIX.tibco.dih.dev.environment');
+        this.tibcoDihDevIstance = gs.getProperty('EQIX.tibco.dih.dev.instance');
+        this.tibcoDihDevToken = gs.getProperty('EQIX.tibco.dih.dev.token');		
+    },
+
+    /**SNDOC
+    @name getMultProductPriceInfo
+    @description Get POE price from Single View and Siebel, considering TIBCO as middleware. To check logs search by "EQIX POE Pricing" Source
+
+    @param {array} [productArray = [{ contractGR: GlideRecord, attributes: [{attributes}] || [] }]
+    An array of products containing the contract GlideRecord and (if have) contract attributes or (if not) an empty array
+    @returns {string} Will return the integration response or an error object
+    @example
+    var products = [
+    {
+    contractGR: GlideRecord,
+    attributes: [
+    			{
+    				"name": "hardwareType",
+    				"value": "Smart Hands",
+    				"type": "String"
+    			},
+    		]
+    },
+    {
+    contractGR: GlideRecord,
+    attributes: []
+    },
+    ];
+    new EQIX_POE_Pricing().getMultProductPriceInfo(products)
+    */
+    getMultProductPriceInfo: function(productArray, timeout) {
+        var error = false;
+        var productBody = productArray.map(function(element, index) {
+            //IsValid function validate if the productArray contains the shape: {contractGR: GlideRecord, attributes: []}
+            if (!isValid(element)) {
+                error = true;
+                // 				gs.log(
+                // 					"Incorrect product properties, please verify the object shape",
+                // 					"EQIX POE Pricing"
+                // 				);
+                return;
+            }
+
+            var contract = element.contractGR;
+
+            //If everything is correct, the request object is structured for each product.
+            return {
+                ibx: contract.u_order_line_item.u_ibx.getDisplayValue(),
+                lnItemIntegrationId: 10000 + index,
+                qtyRequested: 1,
+                salesQuantity: 1,
+                productName: contract.parent.u_product.getDisplayValue(),
+                productSubType: contract.u_product.getDisplayValue(),
+                attributes: element.attributes,
+            };
+        });
+
+        if (error) {
+            return {
+                error: "Error with one or more contracts, check the EQIX POE Pricing logs",
+            };
+        }
+
+        try {
+            var gtBefore = new GlideDateTime();
+            var r = new sn_ws.RESTMessageV2(
+                "EQIX_POE_Pricing",
+                "POE_Pricing_MultipleProduct"
+            );
+            var contractAccountNumber = productArray[0].contractGR.account.u_account_number.getValue();
+            r.setMIDServer(gs.getProperty("EQIX.global.midserver"));
+            r.setStringParameterNoEscape('tibco.instance', this.tibcoDihIstance);
+            r.setStringParameterNoEscape('environment', this.tibcoDihEnvironment);
+            var correlationUUID = gs.generateGUID();
+            r.setStringParameterNoEscape('correlationID', correlationUUID);
+            r.setStringParameterNoEscape('token', this.tibcoDihToken);
+            r.setStringParameterNoEscape("accountNumber", contractAccountNumber);
+            r.setStringParameterNoEscape("time.stamp", gtBefore.getNumericValue());
+            r.setStringParameterNoEscape("productArray", JSON.stringify(productBody));
+            if (timeout) {
+                r.setHttpTimeout(5000);
+            }
+
+
+            var response = r.execute();
+            // 			gs.log(r.getRequestBody(), "EQIX POE Pricing");
+
+            var gtAfter = new GlideDateTime();
+            gtAfter.subtract(gtBefore.getNumericValue());
+            var responseTime = gtAfter.getNumericValue();
+
+            var wsLog = new EQIX_ManagedServiceLog();
+            wsLog.log(
+                "",
+                "",
+                r.getEndpoint(),
+                response.getStatusCode(),
+                response.getBody(),
+                r.getRequestBody(),
+                "EQIX POE Pricing",
+                responseTime
+            );
+
+            // 			gs.log(response, "EQIX POE Pricing");
+            return response;
+        } catch (ex) {
+            var message = ex.message;
+            // 			gs.log(message, "EQIX POE Pricing");
+        }
+
+        //Check mandatory properties
+        function isValid(element) {
+            var validated =
+                element.contractGR &&
+                element.contractGR instanceof GlideRecord &&
+                element.contractGR.instanceOf("sn_customerservice_contract_item") &&
+                "attributes" in element;
+            return validated;
+        }
+    },
+
+    getMultProductPriceInfoMultipleHosts: function(productArray, timeout) {
+        var error = false;
+        var productBody = productArray.map(function(element, index) {
+            if (!isValid(element)) {
+                error = true;
+                return;
+            }
+
+            return {
+                ibx: element.contractGR.u_order_line_item.u_ibx.getDisplayValue(),
+                cage: element.contractGR.u_order_line_item.u_unique_space_id.getDisplayValue(),
+                lnItemIntegrationId: 10000 + index,
+                qtyRequested: 1,
+                salesQuantity: 1,
+                productName: element.contractGR.u_order_line_item.u_pof.u_product.getDisplayValue(),
+                productSubType: element.contractGR.u_order_line_item.u_product.getDisplayValue(),
+                attributes: element.attributes,
+            };
+        });
+
+        if (error) {
+            return {
+                error: "Error with one or more contracts, check the EQIX POE Pricing logs",
+            };
+        }
+
+        try {
+            var gtBefore = new GlideDateTime();
+            var r = new sn_ws.RESTMessageV2(
+                "EQIX_POE_Pricing",
+                "POE_Pricing_MultipleProduct_V2"
+            );
+            var contractAccountNumber = productArray[0].contractGR.account.u_account_number.getValue();
+            r.setMIDServer(gs.getProperty("EQIX.global.midserver"));
+            r.setStringParameterNoEscape("tibco.instance", gs.getProperty("EQIX.tibco.instance.onPremise"));
+            r.setStringParameterNoEscape("accountNumber", contractAccountNumber);
+            r.setStringParameterNoEscape("time.stamp", gtBefore.getNumericValue());
+            r.setStringParameterNoEscape("productArray", JSON.stringify(productBody));
+            if (timeout) {
+                r.setHttpTimeout(5000);
+            }
+            var response = r.execute();
+            var gtAfter = new GlideDateTime();
+            gtAfter.subtract(gtBefore.getNumericValue());
+            var responseTime = gtAfter.getNumericValue();
+            var wsLog = new EQIX_ManagedServiceLog();
+            wsLog.log(
+                "",
+                "",
+                r.getEndpoint(),
+                response.getStatusCode(),
+                response.getBody(),
+                r.getRequestBody(),
+                "EQIX POE Pricing",
+                responseTime
+            );
+
+            return response;
+        } catch (ex) {
+            var message = ex.message;
+        }
+
+        function isValid(element) {
+            var validated =
+                element.contractGR &&
+                element.contractGR instanceof GlideRecord &&
+                element.contractGR.instanceOf("sn_customerservice_contract_item") &&
+                "attributes" in element;
+            return validated;
+        }
+    },
+
+    getIBX: function() {
+        var responseIBX = 'SSS';
+        var grCOLI = new GlideRecord('csm_order_line_item');
+        grCOLI.addEncodedQuery("sys_id=f3dec369db4a7810545dee0c139619b4");
+        grCOLI.query();
+        if (grCOLI.next()) {
+            responseIBX = grCOLI.getDisplayValue('u_ibx');
+        }
+        return responseIBX;
+    },
+
+    getPremierPrice: function(accountNumber, ibx, qty, source) {
+        var gtBefore = new GlideDateTime();
+        var productBody = {};
+		if (!qty) qty = 1;
+		if (!source) source = "EQIX POE Pricing - Create Ticket";
+        //productBody.ibx = ibx; ESS2-145
+        productBody.ibx = ibx.toString();
+        productBody.lnItemIntegrationId = 1000;
+        productBody.qtyRequested = 1;
+        productBody.salesQuantity = qty;
+        productBody.productName = 'Managed Services Premier Support Hour';
+        productBody.productSubType = 'Managed Ser Prem Sup Hour Prod';
+        productBody.attributes = [{}];
+        var productArray = [];
+        productArray.push(productBody);
+
+        var ws = new sn_ws.RESTMessageV2('EQIX_POE_Pricing', 'POE_Pricing_MultipleProduct');
+        ws.setMIDServer(gs.getProperty("EQIX.global.midserver"));
+        ws.setStringParameterNoEscape('tibco.instance', this.tibcoDihIstance);
+        ws.setStringParameterNoEscape('environment', this.tibcoDihEnvironment);
+        var correlationUUID = gs.generateGUID();
+        ws.setStringParameterNoEscape('correlationID', correlationUUID);
+        ws.setStringParameterNoEscape('token', this.tibcoDihToken);
+        ws.setStringParameterNoEscape("accountNumber", accountNumber);
+        ws.setStringParameterNoEscape("time.stamp", gtBefore.getNumericValue());
+        ws.setStringParameterNoEscape("productArray", JSON.stringify(productArray));
+
+        var response = ws.execute();
+        var responseBody = response.getBody();
+        var gtAfter = new GlideDateTime();
+        gtAfter.subtract(gtBefore.getNumericValue());
+        var responseTime = gtAfter.getNumericValue();
+        var msLog = new EQIX_ManagedServiceLog();
+        msLog.log("", "", ws.getEndpoint(), response.getStatusCode(), responseBody, ws.getRequestBody(), source, responseTime);
+
+        return JSON.parse(responseBody);
+    },
+
+    /**SNDOC
+        @name getPremierPriceFX
+        @description Get POE price from PriceFX platform. To check logs search by "EQIX POE Pricing" Source
+
+        @param {string} [accountNumber] - Account Number
+		@param {string} [ibx] - IBX Location from current case CI or Contract
+		@param {string} [qty] - Number of hours, 0.5 = 30 minutes, 1 = 60 minutes
+        @returns {string} Will return the integration response or an error object
+        @example
+        
+        */
+    getPremierPriceFX: function(accountNumber, ibx, qty) {
+        var gtBefore = new GlideDateTime();
+		var correlationUUID = gs.generateGUID();
+
+        var payload = {
+            referenceNumber: "AccNumber"+accountNumber, //eqxTrackingNumber
+            transactionId: correlationUUID, //uniqueID for request
+            sourceName: "Portal", //Fixed value
+            accountNumber: accountNumber,
+            lineItems: [{
+                ibx: ibx,
+                partNumber: "MGD00017.ELEM", //Fixed part number. product.u_part_number
+                quantity: 1, //Fixed
+                salesQuantity: qty, //if required to get partial price
+                description: "Managed Services Premier Support Hour", //Fixed
+                id: "1" //Incremental ID for multiple lines.
+            }]
+        };
+
+        var ws = new sn_ws.RESTMessageV2('EQIX_POE_Pricing', 'PriceFX_GetPrice');
+        ws.setMIDServer(gs.getProperty("EQIX.global.midserver"));
+		
+		var headers = this._getDihHeaders();
+		ws.setStringParameterNoEscape('tibco.instance', headers.tibcoDihIstance);
+        ws.setStringParameterNoEscape('environment', headers.tibcoDihEnvironment);
+		ws.setStringParameterNoEscape('token', headers.tibcoDihToken);
+
+        ws.setStringParameterNoEscape('correlationID', correlationUUID);
+        ws.setStringParameterNoEscape("accountNumber", accountNumber);
+        ws.setStringParameterNoEscape("time.stamp", gtBefore.getNumericValue());
+        ws.setStringParameterNoEscape("payload", JSON.stringify(payload));
+
+        var response = ws.execute();
+        var responseBody = response.getBody();
+        var gtAfter = new GlideDateTime();
+        gtAfter.subtract(gtBefore.getNumericValue());
+        var responseTime = gtAfter.getNumericValue();
+        var msLog = new EQIX_ManagedServiceLog();
+        msLog.log("", "", ws.getEndpoint(), response.getStatusCode(), responseBody, ws.getRequestBody(), "EQIX POE Pricing - PremierSupport", responseTime);
+
+        return JSON.parse(responseBody);
+    },
+
+	_getDihHeaders: function(){
+		var headers = {};
+		if(gs.getProperty('instance_name') == 'equinixcsm'){
+			headers.tibcoDihIstance = this.tibcoDihIstance;
+			headers.tibcoDihEnvironment = this.tibcoDihEnvironment;
+			headers.tibcoDihToken = this.tibcoDihToken;
+		} else{
+			headers.tibcoDihIstance = this.tibcoDihDevIstance;
+			headers.tibcoDihEnvironment = this.tibcoDihDevEnvironment;
+			headers.tibcoDihToken = this.tibcoDihDevToken;
+		}
+		return headers;
+	},
+
+    type: "EQIX_POE_Pricing",
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>organize.samara</sys_created_by>
+        <sys_created_on>2020-05-06 18:28:24</sys_created_on>
+        <sys_id>cd87583edba4d8d08da713e81396197e</sys_id>
+        <sys_mod_count>230</sys_mod_count>
+        <sys_name>EQIX_POE_Pricing</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_cd87583edba4d8d08da713e81396197e</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:44</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137999ce0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_cd87583edba4d8d08da713e81396197e</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:02:44</sys_created_on>
+        <sys_id>13762c1587b5c7904d820e96cebb3567</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:44</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>cd87583edba4d8d08da713e81396197e</id>
+        <sys_created_by>edgomes@equinix.com</sys_created_by>
+        <sys_created_on>2024-11-12 14:53:54</sys_created_on>
+        <sys_id>dc9fb1061b7d52d05c2e32231b4bcb3e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>edgomes@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-11-12 14:53:54</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>false</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

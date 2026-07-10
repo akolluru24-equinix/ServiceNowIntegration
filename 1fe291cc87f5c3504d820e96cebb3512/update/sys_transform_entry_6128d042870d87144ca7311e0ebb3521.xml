@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_entry">
+    <sys_transform_entry action="INSERT_OR_UPDATE">
+        <choice_action>ignore</choice_action>
+        <coalesce>true</coalesce>
+        <coalesce_case_sensitive>false</coalesce_case_sensitive>
+        <coalesce_empty_fields>false</coalesce_empty_fields>
+        <date_format>yyyy-MM-dd HH:mm:ss</date_format>
+        <map display_value="LTC Contract Item Attributes TM">b0f798ce87c987144ca7311e0ebb3551</map>
+        <reference_value_field/>
+        <source_field>[Script]</source_field>
+        <source_script><![CDATA[answer = (function transformEntry(source) {
+
+    var assetId = source.u_external_id__c;
+
+    if (JSUtil.nil(assetId)) {
+        return "";
+    }
+
+    var contractItemGr = new GlideRecord("sn_customerservice_contract_item");
+    contractItemGr.addQuery("u_siebel_asset_number", assetId);
+    contractItemGr.setLimit(1);
+    contractItemGr.query();
+
+    return contractItemGr.next() ? contractItemGr.getUniqueValue() : "";
+
+})(source);]]></source_script>
+        <source_table>u_ltc_contract_item_attribute_load</source_table>
+        <sys_class_name>sys_transform_entry</sys_class_name>
+        <sys_created_by>sgudimalla1@equinix.com</sys_created_by>
+        <sys_created_on>2026-05-25 13:15:54</sys_created_on>
+        <sys_id>6128d042870d87144ca7311e0ebb3521</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>[Script]</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_transform_entry_6128d042870d87144ca7311e0ebb3521</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:22</sys_updated_on>
+        <target_field>u_contract_item</target_field>
+        <target_table>sn_customerservice_contract_item_attributes</target_table>
+        <use_source_script>true</use_source_script>
+    </sys_transform_entry>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137b1b760000001</claim_timestamp>
+        <metadata_update_name>sys_transform_entry_6128d042870d87144ca7311e0ebb3521</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:22</sys_created_on>
+        <sys_id>1bd628d587b5c7904d820e96cebb35f3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:22</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>6128d042870d87144ca7311e0ebb3521</id>
+        <sys_created_by>sgudimalla1@equinix.com</sys_created_by>
+        <sys_created_on>2026-05-25 13:15:53</sys_created_on>
+        <sys_id>26d95482870d87144ca7311e0ebb3527</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>sgudimalla1@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-05-25 13:15:53</sys_updated_on>
+        <table>sys_transform_entry</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

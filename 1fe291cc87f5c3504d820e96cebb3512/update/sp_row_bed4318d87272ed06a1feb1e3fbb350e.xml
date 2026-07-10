@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_row">
+    <sp_row action="INSERT_OR_UPDATE">
+        <aria_label/>
+        <class_name>bg-white p-y-large m-x-reset</class_name>
+        <order>1</order>
+        <semantic_tag/>
+        <sp_column/>
+        <sp_container display_value="MSP Report Center - Container 2">36d4318d87272ed06a1feb1e3fbb350c</sp_container>
+        <sys_class_name>sp_row</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-08-22 07:34:13</sys_created_on>
+        <sys_id>bed4318d87272ed06a1feb1e3fbb350e</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>1</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_row_bed4318d87272ed06a1feb1e3fbb350e</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:45</sys_updated_on>
+    </sp_row>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f13799dd90000001</claim_timestamp>
+        <metadata_update_name>sp_row_bed4318d87272ed06a1feb1e3fbb350e</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:02:45</sys_created_on>
+        <sys_id>23762c1587b5c7904d820e96cebb3598</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:45</sys_updated_on>
+    </sys_claim>
+</record_update>

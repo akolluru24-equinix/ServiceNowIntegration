@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>false</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>change_request</collection>
+        <condition/>
+        <description>On change of state to "canceled" related publications should be canceled as well</description>
+        <execute_function>false</execute_function>
+        <filter_condition table="change_request">stateCHANGESTO4^EQ<item display_value="Canceled" endquery="false" field="state" goto="false" newquery="false" operator="CHANGESTO" or="false" value="4"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </filter_condition>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>EQIX Cancel Related Publications</name>
+        <order>500</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule(current, previous /*null when async*/ ) {
+	var workflow = new global.Workflow();
+
+    var changeID = current.sys_id;
+    var scheduled_template = gs.getProperty('sn_publications.TC_Scheduled_Change_Template');
+
+    var grPUB = new GlideRecord("sn_publications_publication");
+    grPUB.addEncodedQuery("target_email_template!=" + scheduled_template + "^u_related_ticket=" + changeID);
+    grPUB.query();
+    while (grPUB.next()) {
+		grPUB.stage = 'cancelled';
+		grPUB.u_cancel_details = 'Schedule Maintenance got cancelled';
+		grPUB.u_cancel_reason = 'not_needed_anymore';		
+		workflow.cancel(grPUB);
+        grPUB.update();
+    }
+
+
+
+
+
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>imori@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-13 16:33:32</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>52ddb46987433214acfa635d0ebb3503</sys_id>
+        <sys_mod_count>13</sys_mod_count>
+        <sys_name>EQIX Cancel Related Publications</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_52ddb46987433214acfa635d0ebb3503</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:40</sys_updated_on>
+        <template/>
+        <when>after</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=52ddb46987433214acfa635d0ebb3503"/>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f13798a150000001</claim_timestamp>
+        <metadata_update_name>sys_script_52ddb46987433214acfa635d0ebb3503</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:02:40</sys_created_on>
+        <sys_id>5276e81587b5c7904d820e96cebb3510</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:40</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>52ddb46987433214acfa635d0ebb3503</id>
+        <sys_created_by>imori@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-13 16:33:32</sys_created_on>
+        <sys_id>0d8ef8e987433214acfa635d0ebb3595</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>imori@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-13 16:33:32</sys_updated_on>
+        <table>sys_script</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

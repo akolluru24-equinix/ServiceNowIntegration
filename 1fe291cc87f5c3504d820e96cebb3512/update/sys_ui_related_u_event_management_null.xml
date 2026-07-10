@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_related sys_domain="global" table="u_event_management" version="2" view="">
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <group_by_field/>
+            <list_id display_value="Events - Default view" name="u_event_management" related_list="NULL" sys_domain="global" view="Default view">6d869c89dba4a340448b01a3ca96196c</list_id>
+            <order_by/>
+            <position>0</position>
+            <related_list>REL:0b065489dba4a340448b01a3ca9619fb</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>cliaw@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-10 05:14:21</sys_created_on>
+            <sys_id>6ab3ff9c1b353250bd075425604bcb01</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+            <sys_updated_on>2025-12-10 05:14:21</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <group_by_field/>
+            <list_id display_value="Events - Default view" name="u_event_management" related_list="NULL" sys_domain="global" view="Default view">6d869c89dba4a340448b01a3ca96196c</list_id>
+            <order_by/>
+            <position>1</position>
+            <related_list>REL:2f65d089dba4a340448b01a3ca9619f8</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>cliaw@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-10 05:14:21</sys_created_on>
+            <sys_id>62b3ff9c1b353250bd075425604bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+            <sys_updated_on>2025-12-10 05:14:21</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <group_by_field/>
+            <list_id display_value="Events - Default view" name="u_event_management" related_list="NULL" sys_domain="global" view="Default view">6d869c89dba4a340448b01a3ca96196c</list_id>
+            <order_by/>
+            <position>2</position>
+            <related_list>REL:7feb02771b16c2947d638554604bcbb7</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>cliaw@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-10 05:14:21</sys_created_on>
+            <sys_id>66b3ff9c1b353250bd075425604bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+            <sys_updated_on>2025-12-10 05:14:21</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <group_by_field/>
+            <list_id display_value="Events - Default view" name="u_event_management" related_list="NULL" sys_domain="global" view="Default view">6d869c89dba4a340448b01a3ca96196c</list_id>
+            <order_by/>
+            <position>3</position>
+            <related_list>REL:562d4f3b1b5646947d638554604bcb48</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>cliaw@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-10 05:14:21</sys_created_on>
+            <sys_id>6ab3ff9c1b353250bd075425604bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+            <sys_updated_on>2025-12-10 05:14:21</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list_entry action="INSERT_OR_UPDATE">
+            <filter/>
+            <group_by_field/>
+            <list_id display_value="Events - Default view" name="u_event_management" related_list="NULL" sys_domain="global" view="Default view">6d869c89dba4a340448b01a3ca96196c</list_id>
+            <order_by/>
+            <position>4</position>
+            <related_list>REL:2a03771c1b353250bd075425604bcbc6</related_list>
+            <sys_class_name>sys_ui_related_list_entry</sys_class_name>
+            <sys_created_by>cliaw@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-10 05:14:21</sys_created_on>
+            <sys_id>6eb3ff9c1b353250bd075425604bcb02</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+            <sys_updated_on>2025-12-10 05:14:21</sys_updated_on>
+        </sys_ui_related_list_entry>
+        <sys_ui_related_list action="INSERT_OR_UPDATE">
+            <calculated_name>Events - Default view</calculated_name>
+            <filter/>
+            <name>u_event_management</name>
+            <order_by/>
+            <position/>
+            <related_list/>
+            <sys_class_name>sys_ui_related_list</sys_class_name>
+            <sys_created_by>cliaw@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-10 05:14:21</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>6d869c89dba4a340448b01a3ca96196c</sys_id>
+            <sys_mod_count>1</sys_mod_count>
+            <sys_name>Events - Default view</sys_name>
+            <sys_package display_value="Global" source="global">global</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+            <sys_update_name>sys_ui_related_u_event_management_null</sys_update_name>
+            <sys_updated_by>oneto@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-06-29 13:03:20</sys_updated_on>
+            <sys_user/>
+            <view display_value="Default view" name="NULL">Default view</view>
+            <view_name/>
+        </sys_ui_related_list>
+    </sys_ui_related>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a26ce0000001</claim_timestamp>
+        <metadata_update_name>sys_ui_related_u_event_management_null</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:20</sys_created_on>
+        <sys_id>4ca6e85587b5c7904d820e96cebb353d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:20</sys_updated_on>
+    </sys_claim>
+</record_update>

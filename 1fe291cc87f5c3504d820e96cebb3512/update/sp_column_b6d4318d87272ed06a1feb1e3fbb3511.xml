@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_column">
+    <sp_column action="INSERT_OR_UPDATE">
+        <aria_label/>
+        <class_name>p-l-large p-r-large w-100</class_name>
+        <order>1</order>
+        <semantic_tag/>
+        <size/>
+        <size_lg/>
+        <size_sm/>
+        <size_xs/>
+        <sp_row display_value="1">bed4318d87272ed06a1feb1e3fbb350e</sp_row>
+        <sys_class_name>sp_column</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-08-22 07:34:13</sys_created_on>
+        <sys_id>b6d4318d87272ed06a1feb1e3fbb3511</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>1</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_column_b6d4318d87272ed06a1feb1e3fbb3511</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:07</sys_updated_on>
+    </sp_column>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137adf520000001</claim_timestamp>
+        <metadata_update_name>sp_column_b6d4318d87272ed06a1feb1e3fbb3511</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:07</sys_created_on>
+        <sys_id>63c620d587b5c7904d820e96cebb35b5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:07</sys_updated_on>
+    </sys_claim>
+</record_update>

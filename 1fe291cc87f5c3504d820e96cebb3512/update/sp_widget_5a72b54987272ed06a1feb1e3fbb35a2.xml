@@ -1,0 +1,1385 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller = function($scope, $timeout) {
+    var c = this;
+
+	$scope.locations = [];
+	$scope.assets = [];
+
+	var toastService = new EqToastService();
+	const DEFAULT_REGION = '';
+
+	$scope.STEP_1 = 1;
+	$scope.STEP_2 = 2;
+	$scope.generateStep = $scope.STEP_1;
+	$scope.recordToDelete = null;
+	$scope.allCount = 0;
+
+	$scope.applied = {
+		keyword: '',
+		filters: {}
+	};
+
+	$scope.order = {
+		column: $scope.data.orderColumn,
+		direction: $scope.data.orderDirection,
+	};
+
+    $scope.tblModel = {
+		loading: true,
+		options: {
+			sortable: true,
+			disableDefaultSort: false,
+		},
+        columns: [
+			{
+                title: '${Report Name}',
+				sortable: true,
+                field: 'name'
+            },
+            {
+                title: _.capitalize('${Product}'),
+				sortable: true,
+                field: 'productLabel',
+				width: '300px',
+            },
+            {
+                title: '${Date Requested}',
+				sortable: true,
+				defaultSortDirection: 'desc',
+                field: 'requestedTime',
+				width: '300px',
+				render: function(row) {
+					return row.requestedTime.date + ' ' + row.requestedTime.time;
+				}
+            },
+            {
+                title: '${IBX}',
+				sortable: true,
+				width: '300px',
+                field: 'location'
+            },
+        ],
+        rowActions: {
+			actionsColumnPosition: "last",
+			actionsCellStyle: {
+				width: '100px'
+			},
+            actions: [{
+                icon: (row) => {
+					if (row.attachment) {
+						return EQIX.html('<eq-icon-button type="primary" aria-label="${Download}"><eq-icon name="arrow-bar-down"></eq-icon></eq-icon-button>');
+					} else {
+						return EQIX.html('<eq-icon-button disabled type="primary" aria-label="${Download}"><eq-icon name="arrow-bar-down"></eq-icon></eq-icon-button>');
+					}
+				},
+                tooltip: "${Download}",
+				disabled: (row) => {
+					return !row.attachment;
+				},
+				onClick: (row) => {
+					window.open(row.attachment, '_blank');
+				}
+            }, {
+                icon: () => EQIX.html('<eq-icon-button type="primary" aria-label="${Delete}"><eq-icon name="trash"></eq-icon></eq-icon-button>'),
+                tooltip: "${Delete}",
+				onClick: (row) => {
+					$scope.recordToDelete = row.sysId;
+					$scope.modalDelete.visible = true;
+					
+				}
+            }]
+        },
+		dataSource: [],
+		events: {
+			'column-sort': function(e) {
+				$scope.order.column = e.detail.field;
+				switch(e.detail.field) {
+					case 'name':
+					$scope.order.column = 'u_name';
+					break;
+					case 'productLabel':
+					$scope.order.column = 'u_product';
+					break;
+					case 'requestedTime':
+					$scope.order.column = 'u_requested_at';
+					break;
+				}
+				$scope.order.direction = e.detail.direction;
+				$scope.tblPagination.page = 1;
+				$scope.getData(true);
+			}
+		}
+		
+    };
+	$scope.tblPagination = {
+		totalCount: 0,
+		page: 1,
+		pageSize: 10,
+		// pageSizeOptions: [5, 10, 15, 20],
+		'from': function() {
+			if ($scope.tblPagination.totalCount == 0)
+				return 0;
+			return ($scope.tblPagination.page - 1) * $scope.tblPagination.pageSize + 1;
+		},
+		'to': function() {
+			if ($scope.tblPagination.totalCount == 0)
+				return 0;
+			var maxCount = $scope.tblPagination.page * $scope.tblPagination.pageSize;
+			var totalCount = $scope.tblPagination.totalCount;
+			return maxCount > totalCount ? totalCount : maxCount;
+		},
+	};
+
+	$scope.handlePageChange = function(detail) {
+		var page = detail.page;
+		var pageSize = detail.pageSize;
+		if ($scope.tblPagination.pageSize != pageSize) {
+			$scope.tblPagination.page = 1;
+			$scope.tblPagination.pageSize = pageSize;
+			$scope.tblPagination.totalCount = 0;
+		} else {
+			$scope.tblPagination.page = page;
+		}
+		$scope.getData();
+	};
+
+	$scope.filters = {
+		selectedFilters: {},
+		searchValue: '',
+		hideAllFiltersButton: true,
+		events: {
+			apply: function(e) {
+				$scope.applied = {
+					keyword: '',
+					filters: {}
+				};
+				for (var filterName in e.detail.filters) {
+					var aFilter = e.detail.filters[filterName];
+					$scope.applied.filters[filterName] = aFilter.values;
+				}
+				
+				$scope.filters.searchValue = $scope.filterSearch.searchValue;
+				$scope.applied.keyword = $scope.filterSearch.searchValue;
+				$scope.getData();
+			},
+			reset: () => {
+				$scope.applied = {
+					keyword: '',
+					filters: {}
+				};
+				$scope.resetPagination();
+				$scope.resetFilters();
+				$scope.getData();
+			},
+			search: (e) => {
+				$scope.applied.keyword = e.detail.value;
+				$scope.getData();
+			},
+		}
+	};
+
+	$scope.filterSearch = {
+		placeholder: '${Search by Report Name, IBX}',
+		searchValue: '',
+		displayKey: 'title',
+		searchInKey: 'title',
+		dataSource: $scope.data.suggestions,
+	};
+
+	$scope.filterProduct = {
+		options: $scope.data.products, 
+		disabled: $scope.data.invalidAccess,
+		placeholder: _.capitalize('${Product}'),
+		labelText: _.capitalize('${Product}'),
+		value: '',
+	};
+
+	$scope.btnOpener = {
+		disabled: $scope.data.invalidAccess,
+	};
+
+	$scope.inputName = {
+		value: null,
+		labelText: '${Report Name}',
+		placeholder: '${Enter Report Name}',
+	};
+
+	$scope.sltProduct = {
+		value: null,
+		labelText: _.capitalize('${Product}'),
+		options: $scope.data.products,
+		placeholder: '${Select}',
+		events: {
+			select: () => {
+				if ($scope.sltProduct.value) {
+					$scope.server.get({
+						action: 'getLocations',
+						product: $scope.sltProduct.value
+					}).then(resp => {
+						$scope.sltRegion.value = DEFAULT_REGION;
+						$scope.sltLocation.value = null;
+						$scope.sltAsset.value = null;
+
+						$scope.locations = resp.data.locations;
+						$scope.assets = resp.data.assets;
+						$scope.sltRegion.options = resp.data.regions;
+
+						$scope.sltLocation.options = [];
+						$scope.sltAsset.options = [];
+					});
+				} else {
+					$scope.sltRegion.options = [];
+					$scope.sltLocation.options = [];
+					$scope.sltAsset.options = [];
+				}
+			}
+		}
+	};
+
+	$scope.sltRegion = {
+		value: '',
+		labelText: '${Region}',
+		options: [],
+		placeholder: '${Select}',
+		multiple: true,
+		events: {
+			select: (e) => {
+				$scope.sltLocation.value = null;
+				$scope.sltAsset.value = null;
+			}
+		}
+	};
+
+	$scope.sltLocation = {
+		value: '',
+		labelText: '${Location(IBX)}',
+		placeholder: '${Select}',
+		multiple: true,
+		computed: {
+			options: () => {
+				if (!$scope.sltProduct.value) {
+					return [];
+				}
+				if ($scope.sltRegion.value) {
+					let regions = $scope.sltRegion.value.split(',');
+					return $scope.locations.filter(o => regions.includes(o.region));
+				}
+				return $scope.locations;
+			}
+		},
+	};
+
+	$scope.sltAsset = {
+		value: null,
+		labelText: _.capitalize('${Asset}'),
+		multiple: true,
+		options: [],
+		placeholder: '${Select}',
+		computed: {
+			options: () => {
+				if (!$scope.sltProduct.value) {
+					return [];
+				}
+				if ($scope.sltLocation.value) {
+					let locations = $scope.sltLocation.value.split(',');
+					return $scope.assets
+						.filter(o => locations.includes(o.ibx))
+						.map(o => ({ value: o.asset, label: o.asset}));
+				} else if ($scope.sltRegion.value) {
+					let locationOptions = $scope.sltLocation.computed.options();
+					return $scope.assets
+						.filter(o => {
+							return locationOptions.map(s => s.value)
+								.includes(o.ibx);
+						})
+						.map(o => ({ value: o.asset, label: o.asset}));
+				}
+				return $scope.assets.map(o => ({ value: o.asset, label: o.asset}));
+			}
+		},
+	};
+
+	$scope.dateRange = {
+		value: '',
+		labelText: '${Date Range}',
+		disableAfterToday: true,
+		showPreviousMonth: true,
+		placeholder: '${Select}',
+		noEndDateText: '',
+		format: 'yyyy-MM-dd',
+		options: [],
+	};
+	$scope.sltFormat = {
+		value: 'csv',
+		labelText: '${Report Format}',
+		options: $scope.data.formats,
+		placeholder: '${Select}',
+		disabled: true,
+	};
+
+	$scope.btnSubmit = {
+		disabled: true,
+		computed: {
+			disabled: () => {
+				return !$scope.inputName.value || !$scope.sltProduct.value || !$scope.sltFormat.value || $scope.generateStep == $scope.STEP_2;
+			}
+		},
+		events: {
+			click: () => {
+				if (!$scope.dateRange.value) {
+					$scope.dateRange.value = $scope.dateRange.$elem._options[2].value;
+				}
+				let range = $scope.dateRange.value.split(' ');
+				let startDate = range[0];
+				let endDate = range[1];
+				
+				let payload = {
+					action: 'submit',
+					name: $scope.inputName.value,
+					product: $scope.sltProduct.value,
+					region: $scope.sltRegion.value,
+					location: $scope.sltLocation.value,
+					asset: $scope.sltAsset.value,
+					format: $scope.sltFormat.value,
+					startDate: getYyyyMmDd(startDate),
+					endDate: getYyyyMmDd(endDate),
+				};
+				if (!payload.location) {
+					payload.location = $scope.sltLocation.options.map(o => o.value).join(',');
+				}
+				// return;
+				$scope.server.get(payload).then(resp => {
+					if (resp.data.result) {
+						$scope.generateStep = $scope.STEP_2;
+						$scope.getData();
+					}
+					
+				});
+			}
+		}
+	};
+
+	$scope.btnCancel = {
+		events: {
+			click: () => {
+				$scope.drawer.visible = false;
+			}
+		}
+	};
+
+	$scope.btnClear = {
+		disabled: false,
+		computed: {
+			disabled: () => {
+				return $scope.generateStep > 1;
+			}
+		},
+		events: {
+			click: () => {
+				$scope.inputName.value = null;
+				$scope.sltProduct.value = null;
+				$scope.sltRegion.value = null;
+				$scope.sltLocation.value = null;
+				$scope.sltAsset.value = null;
+				$scope.dateRange.value = null;
+				$scope.sltRegion.options = [];
+				$scope.sltLocation.options =[];
+				$scope.sltAsset.options = [];
+			}
+		}
+	};
+
+	$scope.btnRequestAnother = {
+		events: {
+			click: () => {
+				c.resetDrawer();
+				$scope.btnClear.events.click();
+				EQIX.notifyApply($scope);
+			}
+		}
+	};
+
+	$scope.drawer = {
+		visible: false,
+		events: {
+			'open-end': () => {
+				// c.resetDrawer();
+				$scope.sltRegion.value = DEFAULT_REGION;
+				initDateRangeOptions();
+				$timeout(() => {
+					$scope.dateRange.value = $scope.dateRange.$elem._options[2].value;
+				}, 300);
+			},
+			'close-end': () => {
+				c.resetDrawer();
+				$scope.btnClear.events.click();
+			},
+		}
+	};
+
+	$scope.modalDelete = {
+		titleText: '${Delete Report}',
+		visible: false,
+		events: {
+			'close-end': function() {
+				$scope.modalDelete.visible = false;
+			}
+		}
+	};
+
+	$scope.btnDeleteNo = {
+		events: {
+			click: e => {
+				$scope.modalDelete.visible = false;
+				$scope.recordToDelete = null;
+
+			}
+		}
+	};
+
+	$scope.btnDeleteYes = {
+		events: {
+			click: () => {
+				$scope.server.get({
+					action: 'deleteReport',
+					sysId: $scope.recordToDelete
+				}).then(() => {
+					$scope.getData();
+					toastService.open({
+						type:'success',
+						bodyText:'${Your report is deleted}', 
+						showIcon: true,
+						dismissible: true,
+						duration: 3,
+					});
+					$scope.modalDelete.visible = false;
+				});
+			}
+		}
+	};
+
+	c.resetDrawer = () => {
+		$scope.generateStep = $scope.STEP_1;
+	};
+
+	$scope.resetFilters = function() {
+		$scope.filterSearch.searchValue = '';
+		$scope.filters.searchValue = '';
+		$scope.filters.selectedFilters = {};
+	};
+
+	$scope.resetPagination = function() {
+		$scope.tblPagination.totalCount = 0;
+		$scope.tblPagination.page = 1;
+	};
+
+	$scope.getData = function() {
+		var payload = {
+			action: 'getReports',
+			applied: $scope.applied,
+			page: $scope.tblPagination.page,
+			windowSize: $scope.tblPagination.pageSize,
+			orderColumn: $scope.order.column,
+			orderDirection: $scope.order.direction,
+		};
+		$scope.tblModel.loading = true;
+		$scope.server.get(payload).then((resp) => {
+			$scope.tblModel.loading = false;
+			$scope.tblModel.dataSource = resp.data.list;
+			$scope.tblPagination = Object.assign($scope.tblPagination, { totalCount: +resp.data.totalCount });
+			$scope.allCount = resp.data.allCount;
+		});
+	};
+
+	function daysPassedSinceOneYearAgo() {
+		const today = new Date();
+
+		const oneYearAgo = new Date();
+		oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+		const differenceInMilliseconds = today - oneYearAgo;
+
+		const millisecondsInADay = 1000 * 60 * 60 * 24;
+
+		const daysPassed = Math.floor(differenceInMilliseconds / millisecondsInADay);
+
+		return daysPassed;
+	}
+
+	function initDateRangeOptions() {
+		$scope.dateRange.options = [
+			{
+				"days": -1,
+				"label": $scope.data.label24Hours
+			},
+			{
+				"days": -30,
+				"label": $scope.data.label30Days
+			},
+			{
+				"days": -90,
+				"label": $scope.data.label90Days
+			},
+			{
+				"days": -180,
+				"label": $scope.data.label180Days
+			},
+			{
+				"days": -(daysPassedSinceOneYearAgo()),
+				"label": $scope.data.labelAYear
+			},
+		];
+	}
+
+	function getYyyyMmDd(dateString) {
+		let date = new Date(dateString);
+		let year = date.getFullYear();
+		let month = date.getMonth() + 1;
+		let dateOfMonth = date.getDate();
+		month = _.padStart(month+'', 2, '0');
+		dateOfMonth = _.padStart(dateOfMonth+'', 2, '0');
+		return year + '-' + month + '-' + dateOfMonth;
+	}
+
+	/////////////////////////////////////////////////
+	// init
+	$timeout(() => {
+		$scope.getData();
+	}, 300);
+};]]></client_script>
+        <controller_as>c</controller_as>
+        <css/>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>msp-report-center-table</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) {
+}]]></link>
+        <name>MSP Report Center</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+	data.list = [];
+    var _ = new EQIX_Lodash();
+    var siLocalization = new EQIX_Localization();
+    var siCustomerPermission = new EQIX_Customer_Permissions();
+	var siGlobalProducts = new EQIX_Global_Products();
+    var siDataSegragation = new EQIX_DataSegregationUtils();
+
+	var MPCPartNum = gs.getProperty('EQIX_PartNumber_MPC');
+	var MPCStoragePartNum = gs.getProperty('EQIX_MPC_STORAGE_PART_NUM');
+	var MPCComputePartNum = gs.getProperty('EQIX_MPC_COMPUTE_PART_NUM');
+	var MPCMemoryPartNum = gs.getProperty('EQIX_MPC_MEMORY_PART_NUM');
+
+	var MPBPartNum = gs.getProperty('EQIX_MPB_POF_PART_NUM');
+	var MPBPoePartNum = gs.getProperty('EQIX_MPB_PART_NUM');
+
+	var MPSPartNum = gs.getProperty('EQIX_PartNumber_MPS');
+	var MPSPoePartNum = gs.getProperty('EQIX_MPS_STORAGE_PART_NUM');
+
+    data.orderColumn = 'u_requested_at';
+    data.orderDirection = 'desc';
+	data.invalidAccess = true;
+	data.page = 1;
+	data.windowSize = 10;
+	data.allCount = 0;
+	data.list = [];
+    data.country = siDataSegragation.getUserCountry();
+
+	data.label24Hours = gs.getMessage('{0} hours', 24);
+	data.label30Days = gs.getMessage('{0} days', 30);
+	data.label90Days = gs.getMessage('{0} days', 90);
+	data.label180Days = gs.getMessage('{0} days', 180);
+	data.labelAYear = gs.getMessage('{0} year', 1);
+	
+	data.regions = [
+		{
+			value: 'AMER',
+			label: 'AMER',
+			disabled: false,
+		},
+		{
+			value: 'APAC',
+			label: 'APAC',
+			disabled: false,
+		},
+		{
+			value: 'EMEA',
+			label: 'EMEA',
+			disabled: false,
+		},
+	];
+    var account = siCustomerPermission.getActiveAccountSysId();
+	var grAccount = new GlideRecord('customer_account');
+	if (!grAccount.get(account)) {
+		return;
+	}
+	var orgId = grAccount.getValue('u_org_id');
+	
+	if (!siGlobalProducts.hasAnyPermission()) {
+		return;
+	}
+	data.invalidAccess = false;
+	
+	if (input) {
+
+        optCopy(['applied', 'page', 'windowSize', 'orderColumn', 'orderDirection']);
+		if (input.action == 'getReports') {
+			var result = getReports(orgId);
+			data.list = result[0];
+			data.totalCount = result[1];
+			data.allCount = result[2];
+		}
+		if (input.action == 'getLocations') {
+			data.locations = getLocations(input.product);
+			data.assets = getAssetsByIBXs(input.product, data.locations.map(function(o) {
+				return o.value;
+			}));
+		}
+
+		if (input.action == 'deleteReport') {
+			var grDelete = new GlideRecord('u_managed_service_report');
+			if (grDelete.get(input.sysId)) {
+				var grAttachment = findAttachment(input.sysId);
+				if (grAttachment) grAttachment.deleteRecord();
+				grDelete.deleteRecord();
+			}
+		}
+		if (input.action == 'submit') {
+			var grNew = new GlideRecord('u_managed_service_report');
+			grNew.initialize();
+			var location = input.location || '';
+			var asset = input.asset || '';
+			var region = input.region || '';
+			grNew.u_product = input.product;
+			grNew.u_region = region;
+			grNew.u_format = input.format;
+			grNew.u_start_date = input.startDate;
+			grNew.u_end_date = input.endDate;
+			grNew.u_requestor = gs.getUserID();
+			grNew.u_location = location;
+			grNew.u_asset = asset;
+			grNew.u_name = input.name;
+			grNew.u_org = orgId;
+			grNew.u_requested_at = new GlideDateTime();
+
+			var startDate = input.startDate;
+			var endDate = input.endDate;
+
+			data.result = grNew.insert();
+			var locationList = location.split(',').filter(function(o) { return o;});
+			var assetList = asset;
+			if (input.product.includes('MPC')) {
+				var idList = getContractsByIBXs(MPCPartNum, locationList, assetList);
+				var mpcData = getMpcData(orgId, idList, startDate, endDate);
+				var mpcHeaders = ['Account', 'Asset Number', 'Product', 'Date', 'Compute Baseline', 'Compute Consumption', 'Memory Baseline', 'Memory Consumption', 'Memory Unit', 'Storage Baseline', 'Storage Consumption', 'Storage Unit'];
+				data.attachment = generateCsv(grNew, input.name + '.csv', mpcHeaders, mpcData);
+
+				grNew.u_generated_at = new GlideDateTime();
+				grNew.update();
+			} else if (input.product.includes('MPB')) {
+				var idList = getContractsByIBXs(MPBPartNum, locationList, assetList);
+				var mpbData = getMpbData(orgId, idList, startDate, endDate);
+				var mpbHeaders = ['Account', 'Asset Number', 'Product', 'Date', 'Volume Baseline', 'Volume Consumption', 'Volume Unit'];
+				data.attachment = generateCsv(grNew, input.name + '.csv', mpbHeaders, mpbData);
+
+				grNew.u_generated_at = new GlideDateTime();
+				grNew.update();
+			} else if (input.product.includes('MPS')) {
+				var idList = getContractsByIBXs(MPSPartNum, locationList, assetList);
+				var mpsData = getMpsData(orgId, idList, startDate, endDate);
+				var mpsHeaders = ['Account', 'Asset Number', 'Product', 'Date', 'Volume Baseline', 'Volume Consumption', 'Volume Unit'];
+				data.attachment = generateCsv(grNew, input.name + '.csv', mpsHeaders, mpsData);
+
+				grNew.u_generated_at = new GlideDateTime();
+				grNew.update();
+			}
+
+		}
+		return;
+	}
+
+
+	data.products = getProducts(orgId);
+	data.formats = getFormats();
+
+	function getReports(orgId) {
+		var ga = new GlideAggregate('u_managed_service_report');
+		ga.addQuery('u_org', orgId);
+		ga.addAggregate('COUNT');
+		ga.query();
+		var allCount = 0;
+		if (ga.next()) {
+			allCount = ga.getAggregate('COUNT');
+		}
+
+		var gr = new GlideRecordSecure('u_managed_service_report');
+		gr.addQuery('u_org', orgId);
+		var windowStart = (+input.page - 1) * input.windowSize;
+		var windowEnd = +input.page * input.windowSize;
+		if (input.applied) {
+			if (input.applied.keyword) {
+				// search keyword
+				var w = input.applied.keyword;
+				var condition = gr.addQuery('u_name', 'CONTAINS', w);
+				condition.addOrCondition('u_location', 'CONTAINS', w);
+			}
+			var filterProduct = input.applied.filters['filter-product'];
+			if (filterProduct) {
+				gr.addQuery('u_product', filterProduct[0]);
+			}
+		}
+		gr.chooseWindow(windowStart, windowEnd, true);
+		if (data.orderDirection == 'desc') {
+			gr.orderByDesc(data.orderColumn);
+		} else {
+			gr.orderBy(data.orderColumn);
+		}
+		gr.query();
+
+		var arr = [];
+		var products = getProducts(orgId);
+		while(gr.next()) {
+			var sysId = gr.getValue('sys_id');
+			var grAttachment = findAttachment(sysId);
+			var attachmentUrl = null;
+			var attachmentName = null;
+			if (grAttachment) {
+				// ?sysparm_referring_url=tear_off&view=true&sys_id=5300d0831b27ae14bd075425604bcbe6
+				attachmentUrl = new String(gs.getProperty('glide.servlet.uri') + 'sys_attachment' + '?sys_id=' + grAttachment.getValue('sys_id'));
+				attachmentName = grAttachment.getValue('file_name');
+			}
+			arr.push({
+				sysId: sysId,
+				name: gr.getValue('u_name'),
+				product: gr.getValue('u_product'),
+				productLabel: _.find(products, function(o) {
+					return o.value == gr.getValue('u_product');
+				}).label, // managedServices[gr.getValue('u_product')]
+				requestedTime: {
+					date: siLocalization.getLocalDate(gr.getValue('u_requested_at'), data.country),
+					time: siLocalization.getLocalTime(gr.getValue('u_requested_at')),
+				},
+				generatedTime: gr.getValue('u_generated_at'),
+				attachment: attachmentUrl,
+				location: gr.getValue('u_location'),
+				attachmentName: attachmentName,
+			});
+		}
+		var totalCount = gr.getRowCount();
+		return [arr, totalCount, allCount];
+	}
+
+	function getManagedServices() {
+		var services = {};
+		var grService = new GlideRecord('u_managed_service');
+		var partNums = [MPCPartNum, MPBPartNum, MPSPartNum];
+		grService.addEncodedQuery('u_part_numberIN' + partNums.join(','));
+		grService.setLimit(partNums.length);
+		grService.query();
+		while(grService.next()) {
+			services[grService.getValue('u_part_number')] = grService.getDisplayValue('name');
+		}
+		return services;
+	}
+
+	function findAttachment(sysId) {
+		var gr = new GlideRecord('sys_attachment');
+		gr.addEncodedQuery('content_type=application/csv^table_sys_id=' + sysId);
+		gr.orderByDesc('sys_created_on');
+		gr.setLimit(1);
+		gr.query();
+		if (gr.next()) {
+			return gr;
+		}
+		return null;
+	}
+
+	function findProductByPartNum(partNum) {
+		var gr = new GlideRecord('u_managed_service');
+		gr.addQuery('u_part_number', partNum);
+		gr.query();
+		if (gr.next()) {
+			return gr;
+		}
+		return null;
+	}
+
+	function getLocations(partNumber) {
+		var gaPof = new GlideAggregate('sn_customerservice_contract_item');
+		gaPof.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_number=" + partNumber + "^account.u_org_id=" + orgId);
+		gaPof.setGroup(true);
+		gaPof.groupBy("sys_id");
+		gaPof.query();
+
+		var ibxList = [];
+		while(gaPof.next()) {
+			var ibx = getContractItemAttr(gaPof.getValue('sys_id'), 'IBX');
+			if (ibxList.filter(function(o) {
+				return o.value == ibx;
+			}).length > 0) {
+				continue;
+			}
+
+			ibxList.push({
+				value: ibx,
+				label: ibx,
+				region: getRegion(ibx),
+			});
+		}
+
+		return ibxList;
+	}
+
+	function getRegion(ibx) {
+		var gRlocation = new GlideRecord('cmn_location');
+		gRlocation.addQuery('name', ibx);
+		gRlocation.query();
+		if (gRlocation.next()) {
+			return gRlocation.getValue('u_region');
+		}
+	}
+
+	function generateCsv(grRec, fileName, headers, rows) {
+		var newline = "\n";
+		var seperator = ',';
+		var fileContent = headers.join(seperator);
+		for (var i in rows) {
+			var row = rows[i];
+			fileContent = fileContent + newline + row.join(seperator);
+		}
+		var grAttachment = new GlideSysAttachment();
+		var attachSysID = grAttachment.write(grRec, fileName, 'application/csv', fileContent);
+		return attachSysID;
+	}
+
+	function getContractsByIBXs(partNumber, ibxList, assetList) {
+		var gaPof = new GlideAggregate('sn_customerservice_contract_item');
+		var query = "u_siebel_asset_status=Active^u_product.u_part_number=" + partNumber + "^account.u_org_id=" + orgId;
+		if (assetList) {
+			query += '^u_siebel_asset_numberIN' + assetList;
+		}
+		gaPof.addEncodedQuery(query);
+		gaPof.setGroup(true);
+		gaPof.groupBy("sys_id");
+		gaPof.query();
+
+		var idList = [];
+		while(gaPof.next()) {
+			var ibx = getContractItemAttr(gaPof.getValue('sys_id'), 'IBX');
+			if (ibxList.length === 0 || ibxList.includes(ibx)) {
+				idList.push(gaPof.getValue('sys_id'));
+			}
+		}
+		return idList;
+	}
+
+	function getAssetsByIBXs(partNumber, ibxList) {
+		var gaPof = new GlideAggregate('sn_customerservice_contract_item');
+		gaPof.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_number=" + partNumber + "^account.u_org_id=" + orgId);
+		gaPof.setGroup(true);
+		gaPof.groupBy("sys_id");
+		gaPof.groupBy("u_siebel_asset_number");
+		gaPof.query();
+
+		var assetList = [];
+		while(gaPof.next()) {
+			var ibx = getContractItemAttr(gaPof.getValue('sys_id'), 'IBX');
+			if (ibxList.includes(ibx)) {
+				assetList.push({
+					ibx: ibx,
+					asset: gaPof.getValue('u_siebel_asset_number'),
+				});
+			}
+		}
+		return assetList;
+	}
+
+	function getMpcData(orgId, idList, startDate, endDate) {
+
+		var aggregatedContracts = {};
+		var grSCCIPof = new GlideRecord('sn_customerservice_contract_item');
+		grSCCIPof.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_number=" + MPCPartNum + "^account.u_org_id=" + orgId + '^sys_idIN'+idList.join(','));
+		grSCCIPof.query();
+		
+		while (grSCCIPof.next()) {
+			var grMPC = new GlideRecord('u_global_prod_consumption');
+			grMPC.addEncodedQuery('u_contract_item.u_product.u_part_number=' + MPCPartNum +
+														'^ORu_contract_item.u_product.u_part_number=' + MPCStoragePartNum +
+														'^ORu_contract_item.u_product.u_part_number=' + MPCComputePartNum +
+														'^ORu_contract_item.u_product.u_part_number=' + MPCMemoryPartNum +
+														'^u_contract_item.account.u_org_id=' + orgId + "^u_contract_item.parent=" + grSCCIPof.sys_id +
+														'^u_date>='+startDate +
+														'^u_date<='+endDate
+														);
+			// grMPC.groupBy('u_contract_item');
+			grMPC.orderByDesc('sys_updated_on');
+			grMPC.query();
+
+			while (grMPC.next()) {
+				var parentContract = grSCCIPof.getValue('sys_id');
+				if (!aggregatedContracts[parentContract]) {
+					aggregatedContracts[parentContract] = {
+						parentContract: parentContract,
+						parentContractAssetNumber: grSCCIPof.getValue('u_siebel_asset_number'),
+						location: getContractItemAttr(parentContract, 'IBX'),
+						account: grSCCIPof.getDisplayValue('account'),
+						product: grSCCIPof.getDisplayValue('u_product'),
+						serviceType: getContractItemAttr(grMPC.getValue('u_contract_item'), 'Service Type'),
+						details: [],
+					};
+				}
+				var year = grMPC.getValue('u_year');
+				var month = grMPC.getValue('u_month');
+				var day = grMPC.getValue('u_day');
+				var aDetail = _.find(aggregatedContracts[parentContract].details, function(o) {
+					return o.year == year && o.month == month && o.day == day;
+				});
+				if (!aDetail) {
+					aDetail = {
+						year: year,
+						month: month,
+						day: day,
+						date: +(year + _.pad(month, 2, '0') + _.pad(day, 2, '0')),
+					};
+					aggregatedContracts[parentContract].details.push(aDetail);
+				}
+				if (grMPC.u_contract_item.u_product.u_part_number == MPCStoragePartNum) {
+					aDetail.storage = {
+						baseline: getContractItemAttr(grMPC.getValue('u_contract_item'), 'Storage Quantity'),
+						uom: getContractItemAttr(grMPC.getValue('u_contract_item'), 'UOM'),
+						consumption: grMPC.getValue('u_quantity'),
+					};
+				}
+				if (grMPC.u_contract_item.u_product.u_part_number == MPCComputePartNum) {
+					aDetail.compute = {
+						baseline: grMPC.getValue('u_baseline'),
+						consumption: grMPC.getValue('u_quantity'),
+					};
+					if (gs.nil(aDetail.compute.baseline)) {
+						aDetail.compute.baseline =  getContractItemAttr(grMPC.getValue('u_contract_item'), 'Compute Quantity');
+					}
+				}
+				if (grMPC.u_contract_item.u_product.u_part_number == MPCMemoryPartNum) {
+					aDetail.memory = {
+						baseline: grMPC.getValue('u_baseline'),
+						consumption: grMPC.getValue('u_quantity'),
+						uom: grMPC.getValue('u_quantity_unit'),
+					};
+					if (gs.nil(aDetail.memory.baseline)) {
+						aDetail.memory.baseline =  getContractItemAttr(grMPC.getValue('u_contract_item'), 'Memory Quantity');
+					}
+				}
+			}
+		}
+		var csvData = [];
+		// ['Account', 'Asset Number', 'Product', 'Date', 'Compute Baseline', 'Compute Consumption', 'Memory Baseline', 'Memory Consumption', 'Memory Unit', 'Storage Baseline', 'Storage Consumption', 'Storage Unit']
+		for (var parentId in aggregatedContracts) {
+			var parentRecord = aggregatedContracts[parentId];
+			
+			for (var i in parentRecord.details) {
+				var row = [];
+				var aDetail = parentRecord.details[i];
+				row.push(parentRecord.account);
+				row.push(parentRecord.parentContractAssetNumber);
+				row.push(parentRecord.product);
+
+				var dateString = aDetail.year + '-' + aDetail.month + '-' + aDetail.day;
+				row.push(dateString);
+				if (aDetail.compute) {
+					row.push(aDetail.compute.baseline || '');
+					row.push(aDetail.compute.consumption || '');
+				} else {
+					row.push('');
+					row.push('');
+				}
+				if (aDetail.memory) {
+					row.push(aDetail.memory.baseline || '');
+					row.push(aDetail.memory.consumption || '');
+					row.push(aDetail.memory.uom || '');
+				} else {
+					row.push('');
+					row.push('');
+					row.push('');
+				}
+				if (aDetail.storage) {
+					row.push(aDetail.storage.baseline || '');
+					row.push(aDetail.storage.consumption || '');
+					row.push(aDetail.storage.uom || '');
+				} else {
+					row.push('');
+					row.push('');
+					row.push('');
+				}
+				csvData.push(row);
+			}
+		}
+		return csvData;
+	}
+
+	function getMpbData(orgId, idList, startDate, endDate) {
+		var aggregatedContracts = {};
+		var grSCCIPof = new GlideRecord('sn_customerservice_contract_item');
+		grSCCIPof.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_number=" + MPBPartNum + "^account.u_org_id=" + orgId + '^sys_idIN'+idList.join(','));
+		grSCCIPof.query();
+		
+		while (grSCCIPof.next()) {
+			var grMPB = new GlideRecord('u_global_prod_consumption');
+			grMPB.addEncodedQuery('u_contract_item.u_product.u_part_number=' + MPBPoePartNum +
+														'^u_contract_item.account.u_org_id=' + orgId + "^u_contract_item.parent=" + grSCCIPof.sys_id +
+														'^u_date>='+startDate +
+														'^u_date<='+endDate
+														);
+			// grMPB.groupBy('u_contract_item');
+			grMPB.orderByDesc('sys_updated_on');
+			grMPB.query();
+			while (grMPB.next()) {
+				var parentContract = grSCCIPof.getValue('sys_id');
+				if (!aggregatedContracts[parentContract]) {
+					aggregatedContracts[parentContract] = {
+						parentContract: parentContract,
+						parentContractAssetNumber: grSCCIPof.getValue('u_siebel_asset_number'),
+						location: getContractItemAttr(parentContract, 'IBX'),
+						account: grSCCIPof.getDisplayValue('account'),
+						product: grSCCIPof.getDisplayValue('u_product'),
+						serviceType: getContractItemAttr(grMPB.getValue('u_contract_item'), 'Service Type'),
+						details: [],
+					};
+				}
+				var year = grMPB.getValue('u_year');
+				var month = grMPB.getValue('u_month');
+				var day = grMPB.getValue('u_day');
+				var aDetail = _.find(aggregatedContracts[parentContract].details, function(o) {
+					return o.year == year && o.month == month && o.day == day;
+				});
+				if (!aDetail) {
+					aDetail = {
+						year: year,
+						month: month,
+						day: day,
+						date: +(year + _.pad(month, 2, '0') + _.pad(day, 2, '0')),
+					};
+					aggregatedContracts[parentContract].details.push(aDetail);
+				}
+
+				aDetail.volume = {
+					baseline: normalizeValue(grMPB.getValue('u_baseline')),
+					uom: getContractItemAttr(grMPB.getValue('u_contract_item'), 'UOM'),
+					consumption: grMPB.getValue('u_quantity'),
+				};
+			}
+		}
+
+		var csvData = [];
+		for (var parentId in aggregatedContracts) {
+			var parentRecord = aggregatedContracts[parentId];
+
+			for (var i in parentRecord.details) {
+				var row = [];
+				var aDetail = parentRecord.details[i];
+				row.push(parentRecord.account);
+				row.push(parentRecord.parentContractAssetNumber);
+				row.push(parentRecord.product);
+
+				var dateString = aDetail.year + '-' + aDetail.month + '-' + aDetail.day;
+				row.push(dateString);
+
+
+				if (aDetail.volume) {
+					row.push(aDetail.volume.baseline || '');
+					row.push(aDetail.volume.consumption || '');
+					row.push(aDetail.volume.uom || '');
+				} else {
+					row.push('');
+					row.push('');
+					row.push('');
+				}
+				csvData.push(row);
+			}
+		}
+		return csvData;
+	}
+
+	function getMpsData(orgId, idList, startDate, endDate) {
+		var aggregatedContracts = {};
+		var grSCCIPof = new GlideRecord('sn_customerservice_contract_item');
+		grSCCIPof.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_number=" + MPSPartNum + "^account.u_org_id=" + orgId + '^sys_idIN'+idList.join(','));
+		grSCCIPof.query();
+		
+		while (grSCCIPof.next()) {
+			var grMPS = new GlideRecord('u_global_prod_consumption');
+			grMPS.addEncodedQuery('u_contract_item.u_product.u_part_number=' + MPSPoePartNum +
+														'^u_contract_item.account.u_org_id=' + orgId + "^u_contract_item.parent=" + grSCCIPof.sys_id +
+														'^u_date>='+startDate +
+														'^u_date<='+endDate
+														);
+			grMPS.groupBy('u_contract_item');
+			grMPS.orderByDesc('sys_updated_on');
+			grMPS.query();
+			while (grMPS.next()) {
+				var parentContract = grSCCIPof.getValue('sys_id');
+				if (!aggregatedContracts[parentContract]) {
+					aggregatedContracts[parentContract] = {
+						parentContract: parentContract,
+						parentContractAssetNumber: grSCCIPof.getValue('u_siebel_asset_number'),
+						location: getContractItemAttr(parentContract, 'IBX'),
+						account: grSCCIPof.getDisplayValue('account'),
+						product: grSCCIPof.getDisplayValue('u_product'),
+						serviceType: getContractItemAttr(grMPS.getValue('u_contract_item'), 'Service Type'),
+						details: [],
+					};
+				}
+				var year = grMPS.getValue('u_year');
+				var month = grMPS.getValue('u_month');
+				var day = grMPS.getValue('u_day');
+				var aDetail = _.find(aggregatedContracts[parentContract].details, function(o) {
+					return o.year == year && o.month == month && o.day == day;
+				});
+				if (!aDetail) {
+					aDetail = {
+						year: year,
+						month: month,
+						day: day,
+						date: +(year + _.pad(month, 2, '0') + _.pad(day, 2, '0')),
+					};
+					aggregatedContracts[parentContract].details.push(aDetail);
+				}
+
+				aDetail.volume = {
+					baseline: getContractItemAttr(grMPS.getValue('u_contract_item'), 'Sales Quantity'),
+					uom: getContractItemAttr(grMPS.getValue('u_contract_item'), 'UOM'),
+					consumption: grMPS.getValue('u_quantity'),
+				};
+			}
+		}
+
+		var csvData = [];
+		for (var parentId in aggregatedContracts) {
+			var parentRecord = aggregatedContracts[parentId];
+
+			for (var i in parentRecord.details) {
+				var row = [];
+				var aDetail = parentRecord.details[i];
+				row.push(parentRecord.account);
+				row.push(parentRecord.parentContractAssetNumber);
+				row.push(parentRecord.product);
+
+				var dateString = aDetail.year + '-' + aDetail.month + '-' + aDetail.day;
+				row.push(dateString);
+
+
+				if (aDetail.volume) {
+					row.push(aDetail.volume.baseline || '');
+					row.push(aDetail.volume.consumption || '');
+					row.push(aDetail.volume.uom || '');
+				} else {
+					row.push('');
+					row.push('');
+					row.push('');
+				}
+				csvData.push(row);
+			}
+		}
+		return csvData;
+	}
+
+	function getContractItemAttr(contractItem, attr) {		
+		var query = 'u_contract_item=' + contractItem + '^u_attribute=' + attr;
+		var grCI = new GlideRecord('sn_customerservice_contract_item_attributes');
+		grCI.addEncodedQuery(query);
+		grCI.query();
+		if (grCI.next()) {
+			return grCI.getValue('u_value');
+		}
+	}
+
+	function getProducts() {
+		var gr = new GlideRecord('sys_choice');
+		gr.addEncodedQuery('name=u_managed_service_report^element=u_product^inactive=false');
+		gr.query();
+		var choices = [];
+		while(gr.next()) {
+			var partNo = gr.getValue('value');
+			var moduleName = '';
+			if (partNo.includes('MPC')) {
+				moduleName = 'EQIX_ManagedPrivateCloud';
+			} else if (partNo.includes('MPB')) {
+				moduleName = 'EQIX_ManagedPrivateBackup';
+			} else if (partNo.includes('MPS')) {
+				moduleName = 'EQIX_ManagedPrivateStorage';
+			}
+			if (!siCustomerPermission.hasPermission('view', moduleName, account)) {
+				continue;
+			}
+			choices.push({
+				label: gr.getValue('label'),
+				value: gr.getValue('value'),
+				// disabled: !siGlobalProducts.hasContract(gr.getValue('value'), orgId),
+			});
+		}
+		return choices;
+	}
+
+	function getFormats() {
+		var gr = new GlideRecord('sys_choice');
+		gr.addEncodedQuery('name=u_managed_service_report^element=u_format^inactive=false');
+		gr.query();
+		var choices = [];
+		while(gr.next()) {
+			choices.push({
+				label: gr.getValue('label'),
+				value: gr.getValue('value')
+			});
+		}
+		return choices;
+	}
+
+	function normalizeValue(value)
+	{
+		if (!value) return '';
+		if (value === 'undefined' || value === 'null') return '';
+		return value;
+	}
+
+    function optCopy(names) {
+        names.forEach(function(name) {
+            data[name] = input[name] !== undefined ? input[name] : options[name];
+        });
+    }
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-08-22 07:25:07</sys_created_on>
+        <sys_id>5a72b54987272ed06a1feb1e3fbb35a2</sys_id>
+        <sys_mod_count>485</sys_mod_count>
+        <sys_name>MSP Report Center</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_5a72b54987272ed06a1feb1e3fbb35a2</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:31</sys_updated_on>
+        <template><![CDATA[<div class="d-flex flex-column ff">
+  <div class="d-flex justify-content-between" style="position: relative;">
+    <eq-data-filters eq-model="filters">
+      <eq-local-search slot="local-search" style="--min-width: 280px;" eq-model="filterSearch"></eq-local-search>
+      <div slot="quick-filters">
+        <eq-select-filter data-key="filter-product" eq-model="filterProduct" style="--min-width: 290px;"></eq-select-filter>
+      </div>
+    </eq-data-filters>
+    <eq-drawer titleText="${Generate Report}" style="--width: 600px; --z-index: 1001;" eq-model="drawer">
+      <eq-button-solid type="primary" size="medium" slot="opener" style="position: absolute; top: 0; right: 0" eq-model="btnOpener">
+        ${Generate Report}
+      </eq-button-solid>
+      <div class="d-flex flex-column" ng-show="generateStep === STEP_1" style="padding-left: 44px; padding-right: 44px; padding-top: var(--eq-spacing-x-large-loose);">
+        <div>
+          <eq-text-input eq-model="inputName"></eq-text-input>
+        </div>
+        <div style="margin-top: var(--eq-spacing-large);">
+          <eq-select eq-model="sltProduct"></eq-select>
+        </div>
+        <div style="margin-top: var(--eq-spacing-large);">
+          <eq-select eq-model="sltRegion"></eq-select>
+        </div>
+        <div style="margin-top: var(--eq-spacing-large);">
+          <eq-select eq-model="sltLocation"></eq-select>
+        </div>
+        <div style="margin-top: var(--eq-spacing-large);">
+          <eq-select eq-model="sltAsset"></eq-select>
+        </div>
+        <div style="margin-top: var(--eq-spacing-large);">
+          <eq-date-picker-range ng-show="false"></eq-date-picker-range>
+          <eq-date-range-select eq-model="dateRange"></eq-date-range-select>
+        </div>
+        <div style="margin-top: var(--eq-spacing-large);">
+          <eq-select eq-model="sltFormat"></eq-select>
+        </div>
+      </div>
+      <div ng-show="generateStep === STEP_2" class="d-flex flex-column"  style="padding-left: var(--eq-spacing-medium); padding-right: var(--eq-spacing-medium); padding-top: 96px;">
+        <div style="position: relative; display: flex; justify-content: center;">
+          <img src="report-center_pattern-success2.png" style="position: absolute; width: 400px; left: 0;"/>
+          <img src="report-center_pattern-success1.png" style="position: absolute; width: 400px; top: 220px; right: 0"/>
+          <div style="position: absolute; top: 80px; " class="d-flex flex-column align-items-center">
+            <eq-icon name="check-circle" style="--size: 48px; --fill: var(--eq-color-green-400);"></eq-icon>
+            <div class="h1" style="color: var(--eq-color-text-primary); margin-top: var(--eq-spacing-medium-tight);">${Report Requested}</div>
+            <div class="typo-body m-b-large text-align-center" style="margin-top: var(--eq-spacing-medium-tight); color: var(--eq-color-text-secondary); width: 464px;">
+              ${Your Report was requested. Once generated, it will be available in the Report Center page.}
+            </div>
+            <eq-button-outline eq-model="btnRequestAnother">${Request Another Report}</eq-button-outline>
+          </div>
+
+        </div>
+      </div>
+      <eq-button-solid slot="primary-action" eq-model="btnSubmit" ng-show="generateStep == STEP_1">${Submit}</eq-button-solid>
+      <eq-button-solid slot="primary-action" eq-model="btnCancel" ng-show="generateStep == STEP_2">${Done}</eq-button-solid>
+      <eq-button-outline slot="secondary-action" eq-model="btnClear" ng-show="generateStep == STEP_1">${Clear All}</eq-button-outline>
+      <eq-button-borderless slot="destructive-action" eq-model="btnCancel" ng-show="generateStep == STEP_1">${Cancel}</eq-button-borderless>
+    </eq-drawer>
+  </div>
+
+  <div class="m-t-large d-flex flex-column">
+    <eq-data-table eq-model="tblModel"></eq-data-table>
+    <eqix-msp-pagination ng-show="tblPagination.totalCount > 0" page="{{tblPagination.page}}" page-size="{{tblPagination.pageSize}}" length="{{tblPagination.totalCount}}" from="{{tblPagination.from()}}" to="{{tblPagination.to()}}" page-change="handlePageChange"></eqix-msp-pagination>
+  </div>
+  <div ng-show="!tblModel.loading && allCount == 0" style="padding: 150px var(--eq-spacing-large);">
+    <msp-no-records></msp-no-records>
+  </div>
+  <div ng-if="!tblModel.loading && allCount > 0 && tblModel.dataSource.length == 0" style="padding: 150px var(--eq-spacing-large);">
+    <eqix-no-match ></eqix-no-match>
+  </div>
+</div>
+<eq-modal eq-model="modalDelete" style="--width: 640px; --height: 300px;" class="ff">
+  <div>
+    ${Are you sure you want to delete this report?}
+  </div>
+  <div slot="footer" class="d-flex justify-content-between">
+    <eq-button-borderless eq-model="btnDeleteNo">
+      ${Cancel}
+    </eq-button-borderless>
+    <div class="d-flex">
+      <eq-button-outline eq-model="btnDeleteNo">
+        ${No}
+      </eq-button-outline>
+      <div class="m-l-medium-tight">
+        <eq-button-solid type="primary" eq-model="btnDeleteYes" >
+          ${Yes}
+        </eq-button-solid>
+      </div>
+    </div>
+  </div>
+</eq-modal>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c26db0000001</claim_timestamp>
+        <metadata_update_name>sp_widget_5a72b54987272ed06a1feb1e3fbb35a2</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:31</sys_created_on>
+        <sys_id>c027e09987b5c7904d820e96cebb355d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:31</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>5a72b54987272ed06a1feb1e3fbb35a2</id>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-08-22 07:25:04</sys_created_on>
+        <sys_id>b0c2f50d87272ed06a1feb1e3fbb35ee</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-08-22 07:25:04</sys_updated_on>
+        <table>sp_widget</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

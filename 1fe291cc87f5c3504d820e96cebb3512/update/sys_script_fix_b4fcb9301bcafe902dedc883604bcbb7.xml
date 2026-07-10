@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description>//GET BAN ACCOUNTS THAT WERE MAPPED WITH MDMD3 Account number via transformation map&#13;
+    //GET releted CAN account created from MDM3 and populate expected attrs into BAN.&#13;
+</description>
+        <name>LTC Merge atributes from CAN to BAN acc</name>
+        <record_for_rollback>true</record_for_rollback>
+        <script><![CDATA[var count = 0;
+//GET BAN ACCOUNTS THAT WERE MAPPED WITH MDMD3 Account number via transformation map
+var grBAN = new GlideRecord('customer_account');
+grBAN.addEncodedQuery('u_account_number_mdm3_0!=NULL^u_account_category=ban^u_customer_migrated_mdm3_0=true');
+//grBAN.setLimit(100);
+grBAN.query();
+while (grBAN.next()) {
+
+    //GET releted CAN account created from MDM3 and populate expected attrs into BAN.
+    var grCAN = new GlideRecord('customer_account');
+    grCAN.addEncodedQuery("u_account_number_mdm3_0!=NULL^u_account_number_mdm3_0=" + grBAN.getValue('u_account_number_mdm3_0')+"^ u_account_category=can");
+    grCAN.orderBy('u_account_number_mdm3_0');
+    grCAN.setLimit(1);
+    grCAN.query();
+    if (grCAN.next()) {
+        grBAN.setValue('u_ucm_id', grCAN.getValue('u_mdm_id')); //CAN MDM ID moves to BAN UCM ID
+        grBAN.setValue('u_account_number', grCAN.getValue('u_account_number_mdm3_0')); //CAN MDM3 Number into BAN Number
+        grBAN.setValue('u_parent_legal_account', grCAN.getUniqueValue());
+        grBAN.update();
+        count++;
+    }
+    
+}
+
+gs.info("total BAN accounts updated:" + count);]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-23 20:09:03</sys_created_on>
+        <sys_id>b4fcb9301bcafe902dedc883604bcbb7</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>LTC Merge atributes from CAN to BAN acc</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_fix_b4fcb9301bcafe902dedc883604bcbb7</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:33</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1374ddcc0000001</claim_timestamp>
+        <metadata_update_name>sys_script_fix_b4fcb9301bcafe902dedc883604bcbb7</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:33</sys_created_on>
+        <sys_id>6345e4998775c7904d820e96cebb3519</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:33</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>b4fcb9301bcafe902dedc883604bcbb7</id>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-23 20:09:03</sys_created_on>
+        <sys_id>832d7db81b0afe902dedc883604bcb0e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-12-23 20:09:03</sys_updated_on>
+        <table>sys_script_fix</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

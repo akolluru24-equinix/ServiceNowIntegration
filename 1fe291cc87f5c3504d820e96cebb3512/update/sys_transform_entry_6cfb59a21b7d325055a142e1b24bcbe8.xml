@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_entry">
+    <sys_transform_entry action="INSERT_OR_UPDATE">
+        <choice_action>create</choice_action>
+        <coalesce>false</coalesce>
+        <coalesce_case_sensitive>false</coalesce_case_sensitive>
+        <coalesce_empty_fields>false</coalesce_empty_fields>
+        <date_format>yyyy-MM-dd HH:mm:ss</date_format>
+        <map display_value="IMP Contact MDM3 - TM">26a510de1b31ba102dedc883604bcb0d</map>
+        <reference_value_field/>
+        <source_field>[Script]</source_field>
+        <source_script><![CDATA[answer = (function transformEntry(source) {
+
+	var concatValue = source.u_mdmid+'_'+source.u_email_email;
+	return concatValue; // return the value to be put into the target field
+
+})(source);]]></source_script>
+        <source_table>u_imp_contact_mdm3_0</source_table>
+        <sys_class_name>sys_transform_entry</sys_class_name>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-16 17:59:40</sys_created_on>
+        <sys_id>6cfb59a21b7d325055a142e1b24bcbe8</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>[Script]</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_transform_entry_6cfb59a21b7d325055a142e1b24bcbe8</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:49</sys_updated_on>
+        <target_field>user_name</target_field>
+        <target_table>customer_contact</target_table>
+        <use_source_script>true</use_source_script>
+    </sys_transform_entry>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137b832a0000001</claim_timestamp>
+        <metadata_update_name>sys_transform_entry_6cfb59a21b7d325055a142e1b24bcbe8</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:49</sys_created_on>
+        <sys_id>7df62c1987b5c7904d820e96cebb3549</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:49</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>6cfb59a21b7d325055a142e1b24bcbe8</id>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-16 17:59:39</sys_created_on>
+        <sys_id>1b6cd9ee1b3d325055a142e1b24bcb66</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-12-16 17:59:39</sys_updated_on>
+        <table>sys_transform_entry</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

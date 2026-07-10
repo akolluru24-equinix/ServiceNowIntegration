@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_script">
+    <sys_transform_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <map display_value="Update Billing Accounts with CAN TM">afe9c8df1b3df6502dedc883604bcb80</map>
+        <order>100</order>
+        <script><![CDATA[(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+
+
+   
+
+    if (action == "insert") {
+        // No match found -> prevent creating a new record
+        ignoreRow = true; // special transform-map variable that skips this row
+         gs.info('Skipping row; no match for u_account_number:' + source.u_legacy_billi_account_number);
+    }
+
+})(source, map, log, target);]]></script>
+        <sys_class_name>sys_transform_script</sys_class_name>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-18 20:20:59</sys_created_on>
+        <sys_id>1c3f04931bbdf6502dedc883604bcb15</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>onBefore</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_transform_script_1c3f04931bbdf6502dedc883604bcb15</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:40</sys_updated_on>
+        <when>onBefore</when>
+    </sys_transform_script>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375e0f90000001</claim_timestamp>
+        <metadata_update_name>sys_transform_script_1c3f04931bbdf6502dedc883604bcb15</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:40</sys_created_on>
+        <sys_id>fb85641d8775c7904d820e96cebb357b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:40</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>1c3f04931bbdf6502dedc883604bcb15</id>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-18 20:20:59</sys_created_on>
+        <sys_id>8dffc4131bbdf6502dedc883604bcba5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-12-18 20:20:59</sys_updated_on>
+        <table>sys_transform_script</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

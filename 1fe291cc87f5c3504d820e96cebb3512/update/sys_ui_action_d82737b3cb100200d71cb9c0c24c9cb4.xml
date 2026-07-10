@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name>state_model_move_to_review</action_name>
+        <active>true</active>
+        <client>true</client>
+        <client_script_v2><![CDATA[function onClick(g_form) {
+
+}]]></client_script_v2>
+        <comments/>
+        <condition>gs.hasRole('itil') &amp;&amp; new ChangeRequestStateHandler(current).isNext("review") &amp;&amp; current.state != '-4'  ||  new ChangeRequestStateHandler(current).isNext("review") &amp;&amp; current.type == 'emergency' &amp;&amp; current.u_after_crisis == true</condition>
+        <form_action>true</form_action>
+        <form_button>true</form_button>
+        <form_button_icon/>
+        <form_button_v2>false</form_button_v2>
+        <form_context_menu>false</form_context_menu>
+        <form_link>false</form_link>
+        <form_menu_button_v2>false</form_menu_button_v2>
+        <form_style/>
+        <format_for_configurable_workspace>false</format_for_configurable_workspace>
+        <hint>Progresses change to Review state</hint>
+        <isolate_script>false</isolate_script>
+        <list_action>false</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_button_icon/>
+        <list_choice>false</list_choice>
+        <list_context_menu>false</list_context_menu>
+        <list_link>false</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <list_style/>
+        <messages/>
+        <name>Review</name>
+        <onclick>moveToReview();</onclick>
+        <order>-400</order>
+        <script><![CDATA[function moveToReview() {
+    if (g_form.getValue('u_patch_execution')) {
+        var answer = confirm("Please review the Patching Result for each CI in the Patch Execution CIs related list.\n If you click OK, all CIs without Patching Result will be automatically established as Successful. \n If some CI has had a not resolved issue and patches couldn't be installed, please click Cancel to manually modify the Patching Result to Failed directly on the list. \nNOTE: For each CI with Failed result, a Trouble will be automatically created, once you move the change to Review state.");
+        if (answer) {
+            g_form.setMandatory('close_code', true);
+            g_form.setMandatory('close_notes', true);
+            // g_form.setMandatory('u_5_expedited_changes_justification', true);
+            gsftSubmit(null, g_form.getFormElement(), "state_model_move_to_review");
+        } else {
+            return false;
+        }
+    }
+    var ga = new GlideAjax("ChangeRequestStateHandlerAjax");
+    ga.addParam("sysparm_name", "getStateValue");
+    ga.addParam("sysparm_state_name", "review");
+    ga.getXMLAnswer(function(stateValue) {
+        g_form.setMandatory('close_code', true);
+        g_form.setMandatory('close_notes', true);
+        g_form.setMandatory('u_verification_output', true);
+
+        if (g_form.getValue('u_expedited') == 'true') {
+            g_form.setMandatory('u_5_expedited_changes_justification', true);
+        }
+        if (g_scratchpad.delayedStartTime == true) {
+            g_form.setMandatory('u_implementation_start_delayed_justification', true);
+        }
+        if (g_scratchpad.delayedEndTime == true) {
+            g_form.setMandatory('u_implementation_end_delayed_justification', true);
+        }
+        g_form.setMandatory('u_second_question_review', true);
+
+        gsftSubmit(null, g_form.getFormElement(), "state_model_move_to_review");
+    });
+}
+
+// function confirmAction() {
+
+
+// }
+if (typeof window == 'undefined')
+    setRedirect();
+
+function setRedirect() {
+    var answer = false;
+    var taskGroup = false;
+    var isImplementer = false;
+
+    //	if(current.u_operating_unit == "CA"){ // For canada if the user do not belong to assnmt grp of CTask, still he/she can move the task to review state.   // commented code as per story - 2269
+
+    var userCMgroup = new CMOwnerUsers().checkLoggedinUserBelongsToCMGroup(current.u_operating_country); // changes made as per story - 2269
+    //User in CHG Implementer field;
+    var implementer = [];
+    implementer = current.u_person_s_who_wil_implement_the_change.split(',');
+    if (implementer.length == 1) {
+        if (gs.getUserID() == current.u_person_s_who_wil_implement_the_change) {
+            isImplementer = true;
+        }
+    } else if (implementer.length > 1) {
+        for (var i = 0; i < implementer.length; i++) {
+            if (gs.getUserID() == implementer[i]) {
+                isImplementer = true;
+            }
+        }
+    }
+
+    //User in assignment group from Change Task
+    var gr = new GlideRecord('change_task');
+    gr.addQuery('change_request', current.sys_id);
+    gr.query();
+    count = gr.getRowCount();
+    while (gr.next()) {
+        if (gs.getUser().isMemberOf(gr.assignment_group.getDisplayValue())) {
+            taskGroup = true;
+            break;
+        }
+    }
+    if (gs.getUser().isMemberOf(current.assignment_group.getDisplayValue()) || gs.getUserID() == current.assigned_to || userCMgroup == true || isImplementer == true || taskGroup == true) {
+        answer = true;
+    }
+
+    if (answer) {
+        current.state = 0;
+        current.update();
+        action.setRedirectURL(current);
+    } else {
+        gs.addInfoMessage(gs.getMessage('EQIX Review Button'));
+        action.setRedirectURL(current);
+    }
+
+}]]></script>
+        <show_form_icon_only>false</show_form_icon_only>
+        <show_insert>false</show_insert>
+        <show_list_icon_only>false</show_list_icon_only>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2015-06-04 13:21:52</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>d82737b3cb100200d71cb9c0c24c9cb4</sys_id>
+        <sys_mod_count>137</sys_mod_count>
+        <sys_name>Review</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Change Management - State Model" source="com.snc.change_management.state_model">9e71c5814fa10300fe09e28d0210c734</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_ui_action_d82737b3cb100200d71cb9c0c24c9cb4</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:11</sys_updated_on>
+        <table>change_request</table>
+        <ui11_compatible>false</ui11_compatible>
+        <ui16_compatible>false</ui16_compatible>
+    </sys_ui_action>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a05d60000001</claim_timestamp>
+        <metadata_update_name>sys_ui_action_d82737b3cb100200d71cb9c0c24c9cb4</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:11</sys_created_on>
+        <sys_id>8e96285587b5c7904d820e96cebb351f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:11</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a05d40000001</claim_timestamp>
+        <metadata_update_name>sys_ui_action_d82737b3cb100200d71cb9c0c24c9cb4</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.change_management.state_model</previous_claim_name>
+        <previous_claim_scope>com.snc.change_management.state_</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:11</sys_created_on>
+        <sys_id>c296285587b5c7904d820e96cebb3520</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:11</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>d82737b3cb100200d71cb9c0c24c9cb4</id>
+        <sys_created_by>imori@equinix.com</sys_created_by>
+        <sys_created_on>2024-10-22 16:20:14</sys_created_on>
+        <sys_id>40f94e1f1b159e107d638554604bcb19</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>imori@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-10-22 16:20:14</sys_updated_on>
+        <table>sys_ui_action</table>
+        <use_es_latest>false</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

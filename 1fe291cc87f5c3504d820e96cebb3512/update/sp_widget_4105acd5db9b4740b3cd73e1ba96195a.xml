@@ -1,0 +1,1010 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category/>
+        <client_script><![CDATA[function($scope, spUtil, $rootScope, $timeout, spAriaUtil, $window, $timeout, $location) {
+    var c = this;
+
+    $scope.$on("ShowWarnM", function(evt, data) {
+        // handler code here 
+        c.data.showWarm = data;
+    });
+
+    //MSPI-8542 Set the dafult selected menu
+    $scope.activeMenuId = c.data.defaultMenu;
+
+    //MSPI-8775 Fix main menu category selected state issues
+    c.setCurrentActiveMenu = function(event, sys_id, item_url, item_url_target) {
+        event.preventDefault();
+
+        if (item_url_target) {
+            window.open(item_url);
+        } else {
+            var menu = c.data.parentChildMenus.filter(function(item) {
+                return item.child == sys_id;
+            })[0];
+
+            $scope.activeMenuId = menu.parent;
+            $location.url(item_url);
+        }
+    }
+
+    c.active_menu = null;
+    c.setActiveMenu = function(id, hasItens) {
+        c.active_menu = id;
+        $('.menu-panel').removeClass('active');
+        $('.menu-item').removeClass('active');
+
+        $('#panel_' + id).addClass('active');
+        $('#menu_item_' + id).addClass('active');
+
+        // var maxH = $window.innerHeight;
+        // $('.menu-panel').css({
+        //     'max-height': 'calc(' + maxH + 'px - 230px'
+        // });
+    };
+
+
+    c.getMenuPanelPosition = function(id) {
+        var elem = $('#menu_item_' + id);
+        if (!elem.offset())
+            return;
+
+        var posX = elem.offset().left;
+        return {
+            left: posX + 'px'
+        };
+    };
+
+    $scope.loadingIndicator = $rootScope.loadingIndicator;
+    $scope.cartItemCount = 0;
+    $scope.itemAddedTooltipOpen = false;
+
+    $scope.accessibilityEnabled = spAriaUtil.g_accessibility === "true";
+
+    $scope.$on("$sp.service_catalog.cart.count", function($evt, count) {
+        $scope.cartItemCount = count;
+    });
+
+    var cancelTooltipPromise;
+    $scope.$on("$sp.service_catalog.cart.add_item", function() {
+        $timeout.cancel(cancelTooltipPromise);
+
+        $scope.itemAddedTooltipOpen = true;
+        cancelTooltipPromise = $timeout(function() {
+            $scope.itemAddedTooltipOpen = false;
+        }, 3000);
+    });
+
+    $scope.$on('sp_loading_indicator', function(e, value) {
+        $scope.loadingIndicator = value;
+    });
+
+    $scope.toggleCart = function() {
+        $timeout.cancel(cancelTooltipPromise);
+        $scope.itemAddedTooltipOpen = false;
+        $timeout(function() {
+            $("#cart-dropdown").dropdown("toggle");
+        });
+    };
+
+    // PRB1108244: visibleItems array is used to improve keyboard nav 
+    // in menu, refresh it as needed
+    $scope.$watch('data.menu.items', function() {
+        $scope.visibleItems = [];
+        if ($scope.data.menu.items) {
+            for (var i in $scope.data.menu.items) {
+                var item = $scope.data.menu.items[i];
+                if (item.items || (item.scriptedItems && item.scriptedItems.count != 0))
+                    $scope.visibleItems.push(item);
+            }
+
+            //MSPI-7068 To enable setting of max item per column
+            $scope.subItems = angular.copy($scope.visibleItems);
+            constructMenuOverlay();
+        }
+    }, true);
+
+    function constructMenuOverlay() {
+
+        var exit_loop = false;
+
+        for (var x in $scope.subItems) {
+            for (var j in $scope.subItems[x].items) {
+                if ($scope.subItems[x].items[j].items.length > $scope.data.overlayColumnMaxItems) {
+                    //If a category's items exceeded the max items allowed, call the "reSubmenuItems" function to restructure the "subItems" array
+                    //Parameters: Category's items, Categories, Index of category, Category's object
+                    reSubmenuItems($scope.subItems[x].items[j].items, $scope.subItems[x].items, j, $scope.subItems[x].items[j]);
+                    exit_loop = true;
+                    break;
+                }
+            }
+
+            //If "reSubmenuItems" function is triggered, then break out of the outer loop
+            if (exit_loop == true)
+                break;
+        }
+        //If "reSubmenuItems" function is triggered, then we would need to call the "constructMenuOverlay" function again to reflect the changes
+        //This is required because new category/categories have been inserted to the original array  
+        if (exit_loop == true)
+            constructMenuOverlay();
+    }
+
+
+    function reSubmenuItems(items, categoryArr, categoryIndex, categoryObj) {
+        //Exit if the length of the current category's items are less than the max item allowed
+        if (items.length <= $scope.data.overlayColumnMaxItems)
+            return;
+
+        var tempObj = angular.copy(categoryObj); // Deep copy the category object into a new category object
+        var index = parseInt(categoryIndex) + 1;
+
+        //Extract the remaining items and associate them to the new category with empty label
+        var tempArr = items.splice($scope.data.overlayColumnMaxItems);
+        tempObj["items"] = tempArr;
+        tempObj["sys_id"] = "";
+        tempObj["label"] = "";
+
+        categoryArr.splice(index, 0, tempObj); // Insert the new category into existing category array
+        reSubmenuItems(tempArr, categoryArr, index, categoryObj); // Rerun the same process till no new category is required
+
+    }
+
+    // Get list of record watchers
+    var record_watchers = [];
+    if ($scope.data.menu.items) {
+        for (var i in $scope.data.menu.items) {
+            var item = $scope.data.menu.items[i];
+            if (item.type == 'scripted') {
+                if (item.scriptedItems.record_watchers)
+                    record_watchers = record_watchers.concat(item.scriptedItems.record_watchers);
+            }
+            if (item.type == 'filtered') {
+                record_watchers.push({
+                    'table': item.table,
+                    'filter': item.filter
+                });
+            }
+        }
+    }
+
+    // Init record watchers
+    for (var y in record_watchers) {
+        var watcher = record_watchers[y];
+        spUtil.recordWatch($scope, watcher.table, watcher.filter);
+    }
+
+    // $scope.$on('active.menu', function(event, args) {
+    //     $scope.activeMenuId = args.sys_id;
+    // });
+
+    if (c.data.identifyUser) {
+        identifyUserTracking(c.data.identifyUser);
+    }
+
+    $scope.clickMenu1 = function(clickEvent, menuItem) {
+
+        var event = '';
+        var properties = '';
+        var triggerTrack = false;
+        var idMenu = menuItem.sys_id;
+        //0c20b42bdb28d340448b01a3ca961930 menu item Create Tickt
+        if (idMenu == c.data.menuItemCreateTicket) {
+            triggerTrack = true;
+            event = 'start support ticket wizard';
+            properties = {
+                'category': 'customer support',
+                'flow': 'submit support ticket',
+                'source': 'primary menu'
+            };
+        }
+
+        if (idMenu == c.data.menuItemTrialManagement) {
+            triggerTrack = true;
+            event = 'go to trial management';
+            properties = {
+                'category': 'Trial Management',
+            };
+        }
+
+        if (triggerTrack) {
+            createTracking(event, properties, c.data.trackingEnabled, c.data.categoriesTrackingEnabled);
+        }
+
+
+        if (idMenu == c.data.menuItemCreateTicket) {
+            clickEvent.preventDefault();
+            window.open(menuItem.href + '&ts=' + (new Date()).getTime(), menuItem.url_target || '_self');
+        } else {}
+
+    }
+
+    $scope.checkBetaBadge = function(selectedItem) {
+        var strBETA = '${beta}';
+        if (selectedItem.toUpperCase() === strBETA.toUpperCase() || selectedItem.toUpperCase() === 'BETA') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    $scope.checkNewBadge = function(selectedItem) {
+        var strNEW = '${new}';
+        if (selectedItem.toUpperCase() === strNEW.toUpperCase() || selectedItem.toUpperCase() === 'NEW') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    //Hide top level menu if it doesn't contain any sub-items
+    c.containSubItems = function(items) {
+        for (var i in items) {
+            if (items[i].items.length > 0)
+                return true;
+        }
+        return false;
+    }
+
+    //Show top level menu if it is defined as stand alone menu in system property
+    c.standAloneMenu = function(item) {
+        if (c.data.standAloneMenus.indexOf(item) != -1) {
+            return true;
+        }
+        return false;
+    }
+
+	// Reporting guided tour
+    if ($scope.reportingTourWidget == null) {
+        spUtil.get('new-guided-tour', {
+            bindTour: $scope.data.reportingTour
+        }).then(function(response) {
+            $scope.reportingTourWidget = response;
+            $timeout(function() {
+                $rootScope.$broadcast('start-new-guided-tour', {
+                    tour: $scope.data.reportingTour,
+                    autoLaunch: false,
+                    delay: 1000,
+                });
+            })
+        });
+    }
+    //MSPI-9135 
+    //When a menu item is clicked, the model will be refreshed and present a new defaultMenu value in the event of page changes.
+    //When the model value is changed, we want to synchronize the activeMenuId as well. 
+    $scope.$watch('data.defaultMenu', function(newValue, oldValue) {
+        if (newValue != oldValue) {
+            $scope.activeMenuId = newValue;
+        }
+    });
+
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.nav {&#13;
+  width: 100%;&#13;
+}&#13;
+&#13;
+ul &gt; li &gt; a {&#13;
+  flex-wrap: wrap;&#13;
+}&#13;
+&#13;
+/* MSP Main Nav */&#13;
+.msp-header-menu {&#13;
+   gap: 0.8rem;&#13;
+  &#13;
+  li:nth-child(1) &gt; a {&#13;
+          padding-left: 0;&#13;
+    padding-right: 0.8rem;&#13;
+  }&#13;
+  &#13;
+  li.dropdown &gt; a {&#13;
+          gap: 0.8rem;&#13;
+  }&#13;
+  &#13;
+  .ms-right{&#13;
+  margin-left: auto;&#13;
+  padding: 0!important;&#13;
+  }&#13;
+}&#13;
+&#13;
+.menu-panel {&#13;
+  position: absolute;&#13;
+  top: 63px;&#13;
+  left: 66px;&#13;
+  max-width: 90vw;&#13;
+  max-height: 748px;&#13;
+  transition-duration: 300ms;&#13;
+  background-color: $white;&#13;
+  box-shadow: 0px 2px 8px 4px rgba(42, 48, 60, 0.20);&#13;
+  border-radius: 0px;&#13;
+  z-index: 9999;&#13;
+  display: none;&#13;
+}&#13;
+&#13;
+.menu-panel.active,&#13;
+.menu-panel.active-menu {&#13;
+  display: flex;&#13;
+}&#13;
+.menu-panel &gt; ul {&#13;
+  padding-left: 0px;&#13;
+  display: flex;&#13;
+  margin: 0;&#13;
+  padding: 5px 0px;&#13;
+  height: 100%;&#13;
+}&#13;
+&#13;
+.menu-panel &gt; ul &gt; li {&#13;
+  display: flex;&#13;
+  flex-direction: column;&#13;
+  max-width: 30rem;&#13;
+  width: 30rem;&#13;
+  vertical-align: top;&#13;
+  border-right: 1px solid var(--eq-color-grey-100);&#13;
+}&#13;
+&#13;
+.menu-panel &gt; ul &gt; li:last-child{&#13;
+  border: none;&#13;
+}&#13;
+&#13;
+.menu-panel &gt; ul &gt; li &gt; a {&#13;
+ &#13;
+  height: 48px;&#13;
+  font-weight: var(--eq-font-weight-semibold);&#13;
+  font-family: var(--eq-font-family);&#13;
+  color: #63718D;&#13;
+  font-size: 12px;&#13;
+  display: flex;&#13;
+  padding: 16px;&#13;
+  text-transform: uppercase;&#13;
+  line-height: 16px;&#13;
+}&#13;
+.menu-panel &gt; ul &gt; li &gt; ul {&#13;
+  padding: 0px 0px;&#13;
+}&#13;
+.menu-panel &gt; ul &gt; li &gt; ul &gt; li {  &#13;
+  display: block;&#13;
+}&#13;
+&#13;
+.menu-panel &gt; ul &gt; li &gt; ul &gt; li:hover {&#13;
+  cursor: pointer;&#13;
+  background: #edeff2;&#13;
+  transition-duration: 400ms;&#13;
+}&#13;
+&#13;
+.menu-panel &gt; ul &gt; li &gt; ul &gt; li:hover &gt; a {&#13;
+  background-color: initial !important;&#13;
+  color: #4a9be6 !important;&#13;
+  transition-duration: 400ms;&#13;
+}&#13;
+&#13;
+.menu-panel &gt; ul &gt; li &gt; ul &gt; li &gt; a {&#13;
+  font-weight: var(--eq-body-font-weight);&#13;
+  font-family: var(--eq-font-family);&#13;
+  display: block;&#13;
+  height: auto;&#13;
+  padding: 16px;&#13;
+  white-space: initial;&#13;
+  color: #2A303C;&#13;
+  &#13;
+  .menu-item-title{&#13;
+  	line-height:24px;&#13;
+    font-size: 16px;&#13;
+  }&#13;
+  &#13;
+  .menu-description{&#13;
+  	line-height: 20px;&#13;
+    color:#63718D;&#13;
+    font-size: 14px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.active,&#13;
+.active-menu {&#13;
+  overflow-y: visible;&#13;
+}&#13;
+&#13;
+.open &gt; .items-list &gt; .has-items {&#13;
+  border-right: 1px solid #DDD;&#13;
+  margin-top: 20px;&#13;
+  margin-bottom: 15px;&#13;
+}&#13;
+.navbar-inverse .navbar-nav &gt; .active &gt; a {&#13;
+  background-color: #fbfbfb !important;&#13;
+  color: #000 !important;&#13;
+}&#13;
+.header-menu-item.active &gt; a, &#13;
+.header-menu-item.active &gt; a:active, &#13;
+.header-menu-item.active &gt; a:focus {&#13;
+  /*color: #000 !important;*/&#13;
+  border-top: 2px solid #086AE3;&#13;
+  height: 63px;&#13;
+  /*text-shadow: 0 1px 0 #2a303c;*/&#13;
+  font-weight: var(--eq-font-weight-semibold);&#13;
+  /*line-height: 28px;*/&#13;
+  /*box-shadow: 0px 2px 6px 2px rgba(42, 48, 60, 0.15);*/&#13;
+  box-shadow: 0px 2px 8px 4px rgba(42, 48, 60, 0.20);&#13;
+  z-index: 10000!important;&#13;
+  clip-path:inset(-10px -10px 0px -10px);&#13;
+  background:#FFF!important;&#13;
+  &#13;
+  /*&#13;
+  margin-bottom: -1px;&#13;
+&#13;
+  &gt; span {&#13;
+    margin-top: -4px;&#13;
+  }&#13;
+&#13;
+  &gt; i {&#13;
+    margin-top: -5px;&#13;
+  }&#13;
+  */&#13;
+}&#13;
+&#13;
+.header-menu-item.active-menu &gt; a, &#13;
+.header-menu-item.active-menu &gt; a:active, &#13;
+.header-menu-item.active-menu &gt; a:focus {&#13;
+  border-top: 2px solid #086AE3;&#13;
+  font-weight:var(--eq-font-weight-semibold);&#13;
+  /*text-shadow: 0 1px 0 #2a303c;*/&#13;
+  height: 63px;&#13;
+  z-index: 1;&#13;
+  /*&#13;
+  margin-bottom: -1px;&#13;
+&#13;
+  &gt; span {&#13;
+    margin-top: -4px;&#13;
+  }&#13;
+&#13;
+  &gt; i {&#13;
+    margin-top: -5px;&#13;
+  }&#13;
+  */&#13;
+}&#13;
+&#13;
+.sp-menu-text-wrapper::after{&#13;
+&#13;
+	display:block;&#13;
+	content:attr(title);&#13;
+	font-weight:bold;&#13;
+	height:1px;&#13;
+	color:transparent;&#13;
+	overflow:hidden;&#13;
+	visibility:hidden;&#13;
+&#13;
+}&#13;
+&#13;
+&#13;
+.header-menu-item &gt; a {&#13;
+  color: $text-color !important;&#13;
+  background-color: unset !important;&#13;
+  z-index: 2;&#13;
+  position: relative;&#13;
+  font-size: 1.6rem!important;&#13;
+  font-family: var(--eq-font-family);&#13;
+}&#13;
+&#13;
+/*&#13;
+.header-menu-item &gt; a:hover{&#13;
+  color: #000 !important;&#13;
+}&#13;
+*/&#13;
+&#13;
+.has-items &gt; a.sp-menu-has-items {&#13;
+  text-transform: uppercase;&#13;
+  font-size: 10px;&#13;
+  margin-top: -14px;&#13;
+}&#13;
+&#13;
+.dropdown-menu &gt; li &gt; a {&#13;
+  font-weight: bold;&#13;
+  color: #666;&#13;
+  font-size: 12pt;&#13;
+}&#13;
+&#13;
+.dropdown-menu &gt; li &gt; a:hover, &#13;
+.dropdown-menu &gt; li &gt; a:focus {&#13;
+  background-color: initial !important; &#13;
+}&#13;
+&#13;
+.header-loader {&#13;
+  width: 24px;&#13;
+  //position: relative;&#13;
+  //top: 24px;&#13;
+}&#13;
+&#13;
+.dropdown-menu .has-items {&#13;
+  display: block;&#13;
+}&#13;
+&#13;
+.dropdown-menu {&#13;
+  display: inline-flex;&#13;
+  visibility: hidden;&#13;
+  opacity: 0;&#13;
+  top: 103% !important;&#13;
+}&#13;
+&#13;
+.has-items &gt; a.sp-menu-has-items {&#13;
+  margin-bottom: 0px;&#13;
+  margin-top: 0px;&#13;
+  width: 290px;&#13;
+  font-weight: normal;&#13;
+  font-family: $default-font-family;&#13;
+  color: #797979;&#13;
+  font-size: 8pt;&#13;
+}&#13;
+&#13;
+.item-navbar a i {&#13;
+  font-size: 11px !important;&#13;
+}&#13;
+&#13;
+.item-added-tooltip {&#13;
+  width: 184px;&#13;
+  font-size: 14px;&#13;
+}&#13;
+&#13;
+.menu-description{&#13;
+  font-size: 10pt;&#13;
+  color: #9a8f95;&#13;
+  padding-right: 0px;&#13;
+  white-space: normal;&#13;
+}&#13;
+&#13;
+@media (max-width: 380px) {&#13;
+  .nav &gt; li &gt; a {&#13;
+    height: auto;&#13;
+    line-height: 20px;&#13;
+  }&#13;
+&#13;
+  .dropdown-menu {&#13;
+    display: block !important;&#13;
+    position: unset !important;&#13;
+    border: none;&#13;
+    box-shadow: none;&#13;
+    color: transparent;&#13;
+    visibility: visible;&#13;
+    opacity: 1;&#13;
+    float: none;&#13;
+  }&#13;
+}&#13;
+&#13;
+.globe-link {&#13;
+  margin-right: 22px;&#13;
+&#13;
+  i {&#13;
+    margin-top: auto;&#13;
+    padding: 6px;&#13;
+    width: 30px;&#13;
+    border: 1px solid #666;&#13;
+    border-radius: 2px;&#13;
+    color: #666;&#13;
+    font-size: 16px;&#13;
+    text-align: center;&#13;
+&#13;
+    &amp;:before {&#13;
+      position: relative;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.globe-link:hover {&#13;
+  i {&#13;
+    color: #000;&#13;
+    border-color: #000;&#13;
+  }&#13;
+}&#13;
+&#13;
+.tooltip {&#13;
+  &amp;.left {&#13;
+    .tooltip-arrow {&#13;
+      border-left-color: #323949;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  .tooltip-inner {&#13;
+    padding: 10px;&#13;
+    border-radius: 2px;&#13;
+    background: #323949;&#13;
+    box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.2);&#13;
+    opacity: 1;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-light);&#13;
+    font-size: 14px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.open .dropdown-toggle{&#13;
+  background-color: #fff !important;&#13;
+}&#13;
+&#13;
+/* Start MRC-48 EG */&#13;
+#rightMenu{&#13;
+  display: block;&#13;
+  right: 0px;&#13;
+}&#13;
+#seletor{&#13;
+	border-color: transparent;&#13;
+  	color: #009aff;&#13;
+  	font-size: 10px;&#13;
+}&#13;
+#text_Service_Managed{&#13;
+  	color: #009aff;&#13;
+}&#13;
+&#13;
+#current-account{&#13;
+	display: inline !important;&#13;
+}&#13;
+&#13;
+.badge-pill {&#13;
+	font-size: 1.2rem;&#13;
+    font-weight: var(--eq-font-weight-semibold);&#13;
+    line-height: 1.6rem;&#13;
+    padding: 0.2rem 0.8rem;&#13;
+    margin-left: 0.6rem;&#13;
+}&#13;
+&#13;
+.setBetaBadge {&#13;
+  background: #fbfbfb!important;&#13;
+  color: #009aff;    &#13;
+  border: 1px solid #009aff;&#13;
+}&#13;
+.setNewBadge {&#13;
+  background: var(--eq-color-blue-100)!important;&#13;
+  color: var(--eq-color-blue-600);&#13;
+  border: 1px solid var(--eq-color-blue-200);&#13;
+}</css>
+        <data_table>sp_instance_menu</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list>title</field_list>
+        <has_preview>false</has_preview>
+        <id/>
+        <internal>false</internal>
+        <link><![CDATA[function(scope, elem, attr, ctrl) {
+    $('[data-toggle="tooltip"]').tooltip();
+
+    // Menu animation
+    $(elem).on('mouseleave', '.header-menu-item:not(.dropdown)', function() {
+        $(this).removeClass('active');
+    });
+
+    // $(elem).on('mouseleave', '.menu-panel',  function(){
+    // 	$(this).removeClass('active');
+    // 	$('#menu_item_'+ctrl.active_menu).removeClass('active');
+    // });
+
+    //Remove menu overlay when mouse leave the menu-item or menu-panel
+    ctrl.removeMenuOverlay = function(e, first_level) {
+        var element = document.elementFromPoint(e.clientX, e.clientY);
+        var isOutsideMenu = first_level ?
+            !element.classList.contains('dropdown-menu1') &&
+            !element.classList.contains('sp-menu-has-items') &&
+            !element.classList.contains('ng-scope') :
+            !element.classList.contains('dropdown-menu1') &&
+            !element.classList.contains('sp-menu-has-items');
+
+        if (isOutsideMenu) {
+            $('#menu_item_' + ctrl.active_menu).removeClass('active');
+            $('#panel_' + ctrl.active_menu).removeClass('active');
+        }
+    };
+
+}]]></link>
+        <name>MSP Header Menu</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+
+    //Tracking to analytics
+    //This is to validate if it is Enabled
+    data.trackingEnabled = gs.getProperty('EQIX_ANALYTICS_SEGMENT_ENABLED');
+    data.categoriesTrackingEnabled = gs.getProperty('EQIX_ANALYTICS_CATEGORIES_ENABLED');
+    data.menuItemCreateTicket = gs.getProperty('EQIX_SisIDMenuItemCreateTicket');
+    data.menuItemTrialManagement = gs.getProperty('EQIX_SisIDMenuItemTrialManagement');
+    data.overlayColumnMaxItems = parseInt(gs.getProperty("EQIX_Menu_Dropdown_Max_Items_Per_Column"));
+    //data.oi_impersonation =	$sp.getWidget("oi-impersonate");
+    data.page_id = $sp.getParameter('id') || 'msp_support_center';
+    var useMenuId = $sp.getParameter('use_menu_id') || false;
+    var menuSysId = useMenuId ? $sp.getParameter('sys_id') : '';
+    data.reportingTour = gs.getProperty('EQIX.Tour.CSM.Y25.Reporting');
+    data.menuConfig = JSON.parse(gs.getProperty('EQIX_Menu_Configuration'));
+    data.standAloneMenus = data.menuConfig.stand_alone_menus || '[]';
+
+
+    // build menus
+    var menu_id = $sp.getValue('sys_id'); // instance sys_id
+    var gr = new GlideRecord('sp_instance_menu');
+    gr.get(menu_id);
+    data.menu = {};
+    data.menu.name = gr.name.getDisplayValue();
+    data.menu.items = $sp.getMenuItems(menu_id);
+    data.defaultMenu = data.menuConfig.default_menu || data.menu.items[0].sys_id;
+    data.reportingMenu = data.menuConfig.reporting_menu;
+    data.options = options;
+    data.isLoggedIn = GlideSession.get().isLoggedIn();
+    if (data.isLoggedIn)
+        data.cartWidget = $sp.getWidget("sc-shopping-cart", {
+            cartTemplate: "small_shopping_cart.html",
+            auto_update_cart: options.auto_update_cart
+        });
+    data.ecp_url = gs.getProperty("equix.ecp_url");
+
+    data.showManagedServiceMenu = false;
+
+    //Start MRC-48 EG 
+    var account = new EQIX_Customer_Permissions().getActiveAccountSysId();
+    var result = new EQUIX_RelaxCI().checkServiceMultiHost(account);
+    data.plans = new EQIX_GSD_PremierSupport().getSupportPlans(account);
+
+    var grAccount = new GlideRecord('customer_account');
+    grAccount.get("sys_id", account);
+
+
+    data.operationUnit = grAccount.getValue('u_operating_unit');
+    var isSubAccount = false;
+    var isReseller = false;
+
+    if (grAccount.getValue('u_partner_type') == 'Reseller') {
+        isReseller = true;
+    }
+    if (!gs.nil(grAccount.getValue('u_reseller'))) {
+        isSubAccount = true;
+    }
+
+    if (result || (data.plans.length > 0)) {
+        data.showManagedServiceMenu = true;
+    }
+
+    if (data.showManagedServiceMenu) {
+        data.createRightMenu = $sp.getWidget('msp-view-modal-rigth-sidebar', {});
+    }
+
+    //This is to get the user to track on load
+    data.identifyUser = false;
+    var ucm_id = false;
+    var u_master_admin = "";
+	var hasGlobalProduct = false;
+
+    var grUser = new GlideRecord("sys_user");
+    if (grUser.get(gs.getUserID())) {		
+        if (grUser.last_login_time != grUser.u_previous_login_time) {		
+            data.identifyUser = true;
+            ucm_id = grUser.u_ucm_id.getDisplayValue();
+            u_master_admin = grUser.getValue('u_master_admin');
+            grUser.u_previous_login_time = grUser.last_login_time;			
+			
+			var grCustomContact = new GlideRecord('customer_contact');
+			if(grCustomContact.get(gs.getUserID())){
+				if(grAccount.u_account_with_global_product == true || grAccount.u_account_with_global_product == 'true') {
+					hasGlobalProduct = true;
+				}				
+			}
+			grUser.update();            
+        }
+    }
+    if (ucm_id) {
+        data.identifyUser = {
+            userId: ucm_id,
+            isSubAccount: isSubAccount,
+            isReseller: isReseller,
+			hasGlobalProduct: hasGlobalProduct,
+            isMasterAdmin: new EQIX_Customer_Permissions().is_Master_MS_Admin(gs.getUserID())
+        };
+		
+    }
+	
+    // 	//Services
+    // 	var relaxCIPortal = new EQUIX_RelaxCI();
+    // 	var propertiesModelNumber = gs.getProperty("EQIX_MS_FF.POE_Associate_Multi_CI_Portal").split(",");
+    // 	var listManagedService = [];
+    // 	var resultR = "";
+
+    // 	for (var x = 0; x < propertiesModelNumber.length; x++) {
+    // 		resultR = relaxCIPortal.getServiceManagedAccount(propertiesModelNumber[x], account);
+    // 		if (resultR.permission == true) {
+    // 			listManagedService.push(resultR);
+    // 		}
+    // 	}
+
+    // 	data.hrefSeeMoreDetals_support = "?id=msp_premier_support";
+
+    // 	//data.widget = [];
+    // 	var options = {};
+    // 	for (var i = 0; i < listManagedService.length; i++) {
+
+    // 		switch(listManagedService[i].model_number) {
+    // 			case "1-2FCD1U3S": //Managed - Multiple Hosts
+    // 				// code block
+    // 				// MPE 284 - [Relax CI] - Uninstall Component 1:N
+    // 				//Premisse remove from hrefAddComponents this "&u_service=aaed4a2e1b3054508ca477741a4bcbb1"
+    // 				options = {
+    // 					"sys_id_ci": listManagedService[i].sys_id_CI,
+    // 					"permission": listManagedService[i].permission,
+    // 					"multiple_host": listManagedService[i].u_multiple_host,
+    // 					"quantity_of_components": listManagedService[i].u_quantity_of_components,
+    // 					"product": listManagedService[i].product,
+    // 					"model_number":listManagedService[i].model_number,
+    // 					"hrefSeeMoreDetals": "?id=msp_managed_hosting",
+    // 					"hrefAddComponents": "?id=msp_tickets_history&action=new&autofill=true&u_type=0&u_product_line=a9976772db055014e0e15cb8dc961996&u_product_category=85c068a9db5adf00448b01a3ca9619b1&u_product=97b43c04dbbd9c905173d8f3ce961933"
+    // 				};
+
+    // 				data.managedHosting = $sp.getWidget('msp-view-product-text-rigth-menu', options);
+    // 				//data.data.widget[i] = $sp.getWidget('msp-view-product-text-rigth-menu', options);
+    // 				break;
+    // 			case "1-2FDQN8F6": //Monitoring Services - Multiple Hosts
+    // 				// code block
+    // 				// MPE 284 - [Relax CI] - Uninstall Component 1:N
+    // 				//Premisse remove from hrefAddComponents this "&u_service=3478f55c1bd510d08ca477741a4bcb4d"
+    // 				options = {
+    // 					"sys_id_ci": listManagedService[i].sys_id_CI,
+    // 					"permission": listManagedService[i].permission,
+    // 					"multiple_host": listManagedService[i].u_multiple_host,
+    // 					"quantity_of_components": listManagedService[i].u_quantity_of_components,
+    // 					"product": listManagedService[i].product,
+    // 					"model_number":listManagedService[i].model_number,
+    // 					"hrefSeeMoreDetals": "?id=msp_monitoring",
+    // 					"hrefAddComponents": "?id=msp_tickets_history&action=new&autofill=true&u_type=0&u_product_line=e5fd2865dbdadf00448b01a3ca9619ba&u_product_category=85c068a9db5adf00448b01a3ca9619b1&u_product=6b43b0e9dbdadf00448b01a3ca961960"
+    // 				};
+    // 				data.monitorin = $sp.getWidget('msp-view-product-text-rigth-menu', options);
+    // 				//data.data.widget[i] = $sp.getWidget('msp-view-product-text-rigth-menu', options);
+    // 				break;
+    // 			case "1-2FDQPPXE": //OS Management - Multiple Hosts
+    // 				// code block
+    // 				// MPE 284 - [Relax CI] - Uninstall Component 1:N
+    // 				//Premisse remove from hrefAddComponents this "&u_service=d39906661b3054508ca477741a4bcb63"
+    // 				options = {
+    // 					"sys_id_ci": listManagedService[i].sys_id_CI,
+    // 					"permission": listManagedService[i].permission,
+    // 					"multiple_host": listManagedService[i].u_multiple_host,
+    // 					"quantity_of_components": listManagedService[i].u_quantity_of_components,
+    // 					"product": listManagedService[i].product,
+    // 					"model_number":listManagedService[i].model_number,
+    // 					"hrefSeeMoreDetals": "?id=msp_os_management",
+    // 					"hrefAddComponents": "?id=msp_tickets_history&action=new&autofill=true&u_type=0&u_product_line=47cd70a9db1edf00448b01a3ca9619f2&u_product_category=85c068a9db5adf00448b01a3ca9619b1&u_product=e343b0e9dbdadf00448b01a3ca96193d"
+    // 				};
+    // 				data.osManagement = $sp.getWidget('msp-view-product-text-rigth-menu', options);
+    // 				//data.data.widget[i] = $sp.getWidget('msp-view-product-text-rigth-menu', options);
+    // 				break;
+
+    // 				//default:
+
+    // 		}
+    // 	}
+
+    //MSPI-8542 Set the default active menu
+    var spPageGR = new GlideRecord('sp_page');
+    spPageGR.get('id', data.page_id);
+    data.page_sys_id = spPageGR.getValue("sys_id");
+
+    var spRectGR = new GlideRecord("sp_rectangle_menu_item");
+    spRectGR.addActiveQuery();
+    //If rectangle menu item sys_id is defined and use_menu_id is true, proceed to query with the sys_id rather than page's sys_id
+    if (useMenuId) {
+        spRectGR.addQuery("sys_id", menuSysId);
+    } else {
+        spRectGR.addQuery("sp_page", data.page_sys_id);
+    }
+    spRectGR.query();
+    if (spRectGR.next()) {
+        var item = spRectGR;
+        var sys_id = item.sys_id;
+        while (item.sp_rectangle_menu_item) {
+
+            item = item.sp_rectangle_menu_item;
+            sys_id = item.sys_id;
+        }
+
+        data.defaultMenu = sys_id.toString();
+    }
+
+    //MSPI-8775 Fix main menu category selected state issues
+    var parentChildMenus = [];
+    for (var i = 0; i < data.menu.items.length; i++) {
+
+        if (data.menu.items[i].items.length == 0) {
+            var obj = {};
+            obj.parent = data.menu.items[i].sys_id;
+            obj.child = data.menu.items[i].sys_id;
+            parentChildMenus.push(obj);
+        } else {
+            for (var j = 0; j < data.menu.items[i].items.length; j++) {
+                if (data.menu.items[i].items[j].items.length > 0) {
+                    for (var x = 0; x < data.menu.items[i].items[j].items.length; x++) {
+                        if (data.menu.items[i].items[j].items[x].url_target != '_blank') {
+                            var obj2 = {};
+                            obj2.parent = data.menu.items[i].sys_id;
+                            obj2.child = data.menu.items[i].items[j].items[x].sys_id;
+                            parentChildMenus.push(obj2);
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+    data.parentChildMenus = parentChildMenus;
+
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>organize.luiz</sys_created_by>
+        <sys_created_on>2017-12-26 15:32:02</sys_created_on>
+        <sys_id>4105acd5db9b4740b3cd73e1ba96195a</sys_id>
+        <sys_mod_count>636</sys_mod_count>
+        <sys_name>MSP Header Menu</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_4105acd5db9b4740b3cd73e1ba96195a</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:33</sys_updated_on>
+        <template><![CDATA[<div>
+  <sp-widget widget="reportingTourWidget"></sp-widget>
+  <ul class="nav navbar-nav d-flex msp-header-menu" aria-label="${Header menu}">
+    <!-- Start MRC-48 EG -->
+    
+    <li class="navbar-menu-icon header-menu-item">  
+    	<a target="_blank" ng-href="{{data.ecp_url}}">
+        <eq-tooltip
+  		content="${Equinix Customer Portal}"
+  		variant="light"
+  		placement="bottom-start"
+  		trigger="hover"
+        distance="23"
+		>
+        <eq-icon name="globe-americas" style="--size: 2rem; --fill: #2a303c;"></eq-icon>
+        </eq-tooltip>
+      	</a>
+    </li>
+ 
+     <!-- End MRC-48 EG -->
+    
+    <li ng-repeat="item in visibleItems" id="menu_item_{{item.sys_id}}" class="menu-item item-navbar" ng-init="item.first_level = true" ng-if="c.containSubItems(item.items) || c.standAloneMenu(item.sys_id)" ng-mouseleave="c.removeMenuOverlay($event,item.first_level)" ng-mouseover="c.setActiveMenu(item.sys_id)" ng-class="{dropdown: item.items.length > 0, 'header-menu-item': true, 'active-menu': item.sys_id == activeMenuId}" ng-include="'mspMenuTemplate'" ></li>
+	
+    <!--div class="header-loader" ng-show="loadingIndicator">
+      <i class="hidden-xs fa fa-refresh fa-spin" ng-if="c.ShowWarm==true" ></i>></i>
+    </div-->
+
+   <!-- Start MRC-48 EG -->
+    <li class="globe-link btn btn-link dropdown hidden-xs align-center ms-right" ng-if="data.showManagedServiceMenu == true">
+      <a class="w3-button w3-teal w3-xlarge w3-right" data-toggle="modal" data-target="#myModalRightMenu"  > 
+        <span class="visible-inline selected-language ng-binding" id="text_Service_Managed">
+          <i class="fa fa-exclamation-triangle" style='color: #F69F2A; border: 0px solid #666' ng-if="c.data.showWarm == true"></i>${Management Services} </span>
+          <i class="fa fa-chevron-down" id="seletor"> </i>
+       </a>
+    </li>
+    <!-- End MRC-48 EG-->
+    
+  </ul>
+  <div id="panel_{{item.sys_id}}" ng-repeat="item in subItems" ng-if="item.items.length>0" class="menu-panel" ng-mouseleave="c.removeMenuOverlay($event)" ng-style="c.getMenuPanelPosition(item.sys_id)">
+    <ul ng-if="item.items.length > 0" class="dropdown-menu1 category-list items-list" role="group" id="menu-apply" >  
+      <li ng-repeat="item in item.items" class="has-item" ng-if="item.items.length > 0" ng-include="'mspMenuTemplate'"/>
+    </ul>
+    <!-- MRC-48 EG-->
+    <ul ng-if="item.items.length == 0" class="dropdown-menu1 category-list items-list" role="group" id="menu-apply" >  
+      <li ng-repeat="item in item.items" ng-init= "c.checkMenu(item)" class="has-item" ng-include="'mspMenuTemplate'"/>
+    </ul>
+  </div>
+   <!-- Start MRC-48 EG -->
+  <sp-widget widget="data.createRightMenu"></sp-widget> 
+  <!-- End MRC-48 EG-->
+</div>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c30fe0000001</claim_timestamp>
+        <metadata_update_name>sp_widget_4105acd5db9b4740b3cd73e1ba96195a</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:33</sys_created_on>
+        <sys_id>3c27249987b5c7904d820e96cebb35a6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:33</sys_updated_on>
+    </sys_claim>
+</record_update>

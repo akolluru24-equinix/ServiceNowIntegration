@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>global.EQIX_MDM3_Account_REST</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Used on EQIX_MDM3_Account_and_Contact&#13;
+ImportMDM3Account Scripted REST API</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_MDM3_Account_REST</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_MDM3_Account_REST = Class.create();
+EQIX_MDM3_Account_REST.prototype = {
+    initialize: function() {},
+
+    process: function(request) {
+        var payload = null;
+        try {
+
+            if (request && request.body && request.body.data) {
+                payload = request.body.data;
+
+            } else if (request && request.body) {
+                try {
+                    payload = (typeof request.body === 'string') ? JSON.parse(request.body) : request.body;
+                } catch (e) {
+                    gs.error('REST Import:Invalid JSON in request.body.data - ' + e.message);
+                    throw e;
+                }
+            }
+
+
+            // Support either { data: [...] } or just [...]
+            var arr = [];
+            if (payload && Array.isArray(payload.data)) {
+                arr = payload.data;
+            } else if (Array.isArray(payload)) {
+                arr = payload;
+
+            } else if (payload && payload.data && typeof payload.data === 'object') {
+                // In case data is a single object instead of array
+                arr = [payload.data];
+            }
+
+            if (!arr || arr.length === 0) {
+                throw new Error('REST Import: No data records found in payload (expected data[0]).');
+            }
+
+            // var obj = arr[0];
+            var sysIds = [];
+            arr.forEach(function(obj) {
+
+
+
+                    // Create GlideRecord for u_imp_legal_account_mdm3
+                    var grImpMDM3Acc = new GlideRecord('u_imp_legal_account_mdm3_0');
+                    grImpMDM3Acc.initialize();
+
+                    // Root / account-level
+                    grImpMDM3Acc.u_accountname = obj.accountName || '';
+                    grImpMDM3Acc.u_accountnumber = obj.accountNumber || '';
+                    grImpMDM3Acc.u_mdmid = obj.mdmId || '';
+                    grImpMDM3Acc.u_createdby = obj.createdBy || '';
+                    grImpMDM3Acc.u_createddatetime = obj.createdDateTime || '';
+                    grImpMDM3Acc.u_updatedby = obj.updatedBy || '';
+                    grImpMDM3Acc.u_updateddatetime = obj.updatedDateTime || '';
+                    grImpMDM3Acc.u_dunsnumber = obj.dunsNumber || '';
+                    grImpMDM3Acc.u_doingbusinessasname = obj.doingBusinessAsName || '';
+                    grImpMDM3Acc.u_isfederalaccount = obj.isFederalAccount || ''; // lower-case per XML
+                    grImpMDM3Acc.u_isgovernmentaccount = obj.isGovernmentAccount || '';
+                    grImpMDM3Acc.u_isinternalaccount = obj.isInternalAccount || '';
+                    grImpMDM3Acc.u_isdeleted = obj.isDeleted || '';
+                    grImpMDM3Acc.u_lastupdateddatetime = obj.lastUpdatedDateTime || ''; // fixed typo
+                    grImpMDM3Acc.u_ismaskedaccount = obj.isMaskedAccount || '';
+                    grImpMDM3Acc.u_customersegmentation = obj.customerSegmentation || '';
+                    grImpMDM3Acc.u_websiteurl = obj.websiteUrl || '';
+                    grImpMDM3Acc.u_industryclassification = obj.industryClassification || '';
+                    grImpMDM3Acc.u_accounttype = obj.accountType || '';
+                    grImpMDM3Acc.u_status = obj.status || '';
+                    grImpMDM3Acc.u_tickersymbol = obj.tickerSymbol || '';
+                    grImpMDM3Acc.u_numberofemployees = obj.numberOfEmployees || '';
+                    grImpMDM3Acc.u_salesrevenueamount = obj.salesRevenueAmount || '';
+                    grImpMDM3Acc.u_parentmdmid = obj.parentMdmId || '';
+
+                    // Account Address
+                    if (obj.accountAddress) {
+
+                        grImpMDM3Acc.u_accountaddress_addressid = obj.accountAddress[0].addressId || '';
+                        grImpMDM3Acc.u_accountaddress_addresstype = obj.accountAddress[0].addressType || '';
+                        grImpMDM3Acc.u_accountaddress_addressline1 = obj.accountAddress[0].addressLine1 || '';
+                        grImpMDM3Acc.u_accountaddress_addressline2 = obj.accountAddress[0].addressLine2 || '';
+                        grImpMDM3Acc.u_accountaddress_addressline3 = obj.accountAddress[0].addressLine3 || '';
+                        grImpMDM3Acc.u_accountaddress_city = obj.accountAddress[0].city || '';
+                        grImpMDM3Acc.u_accountaddress_state = obj.accountAddress[0].state || '';
+                        grImpMDM3Acc.u_accountaddress_countrycode = obj.accountAddress[0].countryCode || '';
+                        grImpMDM3Acc.u_accountaddress_postalcode = obj.accountAddress[0].postalCode || '';
+                        grImpMDM3Acc.u_accountaddre_ficationstatus = obj.accountAddress[0].verificationStatus || '';
+                        grImpMDM3Acc.u_accountaddre_cationlatitude = obj.accountAddress[0].geoLocationLatitude || '';
+                        grImpMDM3Acc.u_accountaddre_ationlongitude = obj.accountAddress[0].geoLocationLongitude || '';
+                        grImpMDM3Acc.u_accountaddress_isprimary = obj.accountAddress[0].isPrimary || '';
+                    }
+
+                    // Account Phone
+                    if (obj.accountPhone) {
+                        grImpMDM3Acc.u_accountphone_phonenumber = obj.accountPhone[0].phoneNumber || '';
+                        grImpMDM3Acc.u_accountphone_phonetype = obj.accountPhone[0].phoneType || '';
+                    }
+
+                    // Associated Employee
+                    if (obj.associatedEmployee) {
+                        grImpMDM3Acc.u_associatedem_employeenumber = obj.associatedEmployee[0].employeeNumber || '';
+
+                        if (obj.associatedEmployee.employeeRoles) {
+                            grImpMDM3Acc.u_associatedem_oyeeroles_role = obj.associatedEmployee.employeeRoles[0].role || '';
+                            grImpMDM3Acc.u_associatedem__startdatetime = obj.associatedEmployee.employeeRoles[0].startDateTime || '';
+                            grImpMDM3Acc.u_associatedem_es_enddatetime = obj.associatedEmployee.employeeRoles[0].endDateTime || '';
+                        }
+                    }
+
+                    // Account Data Provider Hierarchy
+                    if (obj.accountDataProviderHierarchy) {
+                        grImpMDM3Acc.u_accountdatap_enrichdatetime = obj.accountDataProviderHierarchy.dnbEnrichDateTime || '';
+                        grImpMDM3Acc.u_accountdatap_confidencecode = obj.accountDataProviderHierarchy.dunsConfidenceCode || '';
+                        grImpMDM3Acc.u_accountdatap_ltimateorgname = obj.accountDataProviderHierarchy.domesticUltimateOrgName || '';
+                        grImpMDM3Acc.u_accountdatap_dataproviderid = obj.accountDataProviderHierarchy.domesticUltimateDataProviderId || ''; // prefer full tag
+                        grImpMDM3Acc.u_accountdatap_alultimateduns = obj.accountDataProviderHierarchy.globalUltimateDuns || '';
+                        grImpMDM3Acc.u_accountdatap_ltimateorgname = obj.accountDataProviderHierarchy.globalUltimateOrgName || ''; // same tag used
+                        grImpMDM3Acc.u_accountdatap_dataproviderid = obj.accountDataProviderHierarchy.globalUltimateDataProviderId || '';
+                        grImpMDM3Acc.u_accountdatap_archy_sic1code = obj.accountDataProviderHierarchy.sic1Code || '';
+                        grImpMDM3Acc.u_accountdatap_ic1description = obj.accountDataProviderHierarchy.sic1Description || '';
+                        grImpMDM3Acc.u_accountdatap_archy_sic2code = obj.accountDataProviderHierarchy.sic2Code || '';
+                        grImpMDM3Acc.u_accountdatap_ic2description = obj.accountDataProviderHierarchy.sic2Description || '';
+                        grImpMDM3Acc.u_accountdatap_archy_sic3code = obj.accountDataProviderHierarchy.sic3Code || '';
+                        grImpMDM3Acc.u_accountdatap_ic3description = obj.accountDataProviderHierarchy.sic3Description || '';
+                        grImpMDM3Acc.u_accountdatap_archy_sic4code = obj.accountDataProviderHierarchy.sic4Code || '';
+                        grImpMDM3Acc.u_accountdatap_ic4description = obj.accountDataProviderHierarchy.sic4Description || '';
+                        grImpMDM3Acc.u_accountdatap_y_issubsidiary = obj.accountDataProviderHierarchy.isSubsidiary || '';
+                    }
+
+                    // Account Firmography
+                    if (obj.accountFirmography) {
+                        grImpMDM3Acc.u_accountfirmography_naics = obj.accountFirmography.naics || '';
+                        grImpMDM3Acc.u_accountfirmo_hy_yearstarted = obj.accountFirmography.yearStarted || '';
+                        grImpMDM3Acc.u_accountfirmo_sequencenumber = obj.accountFirmography.sequenceNumber || '';
+                        grImpMDM3Acc.u_accountfirmo_hy_matchsource = obj.accountFirmography.matchSource || '';
+                        grImpMDM3Acc.u_accountfirmo__matchdatetime = obj.accountFirmography.matchDateTime || '';
+                        grImpMDM3Acc.u_accountfirmo_hy_matchreason = obj.accountFirmography.matchReason || '';
+                        grImpMDM3Acc.u_accountfirmo_candidatecount = obj.accountFirmography.candidateCount || ''; // note: if property is matchCandidateCount, adjust here
+                        grImpMDM3Acc.u_accountfirmo_tchcandidateid = obj.accountFirmography.matchCandidateId || '';
+                        grImpMDM3Acc.u_accountfirmo_choverrideflag = obj.accountFirmography.matchOverrideFlag || '';
+                        grImpMDM3Acc.u_accountfirmo_atchaudittrail = obj.accountFirmography.matchAuditTrail || '';
+                    }
+
+
+                    // Insert the record
+                    sysIds.push(grImpMDM3Acc.insert());
+                    // gs.info('Record created in u_imp_legal_account_mdm3 with sys_id: ' + sysId);
+                }
+
+            );
+
+
+            return "ImpMDM3acc created: " + sysIds.join(',');
+
+        } catch (e) {
+            gs.error('Not possible to create Record  in u_imp_legal_account_mdm3 with : ' + e.message);
+            var mslog = new EQIX_ManagedServiceLog();
+            mslog.errorLog('customer_account', '', 'Scripted REST API', 'EQIX_MDM3_Account_and_Contact.ImportMDM3Account', (request.getHeader('CORRELATION-ID') || '') + '. Error: ' + e.message, '/api/equi2/eqix_mdm3/importAccount');
+
+        }
+    },
+
+    type: 'EQIX_MDM3_Account_REST'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>alviana@equinix.com</sys_created_by>
+        <sys_created_on>2026-03-02 14:56:41</sys_created_on>
+        <sys_id>046b000b879f7e146a1feb1e3fbb3551</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>EQIX_MDM3_Account_REST</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_046b000b879f7e146a1feb1e3fbb3551</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:28</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f13795d430000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_046b000b879f7e146a1feb1e3fbb3551</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:02:28</sys_created_on>
+        <sys_id>2366a41587b5c7904d820e96cebb35c5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:28</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>046b000b879f7e146a1feb1e3fbb3551</id>
+        <sys_created_by>alviana@equinix.com</sys_created_by>
+        <sys_created_on>2026-03-02 14:56:42</sys_created_on>
+        <sys_id>d06b880b879f7e146a1feb1e3fbb35c3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>alviana@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-03-02 14:56:42</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

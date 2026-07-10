@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_dictionary_override">
+    <sys_dictionary_override action="INSERT_OR_UPDATE">
+        <attributes/>
+        <attributes_override>false</attributes_override>
+        <base_table>sys_user</base_table>
+        <calculation/>
+        <calculation_override>false</calculation_override>
+        <default_value/>
+        <default_value_override>false</default_value_override>
+        <dependent/>
+        <dependent_override>false</dependent_override>
+        <display_override>false</display_override>
+        <element>first_name</element>
+        <mandatory>false</mandatory>
+        <mandatory_override>true</mandatory_override>
+        <name>customer_contact</name>
+        <read_only>false</read_only>
+        <read_only_option/>
+        <read_only_option_override>false</read_only_option_override>
+        <read_only_override>false</read_only_override>
+        <reference_qual/>
+        <reference_qual_override>false</reference_qual_override>
+        <sys_class_name>sys_dictionary_override</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2015-07-02 00:58:02</sys_created_on>
+        <sys_id>d359d570c3010200b12d9f2974d3ae9c</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>first_name</sys_name>
+        <sys_package display_value="Customer Service Base Entities" source="com.snc.cs_base">e6d8e4f34f5e8300f5e08e1f0210c73f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_dictionary_override_d359d570c3010200b12d9f2974d3ae9c</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:16</sys_updated_on>
+    </sys_dictionary_override>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137bed480000002</claim_timestamp>
+        <metadata_update_name>sys_dictionary_override_d359d570c3010200b12d9f2974d3ae9c</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:16</sys_created_on>
+        <sys_id>2417e85987b5c7904d820e96cebb3552</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:16</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137bed480000001</claim_timestamp>
+        <metadata_update_name>sys_dictionary_override_d359d570c3010200b12d9f2974d3ae9c</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.cs_base</previous_claim_name>
+        <previous_claim_scope>com.snc.cs_base</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:16</sys_created_on>
+        <sys_id>6817e85987b5c7904d820e96cebb3552</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:16</sys_updated_on>
+    </sys_claim>
+</record_update>

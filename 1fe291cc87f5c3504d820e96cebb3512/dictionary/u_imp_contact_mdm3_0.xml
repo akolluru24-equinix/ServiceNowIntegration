@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="c948fb3c1bf9b6942dedc883604bcb41" extends="sys_import_set_row" label="Imp Contact - MDM3.0" max_length="40" name="u_imp_contact_mdm3_0" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.addressId" label="address.addressId" max_length="150" name="u_address_addressid" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.addressLine1" label="address.addressLine1" max_length="150" name="u_address_addressline1" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.addressLine2" label="address.addressLine2" max_length="150" name="u_address_addressline2" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.addressType" label="address.addressType" max_length="150" name="u_address_addresstype" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.city" label="address.city" max_length="150" name="u_address_city" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.countryCode" label="address.countryCode" max_length="150" name="u_address_countrycode" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.geoLocationAccuracy" label="address.geoLocationAccuracy" max_length="150" name="u_address_geolocationaccuracy" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.geoLocationLatitude" label="address.geoLocationLatitude" max_length="150" name="u_address_geolocationlatitude" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.geoLocationLongitude" label="address.geoLocationLongitude" max_length="150" name="u_address_geolocationlongitude" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.postalCode" label="address.postalCode" max_length="150" name="u_address_postalcode" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.stateProvince" label="address.stateProvince" max_length="150" name="u_address_stateprovince" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=address.verificationStatus" label="address.verificationStatus" max_length="150" name="u_address_verificationstatus" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=associatedAccounts.arrayData" label="associatedAccounts.arrayData" max_length="334" name="u_associatedaccounts_arraydata" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=commenters" label="commenters" max_length="150" name="u_commenters" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=communication" label="communication" max_length="150" name="u_communication" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=createdBy" label="createdBy" max_length="150" name="u_createdby" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=createdDateTime" label="createdDateTime" max_length="150" name="u_createddatetime" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=dateOfBirth" label="dateOfBirth" max_length="150" name="u_dateofbirth" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=designation" label="designation" max_length="150" name="u_designation" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=email.domain" label="email.domain" max_length="150" name="u_email_domain" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=email.domainType" label="email.domainType" max_length="150" name="u_email_domaintype" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=email.email" label="email.email" max_length="150" name="u_email_email" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=email.emailType" label="email.emailType" max_length="150" name="u_email_emailtype" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=email.username" label="email.username" max_length="150" name="u_email_username" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=email.validationStatus" label="email.validationStatus" max_length="150" name="u_email_validationstatus" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=employmentHistory" label="employmentHistory" max_length="150" name="u_employmenthistory" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=externalSystemInfo.systemId" label="externalSystemInfo.systemId" max_length="150" name="u_externalsysteminfo_systemid" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=externalSystemInfo.systemName" label="externalSystemInfo.systemName" max_length="150" name="u_externalsyst_nfo_systemname" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=firstName" label="firstName" max_length="150" name="u_firstname" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=gender" label="gender" max_length="150" name="u_gender" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=isDeleted" label="isDeleted" max_length="150" name="u_isdeleted" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=isPrimary" label="isPrimary" max_length="150" name="u_isprimary" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=jobTitleGroup" label="jobTitleGroup" max_length="150" name="u_jobtitlegroup" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=lastName" label="lastName" max_length="150" name="u_lastname" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=leadSource" label="leadSource" max_length="150" name="u_leadsource" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=mdmId" label="mdmId" max_length="150" name="u_mdmid" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=middleName" label="middleName" max_length="150" name="u_middlename" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=name" label="name" max_length="150" name="u_name" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=namePrefix" label="namePrefix" max_length="150" name="u_nameprefix" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=nameSuffix" label="nameSuffix" max_length="150" name="u_namesuffix" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=phone.extension" label="phone.extension" max_length="150" name="u_phone_extension" type="string"/>
+        <element label="phone.mobile" max_length="150" name="u_phone_mobile" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=phone.number" label="phone.number" max_length="150" name="u_phone_number" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=phone.preferredTimeToCall" label="phone.preferredTimeToCall" max_length="150" name="u_phone_preferredtimetocall" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=phone.timeZone" label="phone.timeZone" max_length="150" name="u_phone_timezone" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=phone.type" label="phone.type" max_length="150" name="u_phone_type" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=preferredModeOfCommunication" label="preferredModeOfCommunication" max_length="150" name="u_preferredmodeofcommunication" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=privacyPreference.faxOptOut" label="privacyPreference.faxOptOut" max_length="150" name="u_privacypreference_faxoptout" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=privacyPreference.emailOptOut" label="privacyPreference.emailOptOut" max_length="150" name="u_privacyprefe_ce_emailoptout" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=privacyPreference.doNotContact" label="privacyPreference.doNotContact" max_length="150" name="u_privacyprefe_e_donotcontact" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=pronouns" label="pronouns" max_length="150" name="u_pronouns" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=purgeStatus" label="purgeStatus" max_length="150" name="u_purgestatus" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=region" label="region" max_length="150" name="u_region" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=salutation" label="salutation" max_length="150" name="u_salutation" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=seniorityLevel" label="seniorityLevel" max_length="150" name="u_senioritylevel" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=status" label="status" max_length="150" name="u_status" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=statusChangeDateTime" label="statusChangeDateTime" max_length="40" name="u_statuschangedatetime" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=title" label="title" max_length="150" name="u_title" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=updatedBy" label="updatedBy" max_length="150" name="u_updatedby" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=updatedDateTime" label="updatedDateTime" max_length="150" name="u_updateddatetime" type="string"/>
+    </element>
+</database>

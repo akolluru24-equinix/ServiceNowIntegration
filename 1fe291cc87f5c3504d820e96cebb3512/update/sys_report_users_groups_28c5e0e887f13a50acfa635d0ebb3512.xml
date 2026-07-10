@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_report_users_groups">
+    <sys_report_users_groups action="INSERT_OR_UPDATE">
+        <group_id/>
+        <report_id display_value="Events created this week">2cc5e0e887f13a50acfa635d0ebb3511</report_id>
+        <sys_class_name>sys_report_users_groups</sys_class_name>
+        <sys_created_by>syahmad@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-10 08:52:57</sys_created_on>
+        <sys_id>28c5e0e887f13a50acfa635d0ebb3512</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>2cc5e0e887f13a50acfa635d0ebb3511</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_report_users_groups_28c5e0e887f13a50acfa635d0ebb3512</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:18</sys_updated_on>
+        <user_id display_value="Syed Wasif Ahmad">3e1641f04fea0700f5e08e1f0210c7f2</user_id>
+    </sys_report_users_groups>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137bf6220000001</claim_timestamp>
+        <metadata_update_name>sys_report_users_groups_28c5e0e887f13a50acfa635d0ebb3512</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:18</sys_created_on>
+        <sys_id>41172c5987b5c7904d820e96cebb35a9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:18</sys_updated_on>
+    </sys_claim>
+</record_update>

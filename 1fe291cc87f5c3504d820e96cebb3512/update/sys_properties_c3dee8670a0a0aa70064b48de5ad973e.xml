@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_properties">
+    <sys_properties action="INSERT_OR_UPDATE">
+        <choices/>
+        <description>List of system tables (beginning with "sys_", comma separated), that are reportable. By default, system tables are not reportable.
+		</description>
+        <ignore_cache>false</ignore_cache>
+        <is_private>false</is_private>
+        <name>glide.ui.permitted_tables</name>
+        <read_roles/>
+        <suffix/>
+        <sys_class_name>sys_properties</sys_class_name>
+        <sys_created_by>glide.maint</sys_created_by>
+        <sys_created_on>2007-05-25 15:34:12</sys_created_on>
+        <sys_id>c3dee8670a0a0aa70064b48de5ad973e</sys_id>
+        <sys_mod_count>22</sys_mod_count>
+        <sys_name>glide.ui.permitted_tables</sys_name>
+        <sys_package display_value="System (glidesoft)" source="glidesoft">19fc3c014f210300fe09e28d0210c7af</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_properties_c3dee8670a0a0aa70064b48de5ad973e</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:10</sys_updated_on>
+        <type>string</type>
+        <value>sys_db_object,sys_user,sys_audit,sys_user_group,sys_user_grmember,sys_dictionary,sysapproval_approver,sys_user_has_role,sys_group_has_role,sys_user_delegate,sys_report_page_hdrftr,sysapproval_group,sys_api_stats,sys_api_stats_requestor,sys_api_stats_requestor_monthly,v_api_stats_requestor,sys_portal_page,sys_report,sys_security_acl_role,sys_security_acl, sys_update_set, sys_remote_update,sys_hub_flow,sys_hub_action_type_definition,sys_upgrade_history_log,sys_atf_test_result,sys_pattern,sysevent_pattern,sys_cache_build_pattern,sys_mutex_pattern,sys_query_pattern,sys_script_pattern,sys_transaction_pattern,syslog,ecc_queue,sys_ui_page,sys_ux_page_registry,sysevent,sys_flow_context,sys_flow_step_definition,sys_hub_category,sys_hub_flow_logic_definition,sys_hub_trigger_category,sys_hub_trigger_definition,sys_hub_ui_element,sys_hub_ui_section,sys_ih_external_event_source,sys_ih_external_webhook,sys_pd_activity_definition,sys_cluster_state,v_cluster_transaction, sys_trigger, sys_email,sys_ux_app_route,sys_ux_interoperable_route,sys_pd_process_definition,sys_cs_provider_application,sys_import_set_row</value>
+        <write_roles/>
+    </sys_properties>
+    <sys_translated_text action="delete_multiple" query="documentkey=c3dee8670a0a0aa70064b48de5ad973e"/>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>de</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 12:43:34</sys_created_on>
+        <sys_id>6fabebe34f524300f5e08e1f0210c75a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 12:43:34</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Liste von Systemtabellen (beginnend mit "sys_", kommagetrennt), zu denen Berichte erstellt werden können. Standardmäßig können keine Berichte zu Systemtabellen erstellt werden.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>es</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 12:03:51</sys_created_on>
+        <sys_id>3992ebab4fda0300f5e08e1f0210c7a2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 12:03:51</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Lista de tablas del sistema (comenzando por "sys_", separado por comas) que se pueden incluir en el informe. De forma predefinida, las tablas del sistema no se pueden incluir en informes.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>fi</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 14:09:46</sys_created_on>
+        <sys_id>da6f77274f1e4300f5e08e1f0210c7b4</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 14:09:46</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Luettelo järjestelmätaulukoista (alkaa sys_, pilkuilla eroteltu), jotka ovat raportoitavissa. Oletuksena järjestelmätaulukot eivät ole raportoitavissa.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>fq</language>
+        <sys_created_by>cdudorenko@equinix.com</sys_created_by>
+        <sys_created_on>2021-05-30 21:36:26</sys_created_on>
+        <sys_id>d8555c8cdbe4f810fb5d09ccd39619e7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>cdudorenko@equinix.com</sys_updated_by>
+        <sys_updated_on>2021-05-30 21:36:26</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Liste des tableaux de système (commençant par "sys_", séparés par des virgules) qui peuvent être déclarés. Par défaut, les tableaux du système ne peuvent pas être déclarés.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>fr</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 13:29:47</sys_created_on>
+        <sys_id>b04637eb4f964300f5e08e1f0210c72e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 13:29:47</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Liste de tables système (commençant par"sys_" séparées par des virgules) qui peuvent figurer dans un rapport. Par défaut, les tables système ne peuvent pas figurer dans un rapport.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>ja</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 15:36:21</sys_created_on>
+        <sys_id>ae33d4ff4f528300f5e08e1f0210c741</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 15:36:21</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>レポート可能なシステムテーブルのリスト ("sys_" から始まる、カンマ区切り形式)。デフォルトでは、システムテーブルはレポート不可能です。</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>nl</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 16:18:52</sys_created_on>
+        <sys_id>e1fc103b4fd68300f5e08e1f0210c761</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 16:18:52</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Lijst van systeemtabellen (beginnend met "sys_", met komma's gescheiden) die kunnen worden opgenomen in rapporten. Systeemtabellen kunnen standaard niet worden opgenomen in rapporten.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>pb</language>
+        <sys_created_by>system</sys_created_by>
+        <sys_created_on>2017-11-14 11:25:54</sys_created_on>
+        <sys_id>b9e957ef4f560300f5e08e1f0210c727</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>system</sys_updated_by>
+        <sys_updated_on>2017-11-14 11:25:54</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>Lista de tabelas do sistema (começando com "sys_", separadas por vírgulas) que são passíveis de geração de relatório. Como padrão, as tabelas do sistema não são portáteis.</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey name="glide.ui.permitted_tables" tablename="sys_properties">c3dee8670a0a0aa70064b48de5ad973e</documentkey>
+        <fieldname>description</fieldname>
+        <language>zh</language>
+        <sys_created_by>organize.jonas</sys_created_by>
+        <sys_created_on>2017-11-14 17:08:16</sys_created_on>
+        <sys_id>c14860734f5e8300f5e08e1f0210c723</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>organize.jonas</sys_updated_by>
+        <sys_updated_on>2017-11-14 17:08:16</sys_updated_on>
+        <tablename>sys_properties</tablename>
+        <value>可报告的系统表列表（以“sys_”开头，逗号分隔）。默认情况下，系统表格是不可报告的。</value>
+    </sys_translated_text>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137482690000001</claim_timestamp>
+        <metadata_update_name>sys_properties_c3dee8670a0a0aa70064b48de5ad973e</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:10</sys_created_on>
+        <sys_id>f5356c598775c7904d820e96cebb3531</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:10</sys_updated_on>
+    </sys_claim>
+</record_update>

@@ -1,0 +1,536 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller = function($scope) {
+    var c = this;
+	c.estimativeTime = null;
+	c.requesting = false;
+
+	c.scenarioLabel = (scenario) => {
+		const {hours, minutes} = scenario;
+		let msg = '';
+		if (hours > 0)
+			msg = hours + (hours == 1 ? ' ${Hour}' : ' ${Hour}');
+		if (hours > 0 && minutes > 0)
+			msg += ' ${and}';
+		if (minutes > 0)
+			msg = msg + ' ' + minutes + ' ${minutes}';
+		return msg;
+	};
+
+	c.handleRadioChange = (e) => {
+		if (!e.target.checked) return;
+		const key = e.target.dataset.key;
+		let keys = ['scenario1', 'scenario2', 'scenario3'];
+		for (let k of keys) {
+			if (k != key && $scope[k]) {
+				$scope[k].checked = false;
+			}
+		}
+		c.estimativeTime = e.target.value;
+		
+		// $scope.data.estimateHour = c.estimativeTime/(60 * 60 * 1000);
+	};
+
+    $scope.cbTerms = {
+        checked: false,
+    };
+	$scope.banner = {
+		type: $scope.data.supportPlans.length === 0 ? 'alert' : 'info',
+		bodyText:  $scope.data.bannerContent,
+		dismissible: false,
+	};
+
+	$scope.scenarioGroup = {
+		value: null,
+	};
+	if ($scope.data.scenario1) {
+		$scope.scenario1 = {
+			checked: false,
+			value: $scope.data.scenario1.time,
+			labelText: c.scenarioLabel($scope.data.scenario1),
+			captionText: $scope.data.scenario1.description,
+			events: {
+				change: c.handleRadioChange
+			}
+		};
+	}
+	if ($scope.data.scenario2) {
+		$scope.scenario2 = {
+			checked: false,
+			value: $scope.data.scenario2.time,
+			labelText: c.scenarioLabel($scope.data.scenario2),
+			captionText: $scope.data.scenario2.description,
+			events: {
+				change: c.handleRadioChange
+			}
+		};
+	}
+	if ($scope.data.scenario3) {
+		$scope.scenario3 = {
+			checked: false,
+			value: $scope.data.scenario3.time,
+			labelText: c.scenarioLabel($scope.data.scenario3),
+			captionText: $scope.data.scenario3.description,
+			events: {
+				change: c.handleRadioChange
+			}
+		};
+	}
+	
+	c.rejectDisabled = () => {
+		return c.requesting || (!$scope.data.premierSupportPermission && !$scope.data.isMasterAdmin);
+	};
+
+    c.handleReject = () => {
+		if (!c.hasPermission()) return;
+		c.requesting = true;
+		$scope.server.get({action: 'reject', caseId: $scope.data.caseId}).then(function() {			
+			$scope.data.awaitingCustomerApproval = false;
+			c.requesting = false;
+			$scope.$emit('evt-case-estimation-rejected', {});
+		});
+	};
+
+	c.approveDisabled = () => {
+		let termsChecked = $scope.cbTerms.checked;
+		if ($scope.data.scenario1 || $scope.data.scenario2 || $scope.data.scenario3) {
+			return !termsChecked || !c.estimativeTime || (!$scope.data.premierSupportPermission && !$scope.data.isMasterAdmin);
+		}
+		return c.requesting || !termsChecked || (!$scope.data.premierSupportPermission && !$scope.data.isMasterAdmin);
+	};
+
+	c.handleApprove = () => {
+		if (!c.hasPermission()) return;
+		let payload = {
+			action: 'approve', 
+			caseId: $scope.data.caseId
+		};
+		if (c.estimativeTime) {
+			payload.estimativeTime = c.estimativeTime;
+		}
+		c.requesting = true;
+		$scope.server.get(payload).then(function() {			
+			$scope.data.awaitingCustomerApproval = false;
+			c.requesting = false;
+			$scope.$emit('evt-case-estimation-rejected', {});
+		});
+	};
+
+	c.totalCharges = () => {
+		if ($scope.data.currentHours >= $scope.data.estimateHour) {
+			return 0;
+		}
+		return $scope.data.pricePerHour * ($scope.data.estimateHour - $scope.data.currentHours);
+	};
+
+	c.hasPermission = () => {
+		return $scope.data.premierSupportPermission || $scope.data.isMasterAdmin;
+	};
+};]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.msp-premier-support-approval {&#13;
+  clear: both;&#13;
+  margin: 0 auto;&#13;
+}&#13;
+&#13;
+.msp-premier-support-approval .terms {&#13;
+  color: $primary;&#13;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>msp-premier-support-approval</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) { 
+
+ }]]></link>
+        <name>MSP Premier Support Approval</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+    data.caseId = options.caseId;
+    data.cmdbCi = null;
+    data.note = '';
+    data.pricePerHour = 999999999;
+    data.priceUnit = '';
+	data.totalNRC = 0;
+    data.currentHours = 0;
+    data.scenario1 = null;
+    data.scenario2 = null;
+    data.scenario3 = null;
+
+    var siPortalCSM = new EQIX_Portal_CSM();
+    var siCustomerPermission = new EQIX_Customer_Permissions();
+    var siPremierSupport = new EQIX_GSD_PremierSupport();
+    var account = siCustomerPermission.getActiveAccountSysId();
+	var source = 'EQIX POE Pricing - Awaiting Customer Approval';
+	
+    var caseTypes = gs.getProperty('EQIX_Case_Associate_Types') || '';
+    caseTypes = caseTypes.split(',');
+    data.caseTypes = caseTypes;
+
+    data.termsAndConditions = gs.getMessage('MS Premier Support terms and conditions');
+    data.premierSupportPermission = siCustomerPermission.hasPermission('support_hours_approval', 'ticket', account);
+	data.isMasterAdmin = siCustomerPermission.hasPermission('master_admin');
+
+    if (input) {
+        optCopy(['caseId', 'estimativeTime']);
+
+        if (input.action == 'approve') {
+            postMessage(data.caseId, data.estimativeTime);
+            var grApprove = new GlideRecord('sn_customerservice_case');
+            if (grApprove.get(data.caseId)) {
+                if (caseTypes.indexOf(grApprove.getValue('u_type')) > -1) {
+                    // association
+                    var estimatedHours = parseInt(input.estimativeTime);
+                    if (isNaN(estimatedHours)) {
+                        estimatedHours = 0;
+                    }
+
+                    grApprove.u_new_customer_approval_performed = true;
+
+                    grApprove.u_estimated_hours = new GlideDuration(estimatedHours);
+                }
+				grApprove.state = '10'; // Open			
+				//grApprove.assigned_to = '';
+				grApprove.u_execution_approval = true;
+				grApprove.update();
+            }
+        }
+
+        if (input.action == 'reject') {
+            var caseReject = new GlideRecord('sn_customerservice_case');
+            if (caseReject.get(data.caseId)) {
+                caseReject.state = '35'; // Not approved			
+                caseReject.update();
+            }
+        }
+
+		return;
+    }
+
+
+    var theCase = new GlideRecord('sn_customerservice_case');
+    if (!theCase.get(options.caseId)) {
+        return;
+    }
+    data.caseId = options.caseId;
+    data.cmdbCi = theCase.getValue('cmdb_ci');
+    data.supportPlans = siPremierSupport.getSupportPlans(account, data.cmdbCi);
+    data.awaitingCustomerApproval = theCase.state == 32;
+	if (!data.awaitingCustomerApproval) return;
+	// gs.addInfoMessage('data.supportPlans: ' + data.supportPlans.length);
+    if (data.supportPlans.length === 0) {
+        data.note = gs.getMessage('Note : This service will incur Non-Recurring Charges. The amount stated is an estimate and may vary from the final price.');
+        data.bannerContent = gs.getMessage('You currently do not have an MS Premier Support Plan for the selected service.');
+    } else {
+        data.note = gs.getMessage('Note : The amount stated for Non Recurring Charges is an estimate and may vary from the final price.');
+        data.bannerContent = gs.getMessage('Service Estimate is not considered for ongoing cases');
+        data.currentHours = parseFloat(data.supportPlans[0].u_available_hours);
+    }
+	var gdtEstimation = theCase.getValue('u_estimated_hours');
+	var timeComponents = gdtEstimation.toString().split(' ')[1];
+	// timeComponents = '01:30:00';
+	var hours = +timeComponents.split(":")[0];
+	var minutes = +timeComponents.split(":")[1];
+	data.estimateHour = hours + (minutes/60);
+	data.estimateHourLabel = getDisplayTime(hours, minutes);
+
+
+	var balanceHours = Math.floor(data.currentHours);
+	var balanceMinutes = (data.currentHours - Math.floor(data.currentHours))*60;
+	data.balanceLabel = getDisplayTime(balanceHours, balanceMinutes);
+	var ibx = theCase.cmdb_ci.location.name.toString();
+	if (data.estimateHour > data.currentHours) {
+		var time = data.estimateHour - data.currentHours;
+		var prices = siPortalCSM.getGenericPremierPrice(account, ibx, time, source);
+		if (prices.length > 0) {
+			data.priceUnit = prices[0];
+			data.pricePerHour = prices[1];
+			data.totalNRC = prices[2];
+		} else {
+			// pass through
+		}
+
+		var delta = data.estimateHour - data.currentHours;
+		var chargeableHours = Math.floor(delta);
+		var chargeableMinutes = (delta - Math.floor(delta))*60;
+		data.chargeableHoursLabel = getDisplayTime(chargeableHours, chargeableMinutes);
+	} else {
+		var unitPrices = siPortalCSM.getGenericPremierPrice(account, ibx, 1, source);
+		if (unitPrices.length > 0) {
+			data.pricePerHour = unitPrices[1];
+			data.priceUnit = unitPrices[0];
+		}
+		data.chargeableHoursLabel = getDisplayTime(0, 0);
+	}
+    
+    if (caseTypes.indexOf(theCase.getValue('u_type')) > -1) {
+        // If type is association
+        data.scenarios = getScenarios();
+    }
+    function getScenarios() {
+        var grTask = new GlideRecord('sn_customerservice_case_task');
+        var scenarios = [];
+        if (grTask.get('u_case', data.caseId)) {
+            var scenario = {
+                time: grTask.u_scenario_first.getGlideObject().getNumericValue(),
+                hours: getHour(grTask.u_scenario_first.getGlideObject().getNumericValue()),
+                minutes: getMinutes(grTask.u_scenario_first.getGlideObject().getNumericValue()),
+                description: grTask.getDisplayValue('u_scenario_first_description') + ""
+            };
+            if (scenario.hours > 0 || scenario.minutes > 0) {
+                data.scenario1 = scenario;
+            }
+
+            scenario = {
+                time: grTask.u_scenario_second.getGlideObject().getNumericValue(),
+                hours: getHour(grTask.u_scenario_second.getGlideObject().getNumericValue()),
+                minutes: getMinutes(grTask.u_scenario_second.getGlideObject().getNumericValue()),
+                description: grTask.getValue('u_scenario_second_description')
+            };
+            if (scenario.hours > 0 || scenario.minutes > 0) {
+                data.scenario2 = scenario;
+            }
+
+            scenario = {
+                time: grTask.u_scenario_third.getGlideObject().getNumericValue(),
+                hours: getHour(grTask.u_scenario_third.getGlideObject().getNumericValue()),
+                minutes: getMinutes(grTask.u_scenario_third.getGlideObject().getNumericValue()),
+                description: grTask.getValue('u_scenario_third_description')
+            };
+            if (scenario.hours > 0 || scenario.minutes > 0) {
+                data.scenario3 = scenario;
+            }
+        }
+        return scenarios;
+    }
+
+    function postMessage(caseId, estimativeTime) {
+        var grApprove = new GlideRecord('sn_customerservice_case');
+        if (grApprove.get(caseId)) {
+            if (caseTypes.indexOf(grApprove.getValue('u_type')) > -1) {
+                // If type is association
+
+				var msg = _buildMessage(estimativeTime);
+				grApprove.comments = msg;
+
+                var grSCCT = new GlideRecord('sn_customerservice_case_task');
+                grSCCT.addQuery('u_case', caseId);
+                grSCCT.query();
+                while (grSCCT.next()) {
+                    grSCCT.comments = msg;
+                    grSCCT.update();
+                }
+            } else {
+                // Regular type
+				var estimateDuration = new GlideDateTime(grApprove.u_estimated_hours).getNumericValue();
+                var msg = gs.getMessage('hour(s) effort estimate approved');
+                grApprove.comments = estimateDuration / (3600 * 1000) + ' ' + msg;
+            }
+        }
+        grApprove.update();
+    }
+
+    function _buildMessage(time) {
+        if (!time)
+            time = 0;
+
+        var hours = parseInt(getHour(time));
+        var minutes = parseInt(getMinutes(time));
+
+        var msg = "";
+        if (!isNaN(hours) && hours > 0) {
+            msg += hours + gs.getMessage(" hour") + "(s)";
+        }
+
+        if (!isNaN(minutes) && minutes > 0) {
+            if (msg.length > 0)
+                msg += gs.getMessage(" and ");
+            msg += minutes + gs.getMessage(" minute") + "(s)";
+        }
+        msg += gs.getMessage(' effort estimate approved');
+        msg = msg.toLowerCase();
+        return msg;
+    }
+
+	function getDisplayTime(hours, minutes) {
+		var arr = [];
+		if (hours == 0 && minutes == 0) {
+			return gs.getMessage('{0} hrs', 0);
+		}
+		if (hours > 0) {
+			if (hours > 1) {
+				arr.push(gs.getMessage('{0} hrs', [parseInt(hours).toString()]));
+			} else {
+				arr.push(gs.getMessage('{0} hr', [parseInt(hours).toString()]));
+			}
+		}
+		if (minutes > 0) {
+			if (minutes > 1) {
+				arr.push(gs.getMessage('{0} mins', [parseInt(minutes).toString()]));
+			} else {
+				arr.push(gs.getMessage('{0} min', [parseInt(minutes).toString()]));
+			}
+		}
+		
+		return arr.join(' ');
+	}
+
+    function getHour(ms) {
+
+        if (!ms) {
+            return 0;
+        }
+
+        var hours = Math.floor((ms / (60 * 60 * 1000)));
+        if (hours < 9) {
+            hours = "0" + hours;
+        }
+        return String(hours);
+    }
+
+    // Return only minutes
+    function getMinutes(ms) {
+
+        if (!ms) {
+            return 0;
+        }
+
+        var hours = (ms / (60 * 60 * 1000));
+        var absoluteHours = Math.floor(hours);
+
+        //Get remainder from hours and convert to minutes
+        var minutes = (hours - absoluteHours) * 60;
+        if (minutes < 9) {
+            minutes = "0" + minutes;
+        }
+        return String(minutes);
+    }
+
+    function optCopy(names) {
+        names.forEach(function(name) {
+            data[name] = input[name] !== undefined ? input[name] : options[name];
+        });
+    }
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-04-16 05:19:22</sys_created_on>
+        <sys_id>de5a867787fc2a106a1feb1e3fbb354a</sys_id>
+        <sys_mod_count>157</sys_mod_count>
+        <sys_name>MSP Premier Support Approval</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_de5a867787fc2a106a1feb1e3fbb354a</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:07</sys_updated_on>
+        <template><![CDATA[<div ng-if="data.awaitingCustomerApproval" style="width: 480px;" class="msp-premier-support-approval m-t-large p-t-large p-b-large p-l-medium p-r-medium bg-white">
+  <div class="h4 m-t-0 m-b-0" style="text-align: center;">${Approve Estimate}</div>
+  <div>
+    <div class="m-t-medium">
+      <eq-page-banner eq-model="banner"
+                      showicon="false"
+                      dismissible=""
+                      visible=""
+                      ></eq-page-banner>
+    </div>
+    <div class="m-t-large">
+      {{data.note}}
+    </div>
+    <div class="m-t-large" ng-if="data.scenario1 || data.scenario2 || data.scenario3">
+      <eq-radio-group layout="vertical" eq-model="scenarioGroup">
+        <eq-radio eq-model="scenario1" ng-if="data.scenario1" data-key="scenario1"></eq-radio>
+        <eq-radio eq-model="scenario2" ng-if="data.scenario2" data-key="scenario2"></eq-radio>
+        <eq-radio eq-model="scenario3" ng-if="data.scenario3" data-key="scenario3"></eq-radio>
+      </eq-radio-group>
+    </div>
+    <div class="m-t-large" style="background: #E7E9EE; height: 1px"></div>
+    <div class="p-t-medium p-l-large p-r-large d-flex flex-column">
+      <div class="d-flex justify-content-between">
+        <div class="typo-body">${Service Estimate}</div>
+        <div class="typo-body-bold">{{data.estimateHourLabel}}</div>
+      </div>
+      <div class="m-t-medium d-flex justify-content-between">
+        <div class="typo-body">${Chargeable Hours}</div>
+        <div class="typo-body-bold">{{data.chargeableHoursLabel}}</div>
+      </div>
+      <div class="d-flex justify-content-between m-t-medium">
+        <div class="typo-body">${Current Hours Balance}</div>
+        <div class="typo-body-bold">{{data.balanceLabel}}</div>
+      </div>
+      <div class="m-t-medium d-flex justify-content-between">
+        <div class="typo-body">${Price per hour}</div>
+        <div class="typo-body-bold">{{data.priceUnit}}{{data.pricePerHour}}</div>
+      </div>
+      <div class="m-t-medium d-flex justify-content-between">
+        <div class="typo-body">${Total Non Recurring Charges}</div>
+        <div class="typo-body-bold">{{data.priceUnit}}{{data.totalNRC}}</div>
+      </div>
+    </div>
+    <div class="m-t-medium" style="background: #E7E9EE; height: 1px"></div>
+    <div class="m-t-medium p-l-large d-flex align-items-center" ng-show="c.hasPermission()">
+      <eq-checkbox eq-model="cbTerms">
+      </eq-checkbox>
+      <div class="m-l-small m-r-x-small">${I agree to}</div>
+      <eq-tooltip
+                  content="{{data.termsAndConditions}}"
+                  variant="light"
+                  placement="top"
+                  >
+        <div class="terms d-flex align-items-center"> 
+          <div class="m-r-small">${Terms and Conditions}</div>
+          <eq-icon name="external-link" style="--size: 16px; --fill: #00A0E5;"></eq-icon>	
+        </div>
+      </eq-tooltip>
+    </div>
+    <p ng-hide="c.hasPermission()" class="m-t-medium text-danger">
+      ${You do not have permission to approve this estimate}.
+    </p>
+    <div class="m-t-x-large d-flex justify-content-around" style="gap: var(--eq-spacing-small);">
+      <div style="width: 360px;" class="d-flex justify-content-between">
+        <button class="btn btn-danger flex-1" ng-click="c.handleReject()" ng-disabled="c.rejectDisabled()">
+          ${Reject}
+        </button>
+        <button class="btn btn-primary flex-1 m-l-medium" ng-disabled="c.approveDisabled()" ng-click="c.handleApprove()" >
+          ${Approve}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137476fc0000001</claim_timestamp>
+        <metadata_update_name>sp_widget_de5a867787fc2a106a1feb1e3fbb354a</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:07</sys_created_on>
+        <sys_id>0935e8598775c7904d820e96cebb359e</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:07</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>de5a867787fc2a106a1feb1e3fbb354a</id>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-04-16 05:19:21</sys_created_on>
+        <sys_id>1b7a0a3f87306a106a1feb1e3fbb3593</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-04-16 05:19:21</sys_updated_on>
+        <table>sp_widget</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_atf_step">
+    <sys_atf_step action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <callable_outputs/>
+        <copied_from/>
+        <description>Insert a record into 'change_request' with the following values:
+Requested by = {{Step 1: Create a User.User}}
+and Account = Itminds Consultoria Em Tecnologia Da Informacao
+and MS Product = Managed Services - Custom
+and Configuration Items = Shared Switch Port
+and Does this change require Customer approval? = false
+and Requires Notification? = Yes
+and Short description = ATF Testing
+and Description = ATF Testing
+and Change Justification = ATF Testing
+and Has this change been attempted before? = No
+and Planned start date = 2026-02-06 00:00:00
+and Impact Scope = Internal
+and Impact Type = No Impact
+and Planned end date = 2026-02-13 00:00:00
+and Category = Infrastructure
+and Subcategory = Databases
+and CHG Manager = {{Step 1: Create a User.User}}
+and CHG Implementer = {{Step 1: Create a User.User}}
+and CHG Technical Supervisor = {{Step 1: Create a User.User}}
+and Review By Individual = {{Step 1: Create a User.User}}
+and Review by group = Change Management
+and Assignment group = EMS L2 OpsCenter AMER
+and Assigned to = Adriano Brigario
+and Bypass Account rules = true
+and Type = Normal
+and Risk Analysis and Mitigation Plan = Risk Analysis and Mitigation Plan
+and Describe the reason = Risk Analysis and Mitigation Plan
+and Description of the impact = Description of the impact
+and Downtime expected = No
+and Total Expected Downtime = 1 Hour
+and Implementation plan = Implementation plan
+and Rollback Plan = Rollback Plan
+and Current and Required Situation = Current and Required Situation
+Confirm the record was successfully inserted</description>
+        <display_name>Record Insert</display_name>
+        <inputs/>
+        <inputs/>
+        <mugshots_cache_json/>
+        <notes/>
+        <order>2</order>
+        <step_config display_value="Record Insert">14872288df60220062fe6c7a4df26319</step_config>
+        <sys_class_name>sys_atf_step</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>269338861bbaba58bd075425604bcb40</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>Record Insert</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_atf_step_269338861bbaba58bd075425604bcb40</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:29</sys_updated_on>
+        <table>change_request</table>
+        <test display_value="Normal Change Request">2392fc821bbaba58bd075425604bcb40</test>
+        <timeout/>
+        <warning_message/>
+    </sys_atf_step>
+    <sys_variable_value action="delete_multiple" query="document_key=269338861bbaba58bd075425604bcb40"/>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>sys_atf_step</document>
+        <document_key>269338861bbaba58bd075425604bcb40</document_key>
+        <order>200</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>1d767c0e1bbaba58bd075425604bcb50</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-02 18:59:35</sys_updated_on>
+        <value>change_request</value>
+        <variable display_value="Table">90144b535320220002c6435723dc3488</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>sys_atf_step</document>
+        <document_key>269338861bbaba58bd075425604bcb40</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>55767c0e1bbaba58bd075425604bcb50</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-02 18:59:35</sys_updated_on>
+        <value>record_successfully_inserted</value>
+        <variable display_value="Assert type">9024a37f671003007ba405225685efe5</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>sys_atf_step</document>
+        <document_key>269338861bbaba58bd075425604bcb40</document_key>
+        <order>100</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>59767c0e1bbaba58bd075425604bcb50</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-02 18:59:35</sys_updated_on>
+        <value>1</value>
+        <variable display_value="Enforce security">e6e3c7535320220002c6435723dc3496</variable>
+    </sys_variable_value>
+    <sys_variable_value action="INSERT_OR_UPDATE">
+        <document>sys_atf_step</document>
+        <document_key>269338861bbaba58bd075425604bcb40</document_key>
+        <order>400</order>
+        <sys_class_name>sys_variable_value</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>dd767c0e1bbaba58bd075425604bcb50</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-02 19:48:21</sys_updated_on>
+        <value>requested_by={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_account=bfad69fb4f302700f3d33d828110c7df^u_ms_product=82c73f2bdb519b00448b01a3ca9619e9^u_configuration_items=fe98f4fc4fc5ab00f3d33d828110c706^u_customer_approval=false^u_requires_cmr=yes^short_description=ATF Testing^description=ATF Testing^justification=ATF Testing^u_attempted_before=no^start_date=2026-02-06 00:00:00^u_internal_or_external=internal^u_type_of_impact=no impact^end_date=2026-02-13 00:00:00^category=Infrastructure^u_case_subcategory=Databases^u_cm_owner={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_person_s_who_wil_implement_the_change={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_person_s_overseeing_the_change_implementation={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_reviewed_by={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_review_by_group=a715cd759f2002002920bde8132e7018^assignment_group=ff72689247ee1e143cbfe07a216d4357^assigned_to=fca5c5fc4faa0700f5e08e1f0210c7ff^u_bypass_rules=true^type=normal^risk_impact_analysis=Risk Analysis and Mitigation Plan&#13;
+^u_describe_the_reason=Risk Analysis and Mitigation Plan&#13;
+^u_description_of_the_impact=Description of the impact&#13;
+^u_downtime_expected=No^u_total_expected_downtime=javascript:gs.getDurationDate('0 1:0:0')^implementation_plan=Implementation plan&#13;
+^backout_plan=Rollback Plan&#13;
+^u_current_and_required_situation=Current and Required Situation&#13;
+^EQ</value>
+        <variable display_value="Field values">dd54cf535320220002c6435723dc34fd</variable>
+    </sys_variable_value>
+    <sys_element_mapping action="delete_multiple" query="id=269338861bbaba58bd075425604bcb40"/>
+    <sys_element_mapping action="INSERT_OR_UPDATE">
+        <field>enforce_security</field>
+        <id>269338861bbaba58bd075425604bcb40</id>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>5d767c0e1bbaba58bd075425604bcb4f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-02 18:59:35</sys_updated_on>
+        <table>var__m_atf_input_variable_14872288df60220062fe6c7a4df26319</table>
+        <value/>
+    </sys_element_mapping>
+    <sys_element_mapping action="INSERT_OR_UPDATE">
+        <field>field_values</field>
+        <id>269338861bbaba58bd075425604bcb40</id>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-02 18:59:35</sys_created_on>
+        <sys_id>91767c0e1bbaba58bd075425604bcb50</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-02 19:48:21</sys_updated_on>
+        <table>var__m_atf_input_variable_14872288df60220062fe6c7a4df26319</table>
+        <value>requested_by={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_account=bfad69fb4f302700f3d33d828110c7df^u_ms_product=82c73f2bdb519b00448b01a3ca9619e9^u_configuration_items=fe98f4fc4fc5ab00f3d33d828110c706^u_customer_approval=false^u_requires_cmr=yes^short_description=ATF Testing^description=ATF Testing^justification=ATF Testing^u_attempted_before=no^start_date=2026-02-06 00:00:00^u_internal_or_external=internal^u_type_of_impact=no impact^end_date=2026-02-13 00:00:00^category=Infrastructure^u_case_subcategory=Databases^u_cm_owner={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_person_s_who_wil_implement_the_change={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_person_s_overseeing_the_change_implementation={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_reviewed_by={{step['04d274c21bbaba58bd075425604bcbf8'].user}}^u_review_by_group=a715cd759f2002002920bde8132e7018^assignment_group=ff72689247ee1e143cbfe07a216d4357^assigned_to=fca5c5fc4faa0700f5e08e1f0210c7ff^u_bypass_rules=true^type=normal^risk_impact_analysis=Risk Analysis and Mitigation Plan&#13;
+^u_describe_the_reason=Risk Analysis and Mitigation Plan&#13;
+^u_description_of_the_impact=Description of the impact&#13;
+^u_downtime_expected=No^u_total_expected_downtime=javascript:gs.getDurationDate('0 1:0:0')^implementation_plan=Implementation plan&#13;
+^backout_plan=Rollback Plan&#13;
+^u_current_and_required_situation=Current and Required Situation&#13;
+^EQ</value>
+    </sys_element_mapping>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375b81c0000001</claim_timestamp>
+        <metadata_update_name>sys_atf_step_269338861bbaba58bd075425604bcb40</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:29</sys_created_on>
+        <sys_id>8585201d8775c7904d820e96cebb352b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:29</sys_updated_on>
+    </sys_claim>
+</record_update>

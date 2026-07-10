@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_ng_template">
+    <sp_ng_template action="INSERT_OR_UPDATE">
+        <id>mspMenuTemplate</id>
+        <sp_widget display_value="MSP Header Menu">4105acd5db9b4740b3cd73e1ba96195a</sp_widget>
+        <sys_class_name>sp_ng_template</sys_class_name>
+        <sys_created_by>organize.luiz</sys_created_by>
+        <sys_created_on>2017-12-26 15:36:29</sys_created_on>
+        <sys_id>0ff52c19db9b4740b3cd73e1ba96192d</sys_id>
+        <sys_mod_count>184</sys_mod_count>
+        <sys_name>mspMenuTemplate</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_ng_template_0ff52c19db9b4740b3cd73e1ba96192d</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:56:58</sys_updated_on>
+        <template><![CDATA[<a ng-if="item.items.length == 0 && !item.scriptedItems && item.short_description" ng-href={{item.href}} ng-click="clickMenu1($event, item);c.setCurrentActiveMenu($event,item.sys_id,item.href,item.url_target)" target="{{item.url_target}}" title="{{item.hint}}">
+
+  <fa ng-if="item.glyph" name="{{::item.glyph}}"></fa>
+  <span class="menu-item-title" ng-bind-html="::item.label"></span> 
+  
+  <!--Inserted to meet the development from MPE-045 story><-->
+  <span ng-if="item.u_badge" class="badge-menu badge-pill"  ng-class="{'setBetaBadge': checkBetaBadge(item.u_badge), 'setNewBadge': checkNewBadge(item.u_badge)}">{{item.u_badge}}</span>
+    <p class="menu-description" ng-if="item.short_description"> {{item.short_description}}</p>
+  
+</a>
+<!--Inserted to meet the development from MSSI-1033 story><-->
+<a ng-if="item.items.length == 0 && !item.scriptedItems && !item.short_description" ng-href="{{item.href}}" ng-click="c.setCurrentActiveMenu($event,item.sys_id,item.href)" target="{{item.url_target}}" title="{{item.hint}}">
+  <div class="sp-menu-text-wrapper" title={{::item.label}}>
+    <fa ng-if="item.glyph" name="{{::item.glyph}}"></fa>
+    <span ng-bind-html="item.label" class="m-r-small"></span>
+  </div>
+  <eq-badge content="${Beta}" size="small" type="primary" ng-if="c.data.reportingMenu == item.sys_id"></eq-badge>
+</a>
+
+<a role="button" ng-if="item.items.length > 0 && item.first_level" href="javascript:void(0)" class="dropdown-toggle sp-menu-has-items" aria-controls="menu-apply" data-toggle="dropdown" aria-haspopup="true" title="{{item.hint}}">
+  <fa ng-if="item.glyph" name="{{::item.glyph}}"></fa>
+  <div class="sp-menu-text-wrapper" title={{::item.label}}>
+  <span ng-bind-html=item.label></span> <!--<i ng-if="item.items[0].items.length !== 0" class="fa fa-chevron-down" style="font-size: 9px"></i>-->
+  </div>
+  <span ng-if="item.first_level" class="d-flex">  
+  <eq-icon
+  		name="chevron-down-outline"
+  		style="--size: 16px; --fill: #2a303c;"
+        chevron-directive
+  		>
+  </eq-icon>    
+  </span>
+</a>
+<ul ng-if="item.items.length > 0 && !item.first_level" class="category-list items-list" role="group" id="menu-apply" >  
+  <li ng-repeat="item in item.items" class="has-item " ng-include="'mspMenuTemplate'" />  
+</ul>
+<a role="button" ng-if="item.scriptedItems.count > 0" href="javascript:void(0)" data-toggle="dropdown" title="{{item.hint}}">
+  <fa ng-if="item.glyph" name="{{::item.glyph}}"></fa>
+  <span ng-bind-html="item.label" ></span>
+  <span ng-if="!item.scriptedItems.omitBadge" class="label label-as-badge label-primary sp-navbar-badge-count">{{item.scriptedItems.count}}</span>
+</a>
+<msp-dropdown-tree role="menu" aria-label="{{::item.label}}" ng-if="item.scriptedItems.count > 0" items="item.scriptedItems.items" />]]></template>
+    </sp_ng_template>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137453dd0000001</claim_timestamp>
+        <metadata_update_name>sp_ng_template_0ff52c19db9b4740b3cd73e1ba96192d</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:56:58</sys_created_on>
+        <sys_id>7625e4598775c7904d820e96cebb35dc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:56:58</sys_updated_on>
+    </sys_claim>
+</record_update>
