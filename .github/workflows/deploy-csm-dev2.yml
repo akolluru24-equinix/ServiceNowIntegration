@@ -1,0 +1,45 @@
+# This workflow publishes the app from equinixcsmdev1 and installs it
+# to equinixcsmdev2 for testing purposes only.
+name: Deploy CSM App to Dev2 (Testing)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+    # Allows manually triggering this workflow from the Actions tab,
+    # without needing a push to main. Useful for re-running a deploy
+    # or testing the pipeline itself.
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.publish_app.outputs.newVersion }}
+    steps:
+      - name: Publish Application from Dev1
+        id: publish_app
+        uses: ServiceNow/sncicd-publish-app@2.0.1
+        with:
+          versionFormat: template
+          versionTemplate: 1.1
+        env:
+          nowUsername: ${{ secrets.SN_DEV1_USERNAME }}
+          nowPassword: ${{ secrets.SN_DEV1_PASSWORD }}
+          nowSourceInstance: ${{ secrets.SN_DEV1_INSTANCE_URL }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
+
+  install-dev2:
+    name: Install on Dev2 (testing)
+    needs: publish
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install on Dev2 (testing only)
+        uses: ServiceNow/sncicd-install-app@1.0.0
+        with:
+          version: ${{ needs.publish.outputs.version }}
+        env:
+          nowUsername: ${{ secrets.SN_DEV2_USERNAME }}
+          nowPassword: ${{ secrets.SN_DEV2_PASSWORD }}
+          nowInstallInstance: ${{ secrets.SN_DEV2_INSTANCE_URL }}
+          appSysID: ${{ secrets.SN_APP_SYSID }}
+          appScope: ${{ secrets.SN_APP_SCOPE }}
