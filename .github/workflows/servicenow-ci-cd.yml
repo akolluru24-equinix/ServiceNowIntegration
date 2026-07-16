@@ -77,44 +77,31 @@ jobs:
         # Try the common export forms in order until one produces a file
         mkdir -p servicenow-exports
 
-        echo "Attempting: app export --scope (capture stdout/stderr)"
-        # capture stdout/stderr to temporary files for inspection
-        /bin/bash -c 'npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"' > /tmp/sn_export_out.log 2> /tmp/sn_export_err.log || true
-        if grep -qE "Exported|Success|created|Wrote" /tmp/sn_export_out.log /tmp/sn_export_err.log 2>/dev/null; then
-          echo "App export command produced messages"
-        else
-          echo "No clear success message from app export"
+        echo "Running generate-update-set (capture stdout/stderr)"
+        # normalize DEV1 URL
+        DEV1_URL="${SN_DEV1_INSTANCE_URL}"
+        if ! [[ "$DEV1_URL" =~ ^https?:// ]]; then
+          DEV1_URL="https://${DEV1_URL}"
         fi
+        npx @servicenow/cli --version || true
+        echo "Logging into Dev1: ${DEV1_URL}"
+        /bin/bash -c 'npx @servicenow/cli auth login --instance "${DEV1_URL}" --username "${SN_DEV1_USERNAME}" --password "${SN_DEV1_PASSWORD}"' > /tmp/sn_auth_out.log 2> /tmp/sn_auth_err.log || true
+        echo "auth stdout:" && sed -n '1,200p' /tmp/sn_auth_out.log || true
+        echo "auth stderr:" && sed -n '1,200p' /tmp/sn_auth_err.log || true
 
-        echo "Contents of sn_export_out.log:" && sed -n '1,200p' /tmp/sn_export_out.log || true
-        echo "Contents of sn_export_err.log:" && sed -n '1,200p' /tmp/sn_export_err.log || true
+        echo "Invoking generate-update-set"
+        /bin/bash -c 'npx @servicenow/cli generate-update-set --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.xml"' > /tmp/sn_gus_out.log 2> /tmp/sn_gus_err.log || true
+        echo "generate-update-set stdout:" && sed -n '1,200p' /tmp/sn_gus_out.log || true
+        echo "generate-update-set stderr:" && sed -n '1,200p' /tmp/sn_gus_err.log || true
 
-        # If zip not present, try alternate export verb and capture
-        if [ ! -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
-          echo "Trying alternate 'app export-zip' (capture stdout/stderr)"
-          /bin/bash -c 'npx @servicenow/cli app export-zip --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"' > /tmp/sn_export_out2.log 2> /tmp/sn_export_err2.log || true
-          echo "sn_export_out2.log:" && sed -n '1,200p' /tmp/sn_export_out2.log || true
-          echo "sn_export_err2.log:" && sed -n '1,200p' /tmp/sn_export_err2.log || true
-        fi
-
-        # If still no zip, try generate-update-set and capture output
-        if [ ! -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
-          echo "No zip produced — trying generate-update-set (capture stdout/stderr)"
-          /bin/bash -c 'npx @servicenow/cli generate-update-set --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.xml"' > /tmp/sn_export_out3.log 2> /tmp/sn_export_err3.log || true
-          echo "sn_export_out3.log:" && sed -n '1,200p' /tmp/sn_export_out3.log || true
-          echo "sn_export_err3.log:" && sed -n '1,200p' /tmp/sn_export_err3.log || true
-        fi
-
-        echo "Full workspace files (top-level, 4 levels):" && find . -maxdepth 4 -type f -ls | sed -n '1,200p' || true
+        echo "Listing export directory and workspace"
         echo "Export folder listing:" && ls -lah servicenow-exports || true
+        echo "Workspace top files:" && find . -maxdepth 4 -type f -ls | sed -n '1,200p' || true
 
-        # Prefer zip if present, else xml
-        if [ -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
-          echo "Exported file check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
-        elif [ -f "servicenow-exports/${SN_APP_SCOPE}.xml" ]; then
+        if [ -f "servicenow-exports/${SN_APP_SCOPE}.xml" ]; then
           echo "Exported XML check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.xml || (echo "Export failed or file missing" && exit 1)
         else
-          echo "Export failed or file missing" && echo "(see sn_export_out*.log and sn_export_err*.log)" && exit 1
+          echo "generate-update-set failed or file missing; see /tmp/sn_gus_*.log" && exit 1
         fi
 
     - name: Commit export if changed
