@@ -85,10 +85,23 @@ jobs:
           npx @servicenow/cli app export-zip --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>>/tmp/sn_export_err.log || true
         fi
 
+        # If CLI didn't produce a zip, fall back to generating update-set XML
+        if [ ! -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
+          echo "No zip produced — trying generate-update-set"
+          npx @servicenow/cli generate-update-set --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.xml" 2>>/tmp/sn_export_err.log || true
+        fi
+
         echo "Listing export dir:" && ls -lah servicenow-exports || true
         echo "Export stderr (tail):" && tail -n +1 /tmp/sn_export_err.log || true
 
-        echo "Exported file check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
+        # Prefer zip if present, else xml
+        if [ -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
+          echo "Exported file check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
+        elif [ -f "servicenow-exports/${SN_APP_SCOPE}.xml" ]; then
+          echo "Exported XML check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.xml || (echo "Export failed or file missing" && exit 1)
+        else
+          echo "Export failed or file missing" && exit 1
+        fi
 
     - name: Commit export if changed
       run: |
