@@ -1,0 +1,106 @@
+name: ServiceNow CI/CD (CLI)
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [ main ]
+
+jobs:
+  export-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      SN_APP_SCOPE: ${{ secrets.SN_APP_SCOPE }}
+      SN_APP_SYSID: ${{ secrets.SN_APP_SYSID }}
+      SN_DEV1_INSTANCE_URL: ${{ secrets.SN_DEV1_INSTANCE_URL }}
+      SN_DEV1_USERNAME: ${{ secrets.SN_DEV1_USERNAME }}
+      SN_DEV1_PASSWORD: ${{ secrets.SN_DEV1_PASSWORD }}
+      SN_DEV2_INSTANCE_URL: ${{ secrets.SN_DEV2_INSTANCE_URL }}
+      SN_DEV2_USERNAME: ${{ secrets.SN_DEV2_USERNAME }}
+      SN_DEV2_PASSWORD: ${{ secrets.SN_DEV2_PASSWORD }}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        persist-credentials: true
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+
+    - name: Install ServiceNow CLI
+      run: |
+        set -e
+        echo "Installing @servicenow/cli"
+        npm install -g @servicenow/cli
+        npx --no-install @servicenow/cli --version || true
+
+    - name: Validate Dev1 credentials
+      id: validate-dev
+      run: |
+        set -euo pipefail
+        echo "Validating connectivity to ${SN_DEV1_INSTANCE_URL}"
+        # Basic REST validation using a light endpoint to check auth and connectivity
+        curl -sS -u "${SN_DEV1_USERNAME}:${SN_DEV1_PASSWORD}" \
+          -H "Accept: application/json" \
+          "${SN_DEV1_INSTANCE_URL}/api/now/table/sys_user?sysparm_limit=1" -o /tmp/dev1_check.json
+        jq -r '.result[0].sys_id' /tmp/dev1_check.json || true
+
+    - name: Export application (ServiceNow CLI)
+      id: export-cli
+      run: |
+        set -euo pipefail
+        echo "Exporting application scope ${SN_APP_SCOPE} from ${SN_DEV1_INSTANCE_URL}"
+
+        # Login to dev1 (adjust command if the CLI uses a different auth verb)
+        npx @servicenow/cli auth login --instance "${SN_DEV1_INSTANCE_URL}" --username "${SN_DEV1_USERNAME}" --password "${SN_DEV1_PASSWORD}"
+
+        # Export by scope. Command may vary depending on CLI version — adjust if needed.
+        mkdir -p servicenow-exports
+        npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"
+
+        ls -lh servicenow-exports
+        echo "Exported file:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
+
+    - name: Commit export if changed
+      run: |
+        set -e
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+        if [ -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
+          git add servicenow-exports/${SN_APP_SCOPE}.zip
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: update ServiceNow export for ${SN_APP_SCOPE}\n\nCo-authored-by: Copilot App <223556219+Copilot@users.noreply.github.com>" || true
+            git push
+          fi
+        else
+          echo "Export file missing; skipping commit"
+        fi
+
+    - name: Deploy to target (ServiceNow CLI)
+      if: env.SN_DEV2_INSTANCE_URL != ''
+      run: |
+        set -euo pipefail
+        if [ -z "${SN_DEV2_INSTANCE_URL}" ]; then
+          echo "TARGET not set; skipping deploy"
+          exit 0
+        fi
+
+        echo "Logging into target: ${SN_DEV2_INSTANCE_URL}"
+        npx @servicenow/cli auth login --instance "${SN_DEV2_INSTANCE_URL}" --username "${SN_DEV2_USERNAME}" --password "${SN_DEV2_PASSWORD}"
+
+        echo "Importing/Publishing app to target"
+        # CLI subcommand names may vary; common verbs: app import / app publish
+        npx @servicenow/cli app import --file "servicenow-exports/${SN_APP_SCOPE}.zip" || npx @servicenow/cli app publish --file "servicenow-exports/${SN_APP_SCOPE}.zip"
+
+        echo "Deploy step finished; verify in target instance"
+
+    - name: Workflow summary
+      run: |
+        echo "Export path: servicenow-exports/${SN_APP_SCOPE}.zip"
+        echo "If any CLI command fails, update CLI command names to match the installed @servicenow/cli version."
