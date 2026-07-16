@@ -77,22 +77,36 @@ jobs:
         # Try the common export forms in order until one produces a file
         mkdir -p servicenow-exports
 
-        echo "Attempting: app export --scope"
-        if npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>/tmp/sn_export_err.log; then
-          echo "Exported with 'app export --scope'"
+        echo "Attempting: app export --scope (capture stdout/stderr)"
+        # capture stdout/stderr to temporary files for inspection
+        /bin/bash -c 'npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"' > /tmp/sn_export_out.log 2> /tmp/sn_export_err.log || true
+        if grep -qE "Exported|Success|created|Wrote" /tmp/sn_export_out.log /tmp/sn_export_err.log 2>/dev/null; then
+          echo "App export command produced messages"
         else
-          echo "app export failed, trying 'app export-zip'"
-          npx @servicenow/cli app export-zip --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>>/tmp/sn_export_err.log || true
+          echo "No clear success message from app export"
         fi
 
-        # If CLI didn't produce a zip, fall back to generating update-set XML
+        echo "Contents of sn_export_out.log:" && sed -n '1,200p' /tmp/sn_export_out.log || true
+        echo "Contents of sn_export_err.log:" && sed -n '1,200p' /tmp/sn_export_err.log || true
+
+        # If zip not present, try alternate export verb and capture
         if [ ! -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
-          echo "No zip produced — trying generate-update-set"
-          npx @servicenow/cli generate-update-set --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.xml" 2>>/tmp/sn_export_err.log || true
+          echo "Trying alternate 'app export-zip' (capture stdout/stderr)"
+          /bin/bash -c 'npx @servicenow/cli app export-zip --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"' > /tmp/sn_export_out2.log 2> /tmp/sn_export_err2.log || true
+          echo "sn_export_out2.log:" && sed -n '1,200p' /tmp/sn_export_out2.log || true
+          echo "sn_export_err2.log:" && sed -n '1,200p' /tmp/sn_export_err2.log || true
         fi
 
-        echo "Listing export dir:" && ls -lah servicenow-exports || true
-        echo "Export stderr (tail):" && tail -n +1 /tmp/sn_export_err.log || true
+        # If still no zip, try generate-update-set and capture output
+        if [ ! -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
+          echo "No zip produced — trying generate-update-set (capture stdout/stderr)"
+          /bin/bash -c 'npx @servicenow/cli generate-update-set --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.xml"' > /tmp/sn_export_out3.log 2> /tmp/sn_export_err3.log || true
+          echo "sn_export_out3.log:" && sed -n '1,200p' /tmp/sn_export_out3.log || true
+          echo "sn_export_err3.log:" && sed -n '1,200p' /tmp/sn_export_err3.log || true
+        fi
+
+        echo "Full workspace files (top-level, 4 levels):" && find . -maxdepth 4 -type f -ls | sed -n '1,200p' || true
+        echo "Export folder listing:" && ls -lah servicenow-exports || true
 
         # Prefer zip if present, else xml
         if [ -f "servicenow-exports/${SN_APP_SCOPE}.zip" ]; then
@@ -100,7 +114,7 @@ jobs:
         elif [ -f "servicenow-exports/${SN_APP_SCOPE}.xml" ]; then
           echo "Exported XML check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.xml || (echo "Export failed or file missing" && exit 1)
         else
-          echo "Export failed or file missing" && exit 1
+          echo "Export failed or file missing" && echo "(see sn_export_out*.log and sn_export_err*.log)" && exit 1
         fi
 
     - name: Commit export if changed
