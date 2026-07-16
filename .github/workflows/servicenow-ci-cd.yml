@@ -54,15 +54,30 @@ jobs:
         set -euo pipefail
         echo "Exporting application scope ${SN_APP_SCOPE} from ${SN_DEV1_INSTANCE_URL}"
 
+        echo "--- DEBUG: show installed CLI version and app help ---"
+        npx @servicenow/cli --version || true
+        npx @servicenow/cli --help || true
+        npx @servicenow/cli app --help || true
+
         # Login to dev1 (adjust command if the CLI uses a different auth verb)
+        echo "Logging into Dev1"
         npx @servicenow/cli auth login --instance "${SN_DEV1_INSTANCE_URL}" --username "${SN_DEV1_USERNAME}" --password "${SN_DEV1_PASSWORD}"
 
-        # Export by scope. Command may vary depending on CLI version — adjust if needed.
+        # Try the common export forms in order until one produces a file
         mkdir -p servicenow-exports
-        npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"
 
-        ls -lh servicenow-exports
-        echo "Exported file:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
+        echo "Attempting: app export --scope"
+        if npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>/tmp/sn_export_err.log; then
+          echo "Exported with 'app export --scope'"
+        else
+          echo "app export failed, trying 'app export-zip'"
+          npx @servicenow/cli app export-zip --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>>/tmp/sn_export_err.log || true
+        fi
+
+        echo "Listing export dir:" && ls -lah servicenow-exports || true
+        echo "Export stderr (tail):" && tail -n +1 /tmp/sn_export_err.log || true
+
+        echo "Exported file check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
 
     - name: Commit export if changed
       run: |
