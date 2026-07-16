@@ -41,28 +41,54 @@ jobs:
       id: validate-dev
       run: |
         set -euo pipefail
-        echo "Validating connectivity to ${SN_DEV1_INSTANCE_URL}"
+        # Normalize instance URL: allow secrets that are hostnames (dev1.example.com)
+        DEV1_URL="${SN_DEV1_INSTANCE_URL}"
+        if ! [[ "$DEV1_URL" =~ ^https?:// ]]; then
+          DEV1_URL="https://${DEV1_URL}"
+        fi
+        echo "Validating connectivity to ${DEV1_URL}"
         # Basic REST validation using a light endpoint to check auth and connectivity
         curl -sS -u "${SN_DEV1_USERNAME}:${SN_DEV1_PASSWORD}" \
           -H "Accept: application/json" \
-          "${SN_DEV1_INSTANCE_URL}/api/now/table/sys_user?sysparm_limit=1" -o /tmp/dev1_check.json
+          "${DEV1_URL}/api/now/table/sys_user?sysparm_limit=1" -o /tmp/dev1_check.json || true
+        echo "Response preview:" && head -n 50 /tmp/dev1_check.json || true
         jq -r '.result[0].sys_id' /tmp/dev1_check.json || true
 
     - name: Export application (ServiceNow CLI)
       id: export-cli
       run: |
         set -euo pipefail
-        echo "Exporting application scope ${SN_APP_SCOPE} from ${SN_DEV1_INSTANCE_URL}"
+        # Normalize DEV1 URL
+        DEV1_URL="${SN_DEV1_INSTANCE_URL}"
+        if ! [[ "$DEV1_URL" =~ ^https?:// ]]; then
+          DEV1_URL="https://${DEV1_URL}"
+        fi
+        echo "Exporting application scope ${SN_APP_SCOPE} from ${DEV1_URL}"
+
+        echo "--- DEBUG: show installed CLI version and app help ---"
+        npx @servicenow/cli --version || true
+        npx @servicenow/cli --help || true
+        npx @servicenow/cli app --help || true
 
         # Login to dev1 (adjust command if the CLI uses a different auth verb)
-        npx @servicenow/cli auth login --instance "${SN_DEV1_INSTANCE_URL}" --username "${SN_DEV1_USERNAME}" --password "${SN_DEV1_PASSWORD}"
+        echo "Logging into Dev1"
+        npx @servicenow/cli auth login --instance "${DEV1_URL}" --username "${SN_DEV1_USERNAME}" --password "${SN_DEV1_PASSWORD}"
 
-        # Export by scope. Command may vary depending on CLI version — adjust if needed.
+        # Try the common export forms in order until one produces a file
         mkdir -p servicenow-exports
-        npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip"
 
-        ls -lh servicenow-exports
-        echo "Exported file:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
+        echo "Attempting: app export --scope"
+        if npx @servicenow/cli app export --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>/tmp/sn_export_err.log; then
+          echo "Exported with 'app export --scope'"
+        else
+          echo "app export failed, trying 'app export-zip'"
+          npx @servicenow/cli app export-zip --scope "${SN_APP_SCOPE}" --output "servicenow-exports/${SN_APP_SCOPE}.zip" 2>>/tmp/sn_export_err.log || true
+        fi
+
+        echo "Listing export dir:" && ls -lah servicenow-exports || true
+        echo "Export stderr (tail):" && tail -n +1 /tmp/sn_export_err.log || true
+
+        echo "Exported file check:" && ls -l servicenow-exports/${SN_APP_SCOPE}.zip || (echo "Export failed or file missing" && exit 1)
 
     - name: Commit export if changed
       run: |
@@ -91,8 +117,14 @@ jobs:
           exit 0
         fi
 
-        echo "Logging into target: ${SN_DEV2_INSTANCE_URL}"
-        npx @servicenow/cli auth login --instance "${SN_DEV2_INSTANCE_URL}" --username "${SN_DEV2_USERNAME}" --password "${SN_DEV2_PASSWORD}"
+        # Normalize DEV2 URL
+        DEV2_URL="${SN_DEV2_INSTANCE_URL}"
+        if ! [[ "$DEV2_URL" =~ ^https?:// ]]; then
+          DEV2_URL="https://${DEV2_URL}"
+        fi
+
+        echo "Logging into target: ${DEV2_URL}"
+        npx @servicenow/cli auth login --instance "${DEV2_URL}" --username "${SN_DEV2_USERNAME}" --password "${SN_DEV2_PASSWORD}"
 
         echo "Importing/Publishing app to target"
         # CLI subcommand names may vary; common verbs: app import / app publish
