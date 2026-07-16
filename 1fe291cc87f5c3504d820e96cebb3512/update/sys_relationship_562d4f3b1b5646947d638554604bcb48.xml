@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_relationship">
+    <sys_relationship action="INSERT_OR_UPDATE">
+        <advanced>false</advanced>
+        <apply_to/>
+        <basic_apply_to>u_event_management</basic_apply_to>
+        <basic_query_from>u_eqix_imp_backup_event</basic_query_from>
+        <insert_callback/>
+        <name>Backup Import v2</name>
+        <query_from/>
+        <query_with><![CDATA[(function refineQuery(current, parent) {
+
+	current.addQuery('u_event_id',parent.u_event_id);
+	
+})(current, parent);]]></query_with>
+        <reference_field/>
+        <related_list/>
+        <simple_reference>false</simple_reference>
+        <sys_class_name>sys_relationship</sys_class_name>
+        <sys_created_by>rkumar2@equinix.com</sys_created_by>
+        <sys_created_on>2024-05-28 07:25:41</sys_created_on>
+        <sys_id>562d4f3b1b5646947d638554604bcb48</sys_id>
+        <sys_mod_count>8</sys_mod_count>
+        <sys_name>Backup Import v2</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_relationship_562d4f3b1b5646947d638554604bcb48</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:39</sys_updated_on>
+    </sys_relationship>
+    <sys_translated_text action="delete_multiple" query="documentkey=562d4f3b1b5646947d638554604bcb48"/>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a73720000001</claim_timestamp>
+        <metadata_update_name>sys_relationship_562d4f3b1b5646947d638554604bcb48</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:39</sys_created_on>
+        <sys_id>7cb6a09587b5c7904d820e96cebb35ca</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:39</sys_updated_on>
+    </sys_claim>
+</record_update>

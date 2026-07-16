@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_rectangle_menu_item">
+    <sp_rectangle_menu_item action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <color>default</color>
+        <condition/>
+        <display_1/>
+        <display_2/>
+        <display_date/>
+        <filter/>
+        <glyph>empty</glyph>
+        <hint/>
+        <kb_article/>
+        <kb_category/>
+        <kb_topic/>
+        <label>Asset Inventory</label>
+        <order>100</order>
+        <record_script/>
+        <sc_cat_item/>
+        <sc_category/>
+        <short_description>Browse and View your products</short_description>
+        <sp_page display_value="msp_track_order_modify">7ae5bcc01b72019045a91027b04bcbbd</sp_page>
+        <sp_rectangle_menu/>
+        <sp_rectangle_menu_item display_value="View/Manage">f612fa7b1bacde503e1e4197b04bcb06</sp_rectangle_menu_item>
+        <sys_class_name>sp_rectangle_menu_item</sys_class_name>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-03-27 03:25:59</sys_created_on>
+        <sys_id>77d3c7b71bc902587d638554604bcb86</sys_id>
+        <sys_mod_count>25</sys_mod_count>
+        <sys_name>Asset Inventory</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_rectangle_menu_item_77d3c7b71bc902587d638554604bcb86</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:14</sys_updated_on>
+        <table/>
+        <type>page</type>
+        <u_badge/>
+        <url/>
+        <url_target/>
+    </sp_rectangle_menu_item>
+    <sys_translated_text action="delete_multiple" query="documentkey=77d3c7b71bc902587d638554604bcb86"/>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>hint</fieldname>
+        <language>es</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:37:16</sys_created_on>
+        <sys_id>dbd5551b1bed8ed031e80f66624bcb4b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-04-19 02:37:16</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value/>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>hint</fieldname>
+        <language>fq</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:34:25</sys_created_on>
+        <sys_id>7d3519d31bed8ed031e80f66624bcbb6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-04-19 02:34:25</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value/>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>hint</fieldname>
+        <language>ja</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:47:41</sys_created_on>
+        <sys_id>44481d1f1b21ced031e80f66624bcbfd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-04-19 02:47:41</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value/>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>hint</fieldname>
+        <language>pb</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:29:40</sys_created_on>
+        <sys_id>8024dd5b1bad8ed031e80f66624bcb61</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-04-19 02:29:40</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value/>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>label</fieldname>
+        <language>es</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:37:16</sys_created_on>
+        <sys_id>93d5551b1bed8ed031e80f66624bcb48</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-07-03 06:58:28</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Inventario de Activos</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>label</fieldname>
+        <language>fq</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:34:25</sys_created_on>
+        <sys_id>b93519d31bed8ed031e80f66624bcb75</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-07-03 06:57:27</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Inventaire d'actifs</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>label</fieldname>
+        <language>ja</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:47:41</sys_created_on>
+        <sys_id>f7381d1f1b21ced031e80f66624bcbc7</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-07-03 06:59:24</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>アセットインベントリ</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>label</fieldname>
+        <language>pb</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:29:40</sys_created_on>
+        <sys_id>c824dd5b1bad8ed031e80f66624bcb5e</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-07-03 06:56:34</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Inventário de Assets</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>es</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:37:16</sys_created_on>
+        <sys_id>93d5151b1bed8ed031e80f66624bcbd4</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-05-28 05:49:22</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Busca, revisa y actualiza tus productos</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>fq</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:34:25</sys_created_on>
+        <sys_id>7d3519d31bed8ed031e80f66624bcb72</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-05-28 05:46:14</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Parcourez, visualisez et mettez à niveau vos produits</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>ja</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:47:41</sys_created_on>
+        <sys_id>3b381d1f1b21ced031e80f66624bcbc3</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-06-04 06:17:03</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>製品の閲覧、表示、アップグレード</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>77d3c7b71bc902587d638554604bcb86</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>pb</language>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2024-04-19 02:29:40</sys_created_on>
+        <sys_id>c424dd5b1bad8ed031e80f66624bcb5c</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>cliaw@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-05-28 05:44:29</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Navegue, visualize e faça Upgrade dos seus produtos</value>
+    </sys_translated_text>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1374913a0000001</claim_timestamp>
+        <metadata_update_name>sp_rectangle_menu_item_77d3c7b71bc902587d638554604bcb86</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:14</sys_created_on>
+        <sys_id>7235ac598775c7904d820e96cebb35e1</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:14</sys_updated_on>
+    </sys_claim>
+</record_update>

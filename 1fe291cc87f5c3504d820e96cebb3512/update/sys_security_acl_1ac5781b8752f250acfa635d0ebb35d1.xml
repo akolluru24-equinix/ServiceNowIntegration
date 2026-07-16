@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_security_acl">
+    <sys_security_acl action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <admin_overrides>false</admin_overrides>
+        <advanced>false</advanced>
+        <applies_to/>
+        <condition/>
+        <controlled_by_refs/>
+        <decision_type>allow</decision_type>
+        <description>Allow write for u_siebel_asset_number in cmdb_ci, for users with role admin.</description>
+        <local_or_existing>Existing</local_or_existing>
+        <name>cmdb_ci.u_siebel_asset_number</name>
+        <operation display_value="write">write</operation>
+        <script/>
+        <security_attribute/>
+        <sys_class_name>sys_security_acl</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-01-12 19:39:23</sys_created_on>
+        <sys_id>1ac5781b8752f250acfa635d0ebb35d1</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>cmdb_ci.u_siebel_asset_number</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_security_acl_1ac5781b8752f250acfa635d0ebb35d1</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:56:55</sys_updated_on>
+        <type display_value="record">record</type>
+    </sys_security_acl>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137447040000001</claim_timestamp>
+        <metadata_update_name>sys_security_acl_1ac5781b8752f250acfa635d0ebb35d1</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:56:55</sys_created_on>
+        <sys_id>4225a4598775c7904d820e96cebb357f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:56:55</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>1ac5781b8752f250acfa635d0ebb35d1</id>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-01-12 19:39:19</sys_created_on>
+        <sys_id>6e26785b8752f250acfa635d0ebb35dd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>vpankar@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-01-12 19:39:19</sys_updated_on>
+        <table>sys_security_acl</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

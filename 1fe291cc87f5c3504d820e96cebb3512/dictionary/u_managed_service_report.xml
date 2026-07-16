@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="8b11ed5a87a3aa14acfa635d0ebb35ed" label="Managed Service Report" max_length="40" name="u_managed_service_report" type="collection">
+        <element label="Asset" max_length="4000" name="u_asset" type="string"/>
+        <element label="End Date" max_length="40" name="u_end_date" type="glide_date"/>
+        <element label="Format" max_length="40" name="u_format" type="string"/>
+        <element label="Generated At" max_length="40" name="u_generated_at" type="glide_date_time"/>
+        <element label="Location" max_length="4000" name="u_location" type="string"/>
+        <element display="true" label="Name" max_length="100" name="u_name" type="string_full_utf8"/>
+        <element label="Organization" max_length="100" name="u_org" type="string"/>
+        <element label="Product" max_length="255" name="u_product" type="string"/>
+        <element label="Region" max_length="40" name="u_region" type="string"/>
+        <element label="Requested At" max_length="40" name="u_requested_at" type="glide_date_time"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Requestor" max_length="40" name="u_requestor" reference="customer_contact" type="reference"/>
+        <element label="Start Date" max_length="40" name="u_start_date" type="glide_date"/>
+        <index name="index">
+            <element name="u_requestor"/>
+        </index>
+    </element>
+</database>

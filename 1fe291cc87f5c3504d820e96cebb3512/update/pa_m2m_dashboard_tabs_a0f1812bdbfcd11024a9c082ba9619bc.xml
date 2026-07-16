@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="pa_m2m_dashboard_tabs">
+    <pa_m2m_dashboard_tabs action="INSERT_OR_UPDATE">
+        <dashboard display_value="Managed Services Dashboard">e57cb46bdbbcd11024a9c082ba9619dc</dashboard>
+        <home>false</home>
+        <homepage/>
+        <order>2</order>
+        <sys_class_name>pa_m2m_dashboard_tabs</sys_class_name>
+        <sys_created_by>apendem@equinix.com</sys_created_by>
+        <sys_created_on>2022-07-26 00:28:11</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>a0f1812bdbfcd11024a9c082ba9619bc</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>e57cb46bdbbcd11024a9c082ba9619dc</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>pa_m2m_dashboard_tabs_a0f1812bdbfcd11024a9c082ba9619bc</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:42</sys_updated_on>
+        <tab display_value="INT5 Retriggers">e8f145e7dbfcd11024a9c082ba961982</tab>
+    </pa_m2m_dashboard_tabs>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a7c0a0000001</claim_timestamp>
+        <metadata_update_name>pa_m2m_dashboard_tabs_a0f1812bdbfcd11024a9c082ba9619bc</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:42</sys_created_on>
+        <sys_id>51b6e09587b5c7904d820e96cebb35cd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:42</sys_updated_on>
+    </sys_claim>
+</record_update>

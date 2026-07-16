@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <application display_value="Event Management">5fe691a1db5b0b40448b01a3ca96195c</application>
+        <assessment/>
+        <content_page/>
+        <device_type/>
+        <filter table="u_managed_service_log">sys_created_onONToday@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()^u_source=Event V3 Integration^EQ<item endquery="false" field="sys_created_on" goto="false" newquery="false" operator="ON" or="false" value="Today@javascript:gs.beginningOfToday()@javascript:gs.endOfToday()"/>
+            <item endquery="false" field="u_source" goto="false" newquery="false" operator="=" or="false" value="Event V3 Integration"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </filter>
+        <hint/>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>Managed Service Logs</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>u_managed_service_log</name>
+        <order>360</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <require_confirmation>true</require_confirmation>
+        <roles>ms_log_viewer,eqix_event_debug_user</roles>
+        <route/>
+        <screen/>
+        <survey/>
+        <survey_overwrite>true</survey_overwrite>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-10 04:45:42</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>276ce3901b353250bd075425604bcb76</sys_id>
+        <sys_mod_count>6</sys_mod_count>
+        <sys_name>Managed Service Log v3</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_app_module_276ce3901b353250bd075425604bcb76</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:36</sys_updated_on>
+        <timeline_page/>
+        <title>Managed Service Log v3</title>
+        <uncancelable>false</uncancelable>
+        <ux_list/>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1374e6450000001</claim_timestamp>
+        <metadata_update_name>sys_app_module_276ce3901b353250bd075425604bcb76</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:36</sys_created_on>
+        <sys_id>c455e4998775c7904d820e96cebb35e3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:36</sys_updated_on>
+    </sys_claim>
+</record_update>

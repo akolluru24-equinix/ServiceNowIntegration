@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[addLoadEvent(function() {
+    populateProcessSelect();
+});
+
+function populateProcessSelect() {
+    
+    var esAccountId = gel('eqix_es_account').value;
+    var ou = gel('alert_account_ou').value;
+    var acc = JSON.parse(esAccountId)[ou];
+    var eventAccountId = gel('alert_account_id').value;
+    if (ou == 'GB') {
+        for (var i in acc) {
+            var accounts = acc[i];
+        }
+    }
+    
+}
+
+function submitOk() {
+    var selectedCase = document.getElementById('selected_case').value;
+    if (selectedCase == '') {
+        alert("Please Select Case");
+        return false;
+    }
+
+    var c = gel('cancelled');
+    c.value = "false";
+
+    g_form.modified = false;
+
+    return true;
+}
+
+function onCancel() {
+    GlideDialogWindow.get().destroy();
+    return false;
+}]]></client_script>
+        <description/>
+        <direct>false</direct>
+        <endpoint/>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">
+    <g:evaluate var="jvar_alert_id" expression="RP.getWindowProperties().get('alert_id')" />
+
+    <g:evaluate var="jvar_alert_account_id" jelly="true">
+        var alertID = RP.getWindowProperties().get('alert_id');
+        var grEvnt = new GlideRecord('u_event_task');
+        grEvnt.addEncodedQuery('sys_idIN' + alertID);
+        grEvnt.query();
+        grEvnt.next();
+
+        grEvnt.u_event_number.u_account.toString();
+    </g:evaluate>
+
+    <g:evaluate var="jvar_alert_account_ou" jelly="true">
+        var alertID = RP.getWindowProperties().get('alert_id');
+        var grEvnt = new GlideRecord('u_event_task');
+        grEvnt.addEncodedQuery('sys_idIN' + alertID);
+        grEvnt.query();
+        grEvnt.next();
+
+        grEvnt.u_operating_country.toString();
+    </g:evaluate>
+
+    <g:ui_form>
+        <!-- Spain Account sys_id -->
+        <input type="hidden" id="eqix_es_account" name="eqix_es_account" value="$[gs.getProperty('eqix_global_alert_wf_eqxAccounts')]" />
+        <!-- Events sys IDs -->
+        <input type="hidden" id="alert_id" name="alert_id" value="${jvar_alert_id}" />
+        <!-- Event Task Work notes -->
+        <!--<input type="hidden" id="notes" name="notes" value="${jvar_notes}" />-->
+        <!-- Event Account -->
+        <input type="hidden" id="alert_account_id" name="alert_account_id" value="${jvar_alert_account_id}" />
+        <!-- Event Account OU -->
+        <input type="hidden" id="alert_account_ou" name="alert_account_ou" value="${jvar_alert_account_ou}" />
+        <!-- Event Task Assgined To -->
+        <!--<input type="hidden" id="event_assigned_to" name="event_assigned_to" value="${jvar_assigned_to}" />-->
+        <div class="form-horizontal">
+            <!-- Type -->
+            <label id="info-message" class="alert alert-info" style="margin-bottom:15px;">
+                Only open Event Storms with active events for
+                <span style="font-weight:bold; margin:0 4px;">
+                    ${grEvnt.u_event_number.u_account.name}
+                </span>
+                can be included in the Event storm
+            </label>
+
+
+            <!-- Select Case-->
+            <div class="form-group is-required" id="process_selected_case_form_group">
+                <label for="selected_case" class="control-label col-sm-4 text-right">
+                    <span class="required-marker sn-tooltip-basic" title="${gs.getMessage('Required')}" data-original-title="${gs.getMessage('Required')}" aria-label="${gs.getMessage('Required')}"></span>
+                    Select Case
+                </label>
+                <span class="col-sm-8">
+                    <g:ui_reference name="selected_case" id="selected_case" table="sn_customerservice_case" query="short_descriptionSTARTSWITH[Event Storm]^contact_type=monitoring^account=${jvar_alert_account_id}^stateIN10,21,18,8" columns="number,state,sys_created_on,assignment_group,u_type" />
+                </span>
+            </div>
+        </div>
+        <input type="hidden" id="internal_case" name="internal_case" value="" />
+        
+        <div class="modal-footer" id="dialog_buttons" style="text-align:right;padding-top:20px;">
+            <g:dialog_buttons_ok_cancel ok="return submitOk()" cancel="return onCancel()" ok_text="${gs.getMessage('Add to the Event Storm')}" />
+            <input type="hidden" id="cancelled" name="cancelled" value="true" />
+        </div>
+    </g:ui_form>
+</j:jelly>]]></html>
+        <name>EQIX_Add_EventStorm_From_Alerts</name>
+        <processing_script><![CDATA[if (cancelled == "false") {
+    createCaseFromEventTask();
+}
+
+function createCaseFromEventTask() {
+
+    try {
+        var affectedCIs = [];
+        var evntAccount = alert_account_id;
+        var description = '';
+        var worknotes = 'List of Alerts added to the Event Storm:';
+        var alertIDs = alert_id;
+        var selectedCase = selected_case;
+        var getCase = '';
+
+        var alert = new GlideRecord('u_event_task');
+        alert.addEncodedQuery('u_event_number.u_account=' + evntAccount + '^u_autoclose_dateISEMPTY^u_has_open_events=true^stateIN1,2^sys_idIN' + alertIDs);
+        alert.query();
+        var alertIDsArray = alertIDs.split(',');
+        var totalSelected = alertIDsArray.length;
+        var validCount = alert.getRowCount();
+        if (validCount == 0) {
+            gs.addErrorMessage("All Alerts initially selected are now closed or ready to be closed. Please refresh the page to select new active Alerts for your Event Storm");
+            response.sendRedirect('u_event_task_list.do');
+            return;
+        }
+        gs.addInfoMessage('Only Open Alerts of the list with Open Events will be added to the Event Storm');
+        while (alert.next()) {
+            description += alert.number + '\n' + '- Configuration Item: ' + alert.u_event_number.u_equipment.getDisplayValue() + '\n' + '- Short Description: ' + alert.short_description + '\n\n';
+            worknotes += '\n' + alert.number + ' - ' + alert.short_description;
+
+            if (affectedCIs.indexOf(alert.u_event_number.u_equipment.toString()) == -1) {
+                affectedCIs.push(alert.u_event_number.u_equipment.toString());
+            }
+        }
+
+
+        var getCaseRecord = new GlideRecord("sn_customerservice_case");
+        getCaseRecord.get(selectedCase);
+        if (getCaseRecord) {
+            getCase = getCaseRecord.getValue('number');
+            var currentDescription = getCaseRecord.getValue('description') || '';
+            currentDescription += "\n" + description;
+            getCaseRecord.setValue('description', currentDescription);
+            getCaseRecord.work_notes = worknotes;
+            getCaseRecord.update();
+        }
+
+        var evntStorm = new GlideRecord('u_event_task');
+        evntStorm.addEncodedQuery('sys_idIN' + alertIDs + '^stateIN1,2');
+        evntStorm.query();
+
+        while (evntStorm.next()) {
+            var grEvent = new GlideRecord('u_event_management');
+            grEvent.addEncodedQuery('u_caseISEMPTY^sys_idIN' + evntStorm.u_event_number + '^u_stateIN0,6');
+            grEvent.query();
+
+            if (grEvent.next()) {
+                grEvent.u_case = selectedCase;
+                grEvent.update();
+            }
+            evntStorm.work_notes = 'The alert has been added to the Event Storm: ' + getCase;
+            evntStorm.update();
+        }
+        // Create affected CI List
+        affectedCIs.forEach(function(ci) {
+            var grTaskCI = new GlideRecord('task_ci');
+            grTaskCI.addQuery('task', selectedCase);
+            grTaskCI.addQuery('ci_item', ci);
+            grTaskCI.setLimit(1);
+            grTaskCI.query();
+
+            if (!grTaskCI.next()) {
+                grTaskCI.initialize();
+                grTaskCI.task = selectedCase;
+                grTaskCI.ci_item = ci;
+                grTaskCI.insert();
+            }
+        });
+        response.sendRedirect('sn_customerservice_case.do?sys_id=' + selectedCase);
+
+    } catch (e1) {
+
+    }
+
+
+}]]></processing_script>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-03-04 19:25:12</sys_created_on>
+        <sys_id>c90c5fab871f3294acfa635d0ebb35fd</sys_id>
+        <sys_mod_count>78</sys_mod_count>
+        <sys_name>EQIX_Add_EventStorm_From_Alerts</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_ui_page_c90c5fab871f3294acfa635d0ebb35fd</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:34</sys_updated_on>
+    </sys_ui_page>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c34090000001</claim_timestamp>
+        <metadata_update_name>sys_ui_page_c90c5fab871f3294acfa635d0ebb35fd</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:34</sys_created_on>
+        <sys_id>7427649987b5c7904d820e96cebb350d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:34</sys_updated_on>
+    </sys_claim>
+</record_update>

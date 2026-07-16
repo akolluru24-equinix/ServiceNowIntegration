@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="536edfef879d7614acfa635d0ebb35e9" extends="sys_import_set_row" label="Imp Event V3" max_length="40" name="u_imp_event_v3" type="collection">
+        <element label="Assignment Group" max_length="40" name="u_assignment_group" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Autoclose" max_length="40" name="u_autoclose" type="boolean"/>
+        <element label="Backup Agent" max_length="150" name="u_backup_agent" type="string"/>
+        <element label="Backup Level" max_length="150" name="u_backup_level" type="string"/>
+        <element label="Backup Service" max_length="150" name="u_backup_service" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Backup Type" max_length="40" name="u_backup_type" type="integer"/>
+        <element label="Case Contact" max_length="40" name="u_case_contact" type="string"/>
+        <element label="Case Contact Calculation" max_length="40" name="u_case_contact_calculation" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Case Service SR" max_length="32" name="u_case_service_sr" reference="sn_customerservice_services" type="reference"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Case Service TR" max_length="32" name="u_case_service_tr" reference="sn_customerservice_services" type="reference"/>
+        <element label="Case Watchlist" max_length="100" name="u_case_watchlist" type="string"/>
+        <element label="Contacted by Email" max_length="1000" name="u_contacted_by_email" type="string"/>
+        <element label="Contacted by Phone" max_length="100" name="u_contacted_by_phone" type="string"/>
+        <element label="Create Case" max_length="40" name="u_create_case" type="string"/>
+        <element label="Delay Autoclose" max_length="40" name="u_delay_autoclose" type="string"/>
+        <element label="Delay Creation" max_length="40" name="u_delay_creation" type="string"/>
+        <element label="Delay Normalization" max_length="40" name="u_delay_normalization" type="string"/>
+        <element label="Event Console URL" max_length="1024" name="u_event_console_url" type="url"/>
+        <element label="Event Date" max_length="40" name="u_event_date" type="string"/>
+        <element label="Event ID" max_length="100" name="u_event_id" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Event Type" max_length="40" name="u_event_type" type="integer"/>
+        <element label="Exclude Severity" max_length="40" name="u_exclude_severity" type="string"/>
+        <element label="Failure Error Code" max_length="200" name="u_failure_error_code" type="string"/>
+        <element label="Failure Reason" max_length="4000" name="u_failure_reason" type="string"/>
+        <element label="Host ID" max_length="100" name="u_host_id" type="string"/>
+        <element label="Host Sys ID" max_length="100" name="u_host_sys_id" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="Infrastructure" max_length="40" name="u_infrastructure" type="boolean"/>
+        <element label="Integration source" max_length="500" name="u_integration_source" type="string"/>
+        <element label="Job ID" max_length="200" name="u_job_id" type="string"/>
+        <element label="Key Orig" max_length="100" name="u_key_orig" type="string"/>
+        <element label="Message" max_length="2000" name="u_message" type="string"/>
+        <element label="Module" max_length="200" name="u_module" type="string"/>
+        <element label="Monitoring Class" max_length="100" name="u_monitoring_class" type="string"/>
+        <element label="Monitoring IP" max_length="100" name="u_monitoring_ip" type="string"/>
+        <element label="Monitoring Object" max_length="100" name="u_monitoring_object" type="string"/>
+        <element label="Monitoring Parameter" max_length="100" name="u_monitoring_parameter" type="string"/>
+        <element label="Monitoring Server" max_length="100" name="u_monitoring_server" type="string"/>
+        <element label="Monitoring System" max_length="150" name="u_monitoring_system" type="string"/>
+        <element label="Normalization Lifetime" max_length="40" name="u_normalization_lifetime" type="string"/>
+        <element attributes="edge_encryption_enabled=true" label="No Operation" max_length="40" name="u_no_operation" type="boolean"/>
+        <element label="Operation Procedure" max_length="1000" name="u_operation_procedure" type="string"/>
+        <element label="Original Event ID" max_length="100" name="u_original_event_id" type="string"/>
+        <element label="Parameter Value" max_length="100" name="u_parameter_value" type="string"/>
+        <element label="Region" max_length="40" name="u_region" type="string"/>
+        <element label="Remediation Output" max_length="4000" name="u_remediation_output" type="string"/>
+        <element label="Remediation System" max_length="40" name="u_remediation_system" type="string"/>
+        <element label="Service Owner" max_length="40" name="u_service_owner" type="string"/>
+        <element label="Short Description" max_length="200" name="u_short_description" type="string"/>
+        <element label="Start Date" max_length="40" name="u_start_date" type="glide_date_time"/>
+        <element label="State" max_length="40" name="u_state" type="string"/>
+        <element label="Total Failed Files" max_length="150" name="u_total_failed_files" type="string"/>
+        <element label="Total Failed Folders" max_length="150" name="u_total_failed_folders" type="string"/>
+        <element label="Trigger ID" max_length="150" name="u_trigger_id" type="string"/>
+        <element label="Trigger Name" max_length="100" name="u_trigger_name" type="string"/>
+        <element label="Trigger Severity" max_length="100" name="u_trigger_severity" type="string"/>
+        <element label="Trigger Value" max_length="100" name="u_trigger_value" type="string"/>
+        <index name="index">
+            <element name="u_case_service_sr"/>
+        </index>
+        <index name="index2">
+            <element name="u_case_service_tr"/>
+        </index>
+    </element>
+</database>

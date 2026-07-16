@@ -1,0 +1,1091 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update node_type="sys_portal_page" unload_date="2026-07-10 11:41:56">
+    <sys_portal_page action="INSERT_OR_UPDATE">
+        <layout/>
+        <order/>
+        <read_roles>snc_internal</read_roles>
+        <roles/>
+        <selectable>false</selectable>
+        <sys_class_name>sys_portal_page</sys_class_name>
+        <sys_created_by>apendem@equinix.com</sys_created_by>
+        <sys_created_on>2022-07-26 00:28:11</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>60f145e7dbfcd11024a9c082ba96197f</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>PA INT5 Retriggers</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_portal_page_60f145e7dbfcd11024a9c082ba96197f</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:03</sys_updated_on>
+        <title>PA INT5 Retriggers</title>
+        <user/>
+        <view>pa_int5_retriggers</view>
+        <related_items_node>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Analytics Hub</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                <sys_id>019cdd56db911d108ff3fb243996193d</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 22:43:22</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:31">019cdd56db911d108ff3fb243996193d</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                        <sys_id>0d9cdd56db911d108ff3fb2439961942</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 22:43:22</sys_updated_on>
+                        <value>Analytics Hub</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:31">019cdd56db911d108ff3fb243996193d</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                        <sys_id>499cdd56db911d108ff3fb243996193d</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:31</sys_updated_on>
+                        <value>8b2d787bdbf8951024a9c082ba961901</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>render_time</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:31">019cdd56db911d108ff3fb243996193d</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                        <sys_id>499cdd56db911d108ff3fb2439961942</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:31</sys_updated_on>
+                        <value>-1</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:31">019cdd56db911d108ff3fb243996193d</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                        <sys_id>859cdd56db911d108ff3fb2439961942</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:31</sys_updated_on>
+                        <value>pa_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:31">019cdd56db911d108ff3fb243996193d</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                        <sys_id>c19cdd56db911d108ff3fb2439961942</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:31</sys_updated_on>
+                        <value>com.snc.pa.ui.RenderPerformanceAnalytics</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>type</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:31">019cdd56db911d108ff3fb243996193d</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:31</sys_created_on>
+                        <sys_id>c99cdd56db911d108ff3fb2439961943</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:31</sys_updated_on>
+                        <value>score</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Active INT5 LIs Retrigger Count - This Week</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                <sys_id>1419a9bddbe5151082565a6a68961929</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>1019a9bddbe5151082565a6a6896192a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>1819a9bddbe5151082565a6a68961929</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>b0a2a135dbe5151082565a6a689619b3</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>1c19a9bddbe5151082565a6a6896192a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>Active INT5 LIs Retrigger Count - This Week</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>5819a9bddbe5151082565a6a6896192a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>single_score</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>5c19a9bddbe5151082565a6a68961929</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>is_using_database_view</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>9019a9bddbe5151082565a6a6896192b</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>9419a9bddbe5151082565a6a6896192a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_real_time</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:49">1419a9bddbe5151082565a6a68961929</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:49</sys_created_on>
+                        <sys_id>d019a9bddbe5151082565a6a6896192a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:49</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Active INT5 Retriggers Today</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                <sys_id>36dcd95adb911d108ff3fb2439961902</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:44">36dcd95adb911d108ff3fb2439961902</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                        <sys_id>32dcd95adb911d108ff3fb2439961903</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:44">36dcd95adb911d108ff3fb2439961902</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                        <sys_id>3adcd95adb911d108ff3fb2439961902</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                        <value>639ab4b3dbf8951024a9c082ba96199e</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:44">36dcd95adb911d108ff3fb2439961902</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                        <sys_id>7adcd95adb911d108ff3fb2439961903</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                        <value>Active INT5 Retriggers Today</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:44">36dcd95adb911d108ff3fb2439961902</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                        <sys_id>7edcd95adb911d108ff3fb2439961902</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:44">36dcd95adb911d108ff3fb2439961902</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                        <sys_id>b6dcd95adb911d108ff3fb2439961903</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                        <value>list</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:44">36dcd95adb911d108ff3fb2439961902</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:44</sys_created_on>
+                        <sys_id>f2dcd95adb911d108ff3fb2439961903</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:44</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Analytics Hub</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                <sys_id>379c5156db911d108ff3fb243996199a</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 22:42:50</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>render_time</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:42">379c5156db911d108ff3fb243996199a</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                        <sys_id>379c5156db911d108ff3fb243996199b</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:42</sys_updated_on>
+                        <value>-1</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:42">379c5156db911d108ff3fb243996199a</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                        <sys_id>3b9c5156db911d108ff3fb243996199a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:42</sys_updated_on>
+                        <value>b053ee46db09519024a9c082ba961974</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:42">379c5156db911d108ff3fb243996199a</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                        <sys_id>739c5156db911d108ff3fb243996199b</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:42</sys_updated_on>
+                        <value>pa_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:42">379c5156db911d108ff3fb243996199a</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                        <sys_id>bf9c5156db911d108ff3fb243996199a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:42</sys_updated_on>
+                        <value>com.snc.pa.ui.RenderPerformanceAnalytics</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>type</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:42">379c5156db911d108ff3fb243996199a</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                        <sys_id>bf9c5156db911d108ff3fb243996199b</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:42</sys_updated_on>
+                        <value>score</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:42">379c5156db911d108ff3fb243996199a</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:42</sys_created_on>
+                        <sys_id>f79c5156db911d108ff3fb243996199b</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 22:42:50</sys_updated_on>
+                        <value>Analytics Hub</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>INT5 Retriggers This Week</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                <sys_id>60dcdd9adb911d108ff3fb24399619ed</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:34">60dcdd9adb911d108ff3fb24399619ed</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                        <sys_id>28dc91dadb911d108ff3fb24399619e4</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:34">60dcdd9adb911d108ff3fb24399619ed</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                        <sys_id>60dc91dadb911d108ff3fb24399619e5</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                        <value>INT5 Retriggers This Week</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:34">60dcdd9adb911d108ff3fb24399619ed</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                        <sys_id>64dcdd9adb911d108ff3fb24399619ed</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                        <value>f33cb0b7dbf8951024a9c082ba96196f</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:34">60dcdd9adb911d108ff3fb24399619ed</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                        <sys_id>a8dcdd9adb911d108ff3fb24399619ed</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:34">60dcdd9adb911d108ff3fb24399619ed</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                        <sys_id>acdc91dadb911d108ff3fb24399619e4</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                        <value>list</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:34">60dcdd9adb911d108ff3fb24399619ed</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:34</sys_created_on>
+                        <sys_id>e8dc91dadb911d108ff3fb24399619e4</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:34</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Active INT5 LIs Retrigger Count - Today</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-26 23:36:33</sys_created_on>
+                <sys_id>6c09ad35db29151082565a6a689619cd</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_real_time</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>2c09ad35db29151082565a6a689619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>6009ad35db29151082565a6a689619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>b7826139dbe5151082565a6a6896194d</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>6409ad35db29151082565a6a689619cf</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>Active INT5 LIs Retrigger Count - Today</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>6809ad35db29151082565a6a689619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>a009ad35db29151082565a6a689619cf</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>single_score</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>a409ad35db29151082565a6a689619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>is_using_database_view</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>e809ad35db29151082565a6a689619cf</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-26 16:36:33">6c09ad35db29151082565a6a689619cd</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:36:34</sys_created_on>
+                        <sys_id>ec09ad35db29151082565a6a689619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:36:34</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>INT5 Retrigger LIs Count - This Week</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                <sys_id>70292935db29151082565a6a68961989</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_real_time</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>30292935db29151082565a6a6896198a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>74292935db29151082565a6a68961989</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>56e12939dbe5151082565a6a689619de</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>78292935db29151082565a6a6896198a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>INT5 Retrigger LIs Count - This Week</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>7c292935db29151082565a6a68961989</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>b4292935db29151082565a6a6896198a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>single_score</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>b8292935db29151082565a6a68961989</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>f0292935db29151082565a6a6896198a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>is_using_database_view</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:08">70292935db29151082565a6a68961989</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:08</sys_created_on>
+                        <sys_id>fc292935db29151082565a6a6896198a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:08</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>INT5 Retriggers This Month</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                <sys_id>82cc1d5adb911d108ff3fb24399619ce</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:24">82cc1d5adb911d108ff3fb24399619ce</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                        <sys_id>06cc1d5adb911d108ff3fb24399619cf</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                        <value>list</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:24">82cc1d5adb911d108ff3fb24399619ce</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                        <sys_id>42cc1d5adb911d108ff3fb24399619cf</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:24">82cc1d5adb911d108ff3fb24399619ce</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                        <sys_id>86cc1d5adb911d108ff3fb24399619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                        <value>70fdbcbbdbf8951024a9c082ba961962</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:24">82cc1d5adb911d108ff3fb24399619ce</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                        <sys_id>8ecc1d5adb911d108ff3fb24399619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:24">82cc1d5adb911d108ff3fb24399619ce</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                        <sys_id>c6cc1d5adb911d108ff3fb24399619cf</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                        <value>INT5 Retriggers This Month</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:24">82cc1d5adb911d108ff3fb24399619ce</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:24</sys_created_on>
+                        <sys_id>cacc1d5adb911d108ff3fb24399619ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:24</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Analytics Hub</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                <sys_id>8aac995adb911d108ff3fb24399619a8</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 22:43:11</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:51">8aac995adb911d108ff3fb24399619a8</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                        <sys_id>06ac995adb911d108ff3fb24399619a9</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:51</sys_updated_on>
+                        <value>com.snc.pa.ui.RenderPerformanceAnalytics</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>type</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:51">8aac995adb911d108ff3fb24399619a8</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                        <sys_id>06ac995adb911d108ff3fb24399619aa</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:51</sys_updated_on>
+                        <value>score</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:51">8aac995adb911d108ff3fb24399619a8</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                        <sys_id>4eac995adb911d108ff3fb24399619a9</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 22:43:11</sys_updated_on>
+                        <value>Analytics Hub</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>render_time</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:51">8aac995adb911d108ff3fb24399619a8</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                        <sys_id>8aac995adb911d108ff3fb24399619a9</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:51</sys_updated_on>
+                        <value>-1</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:51">8aac995adb911d108ff3fb24399619a8</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                        <sys_id>8eac995adb911d108ff3fb24399619a8</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:51</sys_updated_on>
+                        <value>fa6bf4f3dbf8951024a9c082ba961936</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:51">8aac995adb911d108ff3fb24399619a8</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:51</sys_created_on>
+                        <sys_id>c6ac995adb911d108ff3fb24399619a9</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:51</sys_updated_on>
+                        <value>pa_widget_description</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>INT5 Retrigger LIs Count - This Month</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                <sys_id>98392175db29151082565a6a68961969</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>is_using_database_view</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>18392175db29151082565a6a6896196b</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>1c392175db29151082565a6a6896196a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_real_time</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>58392175db29151082565a6a6896196a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>90392175db29151082565a6a6896196b</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>INT5 Retrigger LIs Count - This Month</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>94392175db29151082565a6a6896196a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>9c392175db29151082565a6a68961969</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>1f01a9b1dbe5151082565a6a68961972</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>d0392175db29151082565a6a6896196a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-26 16:37:22">98392175db29151082565a6a68961969</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-26 23:37:22</sys_created_on>
+                        <sys_id>dc392175db29151082565a6a6896196a</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 23:37:22</sys_updated_on>
+                        <value>single_score</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Analytics Hub</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                <sys_id>d29c1156db911d108ff3fb24399619ba</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-26 22:43:00</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:36">d29c1156db911d108ff3fb24399619ba</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                        <sys_id>129c1156db911d108ff3fb24399619bb</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:36</sys_updated_on>
+                        <value>pa_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:36">d29c1156db911d108ff3fb24399619ba</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                        <sys_id>5e9c1156db911d108ff3fb24399619ba</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:36</sys_updated_on>
+                        <value>com.snc.pa.ui.RenderPerformanceAnalytics</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>type</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:36">d29c1156db911d108ff3fb24399619ba</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                        <sys_id>5e9c1156db911d108ff3fb24399619bb</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:36</sys_updated_on>
+                        <value>score</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:36">d29c1156db911d108ff3fb24399619ba</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                        <sys_id>969c1156db911d108ff3fb24399619bb</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-26 22:43:00</sys_updated_on>
+                        <value>Analytics Hub</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>render_time</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:36">d29c1156db911d108ff3fb24399619ba</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                        <sys_id>d29c1156db911d108ff3fb24399619bb</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:36</sys_updated_on>
+                        <value>-1</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:43:36">d29c1156db911d108ff3fb24399619ba</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:43:36</sys_created_on>
+                        <sys_id>d69c1156db911d108ff3fb24399619ba</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:43:36</sys_updated_on>
+                        <value>e2d93833dbf8951024a9c082ba9619e2</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="PA INT5 Retriggers">60f145e7dbfcd11024a9c082ba96197f</page>
+                <summary>Active INT5 Retriggers This Week</summary>
+                <sys_created_by>apendem@equinix.com</sys_created_by>
+                <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                <sys_id>dccc1d5adb911d108ff3fb24399619ec</sys_id>
+                <sys_mod_count>1</sys_mod_count>
+                <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:17">dccc1d5adb911d108ff3fb24399619ec</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                        <sys_id>14cc1d5adb911d108ff3fb24399619ee</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                        <value>Active INT5 Retriggers This Week</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:17">dccc1d5adb911d108ff3fb24399619ec</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                        <sys_id>18cc1d5adb911d108ff3fb24399619ed</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>report_type</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:17">dccc1d5adb911d108ff3fb24399619ec</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                        <sys_id>50cc1d5adb911d108ff3fb24399619ee</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                        <value>list</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:17">dccc1d5adb911d108ff3fb24399619ec</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                        <sys_id>9ccc1d5adb911d108ff3fb24399619ed</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:17">dccc1d5adb911d108ff3fb24399619ec</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                        <sys_id>d0cc1d5adb911d108ff3fb24399619ed</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                        <value>83b12e06db09519024a9c082ba961913</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2022-08-15 18:44:17">dccc1d5adb911d108ff3fb24399619ec</portal_section>
+                        <sys_created_by>apendem@equinix.com</sys_created_by>
+                        <sys_created_on>2022-08-16 01:44:17</sys_created_on>
+                        <sys_id>d8cc1d5adb911d108ff3fb24399619ed</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>apendem@equinix.com</sys_updated_by>
+                        <sys_updated_on>2022-08-16 01:44:17</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+        </related_items_node>
+    </sys_portal_page>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137bb9a10000001</claim_timestamp>
+        <metadata_update_name>sys_portal_page_60f145e7dbfcd11024a9c082ba96197f</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:03</sys_created_on>
+        <sys_id>5507245987b5c7904d820e96cebb350b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:03</sys_updated_on>
+    </sys_claim>
+</record_update>

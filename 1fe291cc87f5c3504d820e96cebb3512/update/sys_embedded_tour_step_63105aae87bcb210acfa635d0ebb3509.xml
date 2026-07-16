@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_embedded_tour_step">
+    <sys_embedded_tour_step action="INSERT_OR_UPDATE">
+        <action>false</action>
+        <action_event>click</action_event>
+        <action_target/>
+        <action_target_ref/>
+        <active>true</active>
+        <content><![CDATA[<p>Generate and manage reports for your contracted products from here.</p>]]></content>
+        <guide display_value="CSM 25 Reporting">33ff8e6e87bcb210acfa635d0ebb3542</guide>
+        <implicit>false</implicit>
+        <link/>
+        <name>Access Report Center</name>
+        <options>{"eqixShowOverlay": 1}</options>
+        <order>100</order>
+        <placement>right</placement>
+        <skippable>false</skippable>
+        <step_type>step</step_type>
+        <sys_class_name>sys_embedded_tour_step</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-28 04:43:48</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_id>63105aae87bcb210acfa635d0ebb3509</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Access Report Center</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_embedded_tour_step_63105aae87bcb210acfa635d0ebb3509</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:33</sys_updated_on>
+        <target/>
+        <target_ref display_value="Menu Item Reporting">cb01de2687fcb210acfa635d0ebb355c</target_ref>
+        <title>Access Report Center</title>
+        <ui_version>dynamic</ui_version>
+        <view/>
+        <window/>
+    </sys_embedded_tour_step>
+    <sys_translated_text action="delete_multiple" query="documentkey=63105aae87bcb210acfa635d0ebb3509"/>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>content</fieldname>
+        <language>es</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:27:34</sys_created_on>
+        <sys_id>1b4e150c1ba9bed0bd075425604bcb06</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:27:34</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>Genere y gestione informes de sus productos contratados desde aquí</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>content</fieldname>
+        <language>fq</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:27:45</sys_created_on>
+        <sys_id>eb5e190c1ba9bed0bd075425604bcb98</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:27:45</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>Générez et gérez des rapports pour vos produits sous contrat à partir d'ici</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>content</fieldname>
+        <language>ja</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:27:14</sys_created_on>
+        <sys_id>a13e910c1ba9bed0bd075425604bcb2b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:27:14</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>契約済み製品のレポートをここから作成および管理できます</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>content</fieldname>
+        <language>pb</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:27:59</sys_created_on>
+        <sys_id>226e990c1ba9bed0bd075425604bcb05</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:27:59</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>Gere e gerencie relatórios de seus produtos contratados aqui</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>title</fieldname>
+        <language>es</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:26:26</sys_created_on>
+        <sys_id>f01e9dc81ba9bed0bd075425604bcbdc</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:26:26</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>Acceda al Centro de informes</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>title</fieldname>
+        <language>fq</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:26:38</sys_created_on>
+        <sys_id>2b1eddc81ba9bed0bd075425604bcba5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:26:38</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>Accéder au Centre de rapports</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>title</fieldname>
+        <language>ja</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:25:42</sys_created_on>
+        <sys_id>3c9d15481ba9bed0bd075425604bcbf3</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:25:42</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>レポートセンターにアクセス</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>63105aae87bcb210acfa635d0ebb3509</documentkey>
+        <fieldname>title</fieldname>
+        <language>pb</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-26 13:26:48</sys_created_on>
+        <sys_id>752e110c1ba9bed0bd075425604bcbbd</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-26 13:26:48</sys_updated_on>
+        <tablename>sys_embedded_tour_step</tablename>
+        <value>Acessar a Central de Relatórios</value>
+    </sys_translated_text>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137b46650000001</claim_timestamp>
+        <metadata_update_name>sys_embedded_tour_step_63105aae87bcb210acfa635d0ebb3509</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:33</sys_created_on>
+        <sys_id>4ae6e01987b5c7904d820e96cebb3532</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:33</sys_updated_on>
+    </sys_claim>
+</record_update>

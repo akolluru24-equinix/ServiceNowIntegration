@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_ui_list parent="sys_user" relationship="" sys_domain="global" table="u_m2m_users_shift_schedules" version="2" view="resource_manager">
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>u_user</element>
+            <list_id display_value="u_m2m_users_shift_schedules" element="NULL" name="u_m2m_users_shift_schedules" parent="sys_user" relationship="NULL" sys_domain="global" view="9a8f99f2eb01010060bbafcef106fe77">b78d93a187133614acfa635d0ebb3547</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>0</position>
+            <sum>false</sum>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_id>778d93a187133614acfa635d0ebb354a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>imori@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-02-26 14:24:05</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>u_shift_schedule.u_name</element>
+            <list_id display_value="u_m2m_users_shift_schedules" element="NULL" name="u_m2m_users_shift_schedules" parent="sys_user" relationship="NULL" sys_domain="global" view="9a8f99f2eb01010060bbafcef106fe77">b78d93a187133614acfa635d0ebb3547</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>1</position>
+            <sum>false</sum>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_id>fb8d93a187133614acfa635d0ebb354a</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>imori@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-02-26 14:24:05</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>u_shift_schedule.u_schedule</element>
+            <list_id display_value="u_m2m_users_shift_schedules" element="NULL" name="u_m2m_users_shift_schedules" parent="sys_user" relationship="NULL" sys_domain="global" view="9a8f99f2eb01010060bbafcef106fe77">b78d93a187133614acfa635d0ebb3547</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>2</position>
+            <sum>false</sum>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_id>738d93a187133614acfa635d0ebb354b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>imori@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-02-26 14:24:05</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>u_shift_schedule</element>
+            <list_id display_value="u_m2m_users_shift_schedules" element="NULL" name="u_m2m_users_shift_schedules" parent="sys_user" relationship="NULL" sys_domain="global" view="9a8f99f2eb01010060bbafcef106fe77">b78d93a187133614acfa635d0ebb3547</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>3</position>
+            <sum>false</sum>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_id>f78d93a187133614acfa635d0ebb354b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>imori@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-02-26 14:24:05</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>u_shift_schedule.u_group</element>
+            <list_id display_value="u_m2m_users_shift_schedules" element="NULL" name="u_m2m_users_shift_schedules" parent="sys_user" relationship="NULL" sys_domain="global" view="9a8f99f2eb01010060bbafcef106fe77">b78d93a187133614acfa635d0ebb3547</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>4</position>
+            <sum>false</sum>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_id>7f8d93a187133614acfa635d0ebb354b</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>imori@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-02-26 14:24:05</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list_element action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element>u_shift_schedule.u_active</element>
+            <list_id display_value="u_m2m_users_shift_schedules" element="NULL" name="u_m2m_users_shift_schedules" parent="sys_user" relationship="NULL" sys_domain="global" view="9a8f99f2eb01010060bbafcef106fe77">b78d93a187133614acfa635d0ebb3547</list_id>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <position>5</position>
+            <sum>false</sum>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_id>f38d93a187133614acfa635d0ebb354c</sys_id>
+            <sys_mod_count>0</sys_mod_count>
+            <sys_updated_by>imori@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-02-26 14:24:05</sys_updated_on>
+        </sys_ui_list_element>
+        <sys_ui_list action="INSERT_OR_UPDATE">
+            <average_value>false</average_value>
+            <element/>
+            <max_value>false</max_value>
+            <min_value>false</min_value>
+            <name>u_m2m_users_shift_schedules</name>
+            <parent>sys_user</parent>
+            <position/>
+            <relationship/>
+            <sum>false</sum>
+            <sys_class_name>sys_ui_list</sys_class_name>
+            <sys_created_by>imori@equinix.com</sys_created_by>
+            <sys_created_on>2026-02-26 14:24:05</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_id>b78d93a187133614acfa635d0ebb3547</sys_id>
+            <sys_mod_count>1</sys_mod_count>
+            <sys_name>u_m2m_users_shift_schedules</sys_name>
+            <sys_package display_value="Global" source="global">global</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+            <sys_update_name>sys_ui_list_u_m2m_users_shift_schedules_sys_user_resource_manager</sys_update_name>
+            <sys_updated_by>oneto@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-06-29 13:04:52</sys_updated_on>
+            <sys_user/>
+            <view display_value="Resource Manager" name="resource_manager">9a8f99f2eb01010060bbafcef106fe77</view>
+            <view_name/>
+        </sys_ui_list>
+    </sys_ui_list>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137b8da70000001</claim_timestamp>
+        <metadata_update_name>sys_ui_list_u_m2m_users_shift_schedules_sys_user_resource_manager</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:52</sys_created_on>
+        <sys_id>6af66c1987b5c7904d820e96cebb3582</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:52</sys_updated_on>
+    </sys_claim>
+</record_update>

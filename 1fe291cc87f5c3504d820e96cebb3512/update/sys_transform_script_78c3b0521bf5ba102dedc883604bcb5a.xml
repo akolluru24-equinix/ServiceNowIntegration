@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_script">
+    <sys_transform_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <map display_value="IMP Contact MDM3 - TM">26a510de1b31ba102dedc883604bcb0d</map>
+        <order>100</order>
+        <script><![CDATA[(function runTransformScript(source, map, log, target /*undefined onStart*/ ) {
+    var EQIX_ACCCONT_UTIL = new EQIX_AccountContact_Util();
+
+    // ---------- READ ASSOCIATED ACCOUNTS FROM SOURCE ----------
+    var assocStr = (source && source.u_associatedaccounts_arraydata) ? String(source.u_associatedaccounts_arraydata) : '';
+    if (!assocStr) {
+        gs.warn('Post-Processing Contacts: source.u_associatedaccounts_arraydata is empty or undefined; nothing to process.');
+        return;
+    }
+
+    try {
+        assocArr = JSON.parse(assocStr);
+        if (!Array.isArray(assocArr)) {
+            gs.warn('Post-Processing Contacts: Parsed associated accounts but result is not an array. Value=' + assocStr);
+            return;
+        }
+    } catch (e) {
+        gs.error('Post-Processing Contacts: Failed to parse source.u_associatedaccounts_arraydata. Error=' + e.message + ' Value=' + assocStr);
+        return;
+    }
+
+    //gs.info('Post-Processing Contacts: Processing ' + assocArr.length + ' associated account(s) for contact=' + contactSysId);
+
+
+    // ---------- MAIN LOOP ----------
+    for (var idx = 0; idx < assocArr.length; idx++) {
+        var accountObj = assocArr[idx] || {};
+        var accountMdmId = accountObj.accountMdmId ? String(accountObj.accountMdmId) : '';
+        var contactMdmId = source.u_mdmid;
+        var accountName = accountObj.accountName ? String(accountObj.accountName) : '';
+
+
+        if (!accountMdmId && !accountName) {
+            gs.warn('Post-Processing Contacts: Row ' + idx + ' has neither accountMdmId nor accountName; skipping.');
+            continue;
+        }
+
+        var accountSysIds = EQIX_ACCCONT_UTIL.resolveAccountSysId(accountMdmId);
+        if (!accountSysIds || accountSysIds.length == 0) {
+            gs.warn('Post-Processing Contacts: Row ' + idx + ' account not found (MDM=' + accountMdmId + '); skipping.');
+            continue;
+        }
+
+        var contactSysId = EQIX_ACCCONT_UTIL.resolveContactSysId(contactMdmId);
+        if (!contactSysId) {
+            gs.warn('Post-Processing Contacts: Row ' + idx + ' account not found (MDM=' + contactSysId + '); skipping.');
+            continue;
+        }
+
+
+        if (EQIX_ACCCONT_UTIL.permissionExists(accountSysIds, contactSysId)) {
+            gs.info('Post-Processing Contacts: Row ' + idx + ' permission already exists for account=' + accountSysIds + ' contact=' + contactSysId + '; skipping.');
+            continue;
+        }
+
+        var newPermIds = EQIX_ACCCONT_UTIL.insertCustomerPermission(accountSysIds, contactSysId);
+        if (newPermIds) {
+            gs.info('Post-Processing Contacts: Row ' + idx + ' permission inserted: ' + newPermIds.join(',') +
+                ' [account=' + accountSysIds.join(',') + ', contact=' + contactSysId + ']');
+        } else {
+            gs.error('Post-Processing Contacts: Row ' + idx + ' failed to insert permission ' +
+                '[account=' + accountSysIds.join(',') + ', contact=' + contactSysId + ']');
+        }
+    }
+
+
+})(source, map, log, target);]]></script>
+        <sys_class_name>sys_transform_script</sys_class_name>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-15 23:36:59</sys_created_on>
+        <sys_id>78c3b0521bf5ba102dedc883604bcb5a</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>onAfter</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_transform_script_78c3b0521bf5ba102dedc883604bcb5a</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:14</sys_updated_on>
+        <when>onAfter</when>
+    </sys_transform_script>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137be4e00000001</claim_timestamp>
+        <metadata_update_name>sys_transform_script_78c3b0521bf5ba102dedc883604bcb5a</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:14</sys_created_on>
+        <sys_id>c017a85987b5c7904d820e96cebb353b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:14</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>78c3b0521bf5ba102dedc883604bcb5a</id>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-15 23:36:58</sys_created_on>
+        <sys_id>76002dd61b317e1055a142e1b24bcb2c</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-12-15 23:36:58</sys_updated_on>
+        <table>sys_transform_script</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

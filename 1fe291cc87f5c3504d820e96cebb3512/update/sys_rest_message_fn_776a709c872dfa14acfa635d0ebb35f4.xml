@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_rest_message_fn">
+    <sys_rest_message_fn action="INSERT_OR_UPDATE">
+        <authentication_type>inherit_from_parent</authentication_type>
+        <basic_auth_password/>
+        <basic_auth_profile/>
+        <basic_auth_user/>
+        <content>{&#13;
+    "event_id": "${event_id}",&#13;
+    "snow_event": "${snow_event}",&#13;
+    "message": "${message}"&#13;
+}</content>
+        <function_name>POST</function_name>
+        <http_method>post</http_method>
+        <lock>false</lock>
+        <oauth2_profile/>
+        <protocol_name/>
+        <qualified_name>EQIX Event Management [ POST ]</qualified_name>
+        <rest_endpoint>${boomi.instance}/eai/msp/dibs-gema-events-ems/event/v1/eventaction</rest_endpoint>
+        <rest_message display_value="EQIX Event Management">fb0ab45c872dfa14acfa635d0ebb3516</rest_message>
+        <sys_class_name>sys_rest_message_fn</sys_class_name>
+        <sys_created_by>cliaw@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-27 05:30:51</sys_created_on>
+        <sys_id>776a709c872dfa14acfa635d0ebb35f4</sys_id>
+        <sys_mod_count>7</sys_mod_count>
+        <sys_name>POST</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_rest_message_fn_776a709c872dfa14acfa635d0ebb35f4</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:08</sys_updated_on>
+        <use_auth_mid_server/>
+        <use_basic_auth>false</use_basic_auth>
+        <use_mid_server display_value="CSMDEV1_WIN">6abefc951bb492d0ca2020ee2a4bcb32</use_mid_server>
+        <use_mutual_auth>false</use_mutual_auth>
+    </sys_rest_message_fn>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137563020000001</claim_timestamp>
+        <metadata_update_name>sys_rest_message_fn_776a709c872dfa14acfa635d0ebb35f4</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:08</sys_created_on>
+        <sys_id>7b65a4d98775c7904d820e96cebb35ed</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:08</sys_updated_on>
+    </sys_claim>
+</record_update>

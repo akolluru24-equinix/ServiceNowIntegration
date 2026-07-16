@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>true</action_insert>
+        <action_query>false</action_query>
+        <action_update>true</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>change_request</collection>
+        <condition/>
+        <description/>
+        <execute_function>false</execute_function>
+        <filter_condition table="change_request">chg_modelISNOTEMPTY^stateVALCHANGES^EQ<item endquery="false" field="chg_model" goto="false" newquery="false" operator="ISNOTEMPTY" or="false" value=""/>
+            <item endquery="false" field="state" goto="false" newquery="false" operator="VALCHANGES" or="false" value=""/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </filter_condition>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>Change Model: Check State Transition</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule(current, previous /*null when async*/) {
+	if (!previous)
+		return;
+	
+	var changeModel = new ChangeModel(current.chg_model.getRefRecord());
+	var stateFieldName = changeModel.getStateFieldName();
+	var initialStateGr = changeModel.getInitialState();
+	
+	// If it's a new record in the initial state, or the model has changed and it's in the initial state don't do anything.
+	if ((current.isNewRecord() || current.chg_model.changes()) && current.getValue(stateFieldName) === initialStateGr.getValue("state_value"))
+		return;
+	
+	var previousState = previous.getValue(stateFieldName);
+	var previousDisplayValue = previous.getDisplayValue(stateFieldName);
+	
+	if ((!previousState && current.isNewRecord()) ||
+		(current.chg_model.changes() && current.getValue(stateFieldName) !== initialStateGr.getValue("state_value"))) {
+		previousState = initialStateGr;
+		previousDisplayValue = initialStateGr.getDisplayValue("state_label");
+	}
+	
+	// Check if we can transition between the states.
+	if (!changeModel.canTransition(previousState, current) && current.state != previous.state) {
+		gs.addErrorMessage(gs.getMessage("Change model '{0}' prevented state transition from {1} to {2}", [current.getDisplayValue("chg_model"), previousDisplayValue, current.getDisplayValue(stateFieldName)]));
+		current.setAbortAction(true);
+	}
+
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2020-09-16 20:18:13</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path/>
+        <sys_id>b6dae9e15317101034d1ddeeff7b1278</sys_id>
+        <sys_mod_count>11</sys_mod_count>
+        <sys_name>Change Model: Check State Transition</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Change Management - Change Models" source="com.snc.change_management.change_model">4ea388dbdb233010b715aa1d1396199f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_b6dae9e15317101034d1ddeeff7b1278</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:24</sys_updated_on>
+        <template/>
+        <when>before</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=b6dae9e15317101034d1ddeeff7b1278"/>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a37c00000002</claim_timestamp>
+        <metadata_update_name>sys_script_b6dae9e15317101034d1ddeeff7b1278</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:24</sys_created_on>
+        <sys_id>4da62c5587b5c7904d820e96cebb35e6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:24</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a37c00000001</claim_timestamp>
+        <metadata_update_name>sys_script_b6dae9e15317101034d1ddeeff7b1278</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.change_management.change_model</previous_claim_name>
+        <previous_claim_scope>com.snc.change_management.change</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:24</sys_created_on>
+        <sys_id>81a62c5587b5c7904d820e96cebb35e7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:24</sys_updated_on>
+    </sys_claim>
+</record_update>

@@ -1,0 +1,417 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>global.EQIX_Portal_CSM</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>A script include to encapsulate CSM related methods and properites.</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_Portal_CSM</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_Portal_CSM = Class.create();
+EQIX_Portal_CSM.prototype = {
+    initialize: function() {
+		function getStateLabel(value, lang) {
+			var gr = new GlideRecord("sys_choice");
+			gr.addQuery("name", "sn_customerservice_case");
+			gr.addQuery("element", "state");
+			gr.addQuery("language", lang);
+			gr.addQuery("value", value);
+			gr.addQuery("inactive", 'false');
+			gr.setLimit(1);
+				
+			gr.query();
+			if (gr.next()) {
+				return gr.getValue("label");
+			}
+			return null;
+		}
+		var lang = gs.getSession().getLanguage();
+		this.stateWIP = getStateLabel('8', lang) || getStateLabel('8', 'en');
+		this.stateClosed = getStateLabel('3', lang) || getStateLabel('3', 'en');
+		this.specialStatusWIP = (gs.getProperty('EQIX_Case_State_WIP') || '18,29,30').split(',');
+		this.specialStatusClosed = (gs.getProperty('EQIX_Case_State_Closed') || '24,25').split(',');
+	},
+
+    applyEvaluableCondition(gr) {
+        let gdtNow = new GlideDateTime();
+        gdtNow.addDaysUTC(-60);
+
+        let gdtNow2 = new GlideDateTime();
+        gdtNow2.addDaysUTC(-53);
+
+        gr.addQuery('active', '=', 'true');
+        gr.addQuery('state', '6'); // resolved
+        let condition = gr.addQuery('resolved_at', '>', gdtNow.getValue());
+        let subcondition = condition.addOrCondition('state', '3'); // closed
+        subcondition.addCondition('state', '>', gdtNow2.getValue());
+    },
+    caseHasEvaluated(caseId) {
+        let grInstance = new GlideRecord("asmt_assessment_instance");
+        grInstance.addQuery("trigger_id", caseId);
+        grInstance.setLimit(1);
+        grInstance.query();
+        if (grInstance.next()) {
+            return grInstance.getValue("state") == 'complete';
+        }
+        return false;
+    },
+    getEvaluatedCaseIds() {
+        let typeCase = gs.getProperty('EQIX_ASMT_METRIC_TYPE_CASE');
+        let gaInstance = new GlideAggregate("asmt_assessment_instance");
+        gaInstance.addQuery('metric_type', typeCase);
+        gaInstance.addQuery('state', 'complete');
+        gaInstance.setGroup(true);
+        gaInstance.groupBy('trigger_id');
+        gaInstance.query();
+        let arr = [];
+        while (gaInstance.next()) {
+            arr.push(gaInstance.getValue('trigger_id'));
+        }
+        return arr;
+    },
+
+    caseCancelable: function(grCase, permissions) {
+        var notAssigned = gs.nil(grCase.assigned_to);
+        var canCancel = grCase.getValue('canCancel');
+        if (grCase.getValue('state') != '10' || grCase.getValue('active') == '0' || !notAssigned || canCancel == "1") {
+            return 11;
+        }
+        if (!permissions) {
+            var siCustomerPermission = new EQIX_Customer_Permissions();
+            var account = siCustomerPermission.getActiveAccountSysId();
+            permissions.isMasterAdmin = siCustomerPermission.hasPermission('master_admin');
+            permissions.editAll = siCustomerPermission.userHasPermission('edit_all', 'ticket', account, gs.getUser().getID());
+            permissions.manage = siCustomerPermission.hasPermission('manage', 'ticket', account);
+            permissions.editable = grCase.getValue('contact') === gs.getUserID() && permissions.manage;
+        }
+        var caseId = grCase.getValue('sys_id');
+        if (!permissions.isMasterAdmin && !permissions.editAll && !permissions.editable) {
+            return 11;
+        }
+        var hasOpenTask = this.hasOpenCaseTask(caseId);
+        if (hasOpenTask) return 11;
+        var hasInteraction = this.hasInteraction(caseId);
+        if (hasInteraction) return 11;
+        var reopenedBefore = this.caseReopenedBefore(caseId);
+        if (reopenedBefore) return 11;
+        return 0;
+    },
+	getGenericPremierPrice: function(accountId, ibx, qty, source) {
+		var siPricing = new EQIX_POE_Pricing();
+
+		var grAccount = new GlideRecord("customer_account");
+		var serviceCost = [];
+
+		if (!grAccount.get(accountId)) {
+			return serviceCost;
+		}
+		var countryGr = grAccount.getValue("country");
+		var accountNumber = grAccount.getValue("u_account_number");
+		var gtBefore = new GlideDateTime();
+        var productArray = [];
+		var idTotal = 1000;
+		var idUnit = 1100;
+
+        var productBody = {};
+        productBody.ibx = ibx.toString();
+        productBody.lnItemIntegrationId = idTotal;
+        productBody.qtyRequested = 1;
+        productBody.salesQuantity = qty;
+        productBody.productName = 'Managed Services Premier Support Hour';
+        productBody.productSubType = 'Managed Ser Prem Sup Hour Prod';
+        productBody.attributes = [{}];
+        productArray.push(productBody);
+		if (qty != 1) {
+			productBody = {};
+			productBody.ibx = ibx.toString();
+			productBody.lnItemIntegrationId = idUnit;
+			productBody.qtyRequested = 1;
+			productBody.salesQuantity = 1;
+			productBody.productName = 'Managed Services Premier Support Hour';
+			productBody.productSubType = 'Managed Ser Prem Sup Hour Prod';
+			productBody.attributes = [{}];
+			productArray.push(productBody);
+		}
+        var tibcoDihEnvironment = gs.getProperty('EQIX.tibco.dih.environment');
+        var tibcoDihIstance = gs.getProperty('EQIX.tibco.dih.instance');
+        var tibcoDihToken = gs.getProperty('EQIX.tibco.dih.token');
+
+        var ws = new sn_ws.RESTMessageV2('EQIX_POE_Pricing', 'POE_Pricing_MultipleProduct');
+        ws.setMIDServer(gs.getProperty("EQIX.global.midserver"));
+        ws.setStringParameterNoEscape('tibco.instance', tibcoDihIstance);
+        ws.setStringParameterNoEscape('environment', tibcoDihEnvironment);
+        var correlationUUID = gs.generateGUID();
+        ws.setStringParameterNoEscape('correlationID', correlationUUID);
+        ws.setStringParameterNoEscape('token', tibcoDihToken);
+        ws.setStringParameterNoEscape("accountNumber", accountNumber);
+        ws.setStringParameterNoEscape("time.stamp", gtBefore.getNumericValue());
+        ws.setStringParameterNoEscape("productArray", JSON.stringify(productArray));
+
+        var response = ws.execute();
+        var responseBody = response.getBody();
+		
+        var gtAfter = new GlideDateTime();
+        gtAfter.subtract(gtBefore.getNumericValue());
+        var responseTime = gtAfter.getNumericValue();
+        var msLog = new EQIX_ManagedServiceLog();
+        msLog.log("", "", ws.getEndpoint(), response.getStatusCode(), responseBody, ws.getRequestBody(), source, responseTime);
+
+		var resp = JSON.parse(responseBody);
+		
+		var priceList = resp.product.price;
+		var currency = resp.product.currency;
+		var netPrice = '';
+		var totalPrice = '';
+
+		priceList.forEach(function(p) {
+			if (p.PartNumber == 'MGD00017.ELEM' && p.ProductDescription == 'Managed Services Premier Support Hour') {
+				if (p.LnItemIntegrationId == idTotal && !gs.nil(p.PriceList)) {
+					totalPrice = p.PriceList[0].amount;
+				}
+				if (p.LnItemIntegrationId == idUnit && !gs.nil(p.PriceList)) {
+					netPrice = p.PriceList[0].amount;
+				}
+			}
+		});
+		// qty is 1
+		if (!netPrice) netPrice = totalPrice;
+		var currencySymbol = "";
+		var grSysLocale = new GlideRecord('sys_locale');
+		grSysLocale.addEncodedQuery("country=" + countryGr + "^currency_code=" + currency);
+		grSysLocale.query();
+
+		if (grSysLocale.next()) {
+			currencySymbol = grSysLocale.getValue('currency_symbol');
+		}
+
+		serviceCost = [currencySymbol, netPrice, totalPrice];
+		return serviceCost;
+	},
+    getPremierPrice: function(accountId, ibx) {
+		var serviceCost = [];
+        if (!ibx) {
+            var grGetIBXbyAtr = new GlideRecord("sn_customerservice_contract_item_attributes");
+            grGetIBXbyAtr.addEncodedQuery("u_attribute=IBX^u_contract_item.account=" + accountId);
+            grGetIBXbyAtr.setLimit(1);
+            grGetIBXbyAtr.query();
+            if (grGetIBXbyAtr.next()) {
+                ibx = grGetIBXbyAtr.getValue('u_value');
+            } else {
+                var grContractItem = new GlideRecord("sn_customerservice_contract_item");
+                grContractItem.addEncodedQuery('u_order_line_itemISNOTEMPTY^account=' + accountId);
+                grContractItem.setLimit(1);
+                grContractItem.query();
+
+                if (grContractItem.next()) {
+                    ibx = grContractItem.u_order_line_item.u_ibx.name;
+                }
+            }
+        }
+        if (gs.nil(ibx)) {
+			return serviceCost;
+        }
+
+		var grAccount = new GlideRecord("customer_account");
+
+		if (grAccount.get(accountId)) {
+			var countryGr = grAccount.getValue("country");
+			var accountNumber = grAccount.getValue("u_account_number");
+
+			var priceResponse = new EQIX_POE_Pricing().getPremierPrice(accountNumber, ibx);
+
+			var currency = priceResponse.product.currency;
+			var priceList = priceResponse.product.price;
+			var price = '';
+
+			priceList.forEach(function(p) {
+				if (p.PartNumber == 'MGD00017.ELEM' && p.ProductDescription == 'Managed Services Premier Support Hour')
+					if (!gs.nil(p.PriceList)) {
+						price = p.PriceList[0].amount;
+					}
+			});
+
+			if (gs.nil(price)) {
+				return serviceCost;
+			}
+
+			var currency_symbol = "";
+			var grSysLocale = new GlideRecord('sys_locale');
+			grSysLocale.addEncodedQuery("country=" + countryGr + "^currency_code=" + currency);
+			grSysLocale.query();
+
+			if (grSysLocale.next()) {
+				currency_symbol = grSysLocale.getValue('currency_symbol');
+			}
+
+			serviceCost = [currency_symbol, price];
+		}
+		
+		return serviceCost;
+    },
+	getPremierPriceFX: function(accountId, ibx, qty) {
+		var serviceCost = [];
+        if (gs.nil(ibx)) {
+			return serviceCost;
+        }
+
+		var grAccount = new GlideRecord("customer_account");
+
+		if (grAccount.get(accountId)) {
+			var countryGr = grAccount.getValue("country");
+			var accountNumber = grAccount.getValue("u_account_number");
+
+			var priceResponse = new EQIX_POE_Pricing().getPremierPriceFX(accountNumber, ibx, qty);
+
+			var currency = priceResponse.data.currency;
+			var priceList = priceResponse.data.items;
+			var totalNRC = '';
+			var unitPrice = '';
+
+			priceList.forEach(function(p) {
+				if (p.partNumber == 'MGD00017.ELEM') {
+					totalNRC = p.totalNRC;
+					unitPrice = p.netPrice;
+				}
+			});
+
+			if (gs.nil(totalNRC)) {
+				return serviceCost;
+			}
+
+			var currencySymbol = "";
+			var grSysLocale = new GlideRecord('sys_locale');
+			grSysLocale.addEncodedQuery("country=" + countryGr + "^currency_code=" + currency);
+			grSysLocale.query();
+
+			if (grSysLocale.next()) {
+				currencySymbol = grSysLocale.getValue('currency_symbol');
+			}
+
+			serviceCost = [currencySymbol, unitPrice, totalNRC];
+		}
+		
+		return serviceCost;
+    },
+
+	getStateDisplayValue: function(gr) {
+		var stateValue = gr.getValue('state');
+		var typeValue = gr.getValue('u_type');
+		if (typeValue != '0' && typeValue != '1') {
+			return gr.getDisplayValue('state');
+		}
+		if (stateValue == '18') {
+			// awaiting info
+			var reason = gr.getValue('u_on_hold_reason');
+			if (['2', '5', '21', '4'].includes(reason)) {
+				// Awaiting Change, Awaiting Vendor, Awaiting Internal, Awaiting Partner
+				return this.stateWIP;
+			}
+			if (reason == '1') {
+				// Awaiting Customer
+				return gs.getMessage('Awaiting Customer Information');
+			}
+		} else if (stateValue == '21') {
+			// Assigned
+			var gr2 = new GlideRecord('sys_history_line');
+			gr2.addEncodedQuery('field=state^new_value=21^set.id='+gr.getValue('sys_id'));
+			gr2.query();
+
+			var updateArr = [];
+			while (gr2.next()) {
+				var sysId = gr2.set.id + '';
+				var update = gr2.getValue('update');
+				if (!updateArr.includes(update)) {
+					updateArr.push(update);
+				}
+			}
+			if (updateArr.length > 1) {
+				return this.stateWIP;
+			}
+		}
+		
+		if (this.specialStatusWIP.includes(stateValue)) {
+			return this.stateWIP;
+		}
+		if (this.specialStatusClosed.includes(stateValue)) {
+			return this.stateClosed;
+		}
+		
+		return gr.getDisplayValue('state');
+	},
+
+    hasOpenCaseTask: function(caseId) {
+        var grCaseTask = new GlideRecord('sn_customerservice_case_task');
+        grCaseTask.addEncodedQuery("u_case=" + caseId);
+        grCaseTask.addQuery('state', 'NOT IN', '3,11'); // cancel and close
+        grCaseTask.setLimit(1);
+        grCaseTask.query();
+        var countList = grCaseTask.getRowCount();
+
+        return countList > 0;
+    },
+    hasInteraction: function(sysId) {
+        var gr = new GlideRecord("sys_history_line");
+        gr.addQuery("set.table", 'sn_customerservice_case');
+        gr.addQuery("set.id", sysId);
+        gr.addQuery("field", "comments");
+        gr.addQuery("user_name", "!=", "System");
+        gr.addQuery("user_name", "!=", "System Administrator");
+        gr.addQuery('user_name', '!=', gs.getUser().getFullName());
+        gr.addQuery('update', '>', 0);
+        gr.setLimit(1);
+        gr.query();
+
+        return gr.getRowCount() > 0;
+    },
+    caseReopenedBefore: function(sysId) {
+        var gr = new GlideRecord("sys_history_line");
+        gr.addEncodedQuery('set.table=sn_customerservice_case^field=state^old=Resolved^new=Open^set.id=' + sysId);
+        gr.setLimit(1);
+        gr.query();
+
+        return gr.getRowCount() > 0;
+    },
+
+    type: 'EQIX_Portal_CSM'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2024-10-10 03:16:38</sys_created_on>
+        <sys_id>4963651f1b0d5a503e1e4197b04bcb6c</sys_id>
+        <sys_mod_count>88</sys_mod_count>
+        <sys_name>EQIX_Portal_CSM</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_4963651f1b0d5a503e1e4197b04bcb6c</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:56:59</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137455fc0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_4963651f1b0d5a503e1e4197b04bcb6c</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:56:59</sys_created_on>
+        <sys_id>832528598775c7904d820e96cebb3500</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:56:59</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>4963651f1b0d5a503e1e4197b04bcb6c</id>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2024-10-10 03:16:38</sys_created_on>
+        <sys_id>ec83a19f1b095a503e1e4197b04bcbde</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2024-10-10 03:16:38</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

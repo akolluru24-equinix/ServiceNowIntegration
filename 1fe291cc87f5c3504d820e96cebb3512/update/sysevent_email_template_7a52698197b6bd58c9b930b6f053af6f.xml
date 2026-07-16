@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sysevent_email_template">
+    <sysevent_email_template action="INSERT_OR_UPDATE">
+        <collection>sn_publications_publication</collection>
+        <email_layout display_value="Targeted Communication - Maintenance">d64f17871be679947d638554604bcba4</email_layout>
+        <message/>
+        <message_html><![CDATA[<p><span style="font-family: arial, helvetica, sans-serif;">${mail_script:EQIX_TC_Change_Translation} ${mail_script:EQIX_TC_Window_Closed}&nbsp;<br></span></p>
+<hr align="center" size="2" width="100%">
+<p><span style="font-family: arial, helvetica, sans-serif;">The following maintenance window is now closed.<br></span><span style="font-family: arial, helvetica, sans-serif;">${mail_script:EQIX_Convert_Date_UTC}<br><strong>IBX Location: </strong>${u_locations}<br><strong>Ticket #: </strong>${u_related_ticket.number} ${mail_script:publication_content} ${mail_script:add_users_to_bcc_list}</span></p>]]></message_html>
+        <message_list/>
+        <message_text/>
+        <name>Window Closed Maintenance</name>
+        <sms_alternate/>
+        <subject>Window Closed Maintenance</subject>
+        <sys_class_name>sysevent_email_template</sys_class_name>
+        <sys_created_by>fadedoni@equinix.com</sys_created_by>
+        <sys_created_on>2023-11-27 10:52:50</sys_created_on>
+        <sys_id>7a52698197b6bd58c9b930b6f053af6f</sys_id>
+        <sys_mod_count>15</sys_mod_count>
+        <sys_name>Window Closed Maintenance</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sysevent_email_template_7a52698197b6bd58c9b930b6f053af6f</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:37</sys_updated_on>
+        <sys_version>2</sys_version>
+    </sysevent_email_template>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1374ed2b0000001</claim_timestamp>
+        <metadata_update_name>sysevent_email_template_7a52698197b6bd58c9b930b6f053af6f</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:37</sys_created_on>
+        <sys_id>a05528998775c7904d820e96cebb357d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:37</sys_updated_on>
+    </sys_claim>
+</record_update>

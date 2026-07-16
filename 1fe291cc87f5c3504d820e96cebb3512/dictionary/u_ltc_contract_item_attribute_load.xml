@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="enforce_dot_walk_cross_scope_access=true" db_object_id="f6e794ce87c987144ca7311e0ebb3590" extends="sys_import_set_row" label="LTC Contract Item Attribute Load" max_length="40" name="u_ltc_contract_item_attribute_load" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=account_name__c" label="account_name__c" max_length="40" name="u_account_name__c" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=account_number__c" label="account_number__c" max_length="40" name="u_account_number__c" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=attributename" label="attributename" max_length="40" name="u_attributename" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=attributevalue" label="attributevalue" max_length="186" name="u_attributevalue" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=external_id__c" label="external_id__c" max_length="40" name="u_external_id__c" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=product_name__c" label="product_name__c" max_length="40" name="u_product_name__c" type="string"/>
+    </element>
+</database>

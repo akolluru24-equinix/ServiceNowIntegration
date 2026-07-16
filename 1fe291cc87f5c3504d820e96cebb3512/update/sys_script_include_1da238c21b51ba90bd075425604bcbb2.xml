@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>global.EQIX_PatchManagement_Utils_Global</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_PatchManagement_Utils_Global</name>
+        <sandbox_callable>true</sandbox_callable>
+        <script><![CDATA[var EQIX_PatchManagement_Utils_Global = Class.create();
+EQIX_PatchManagement_Utils_Global.prototype = {
+    initialize: function() {},
+
+    getUserTimeZone: function(dateTimeString, timeZone) {
+        // Create a GlideDateTime .
+        var gdt = new GlideDateTime();
+
+        // Set the time zone for the GlideDateTime object
+        gdt.setTimeZone(timeZone);
+
+        // Set the display value of the GlideDateTime object using the date/time string
+        // This will interpret the string as being in the specified time zone.
+        gdt.setDisplayValue(dateTimeString, "yyyy-MM-dd HH:mm:ss");
+
+        // Get the UTC value
+        var utcDateTime = gdt.getValue();
+
+        //Get User Time Zone Value
+        var userDateTime = new GlideDateTime(utcDateTime); // UTC
+        var localDateTime = userDateTime.getDisplayValue();
+
+        return localDateTime;
+    },
+    covertTZ: function(dateStr, toTZ) {
+        var sz = gs.getProperty('glide.sys.default.tz');
+        var tzConvert = new GlideScheduleDateTime(dateStr);
+        tzConvert.convertTimeZone(sz, toTZ);
+        return tzConvert;
+    },
+
+    getNxtPatchDate: function(month, weekday, n) {
+
+        var gdt = new GlideDateTime();
+        var currentMonth = gdt.getMonth();
+        if (month < currentMonth) {
+            gdt.addYears(1);
+        }
+
+        var year = gdt.getYear();
+        gdt = new GlideDateTime(year + '-' + month + '-01 00:00:00');
+
+        // Find the first occurrence of the weekday
+
+        while (gdt.getDayOfWeekUTC() != weekday) {
+            gdt.addDays(1);
+        }
+
+        // Move to the nth occurrence
+        gdt.addDaysUTC((n - 1) * 7);
+
+        return gdt;
+    },
+
+    getLogInUserTimeZone: function() {
+
+        var tz = gs.getUser().getTZ();
+        return tz;
+
+    },
+
+    getTZPatchDate: function(localnxtPatchDate, timeZone, pTimeZone) {
+
+        gdt = new GlideDateTime();
+        gdt.setDisplayValue(localnxtPatchDate);
+
+        gdt.setTimeZone(timeZone);
+
+        var gdtSP = new GlideDateTime(gdt);
+        gdtSP.setTimeZone(pTimeZone);
+
+        return (gdtSP.getDisplayValue());
+    },
+
+    iddetails: function() {
+		
+        var finalList = [];
+        var patchRoutines = [];
+        var routinesToExclude = [];
+
+        var ga = new GlideAggregate('x_equi2_patch_mana_m2m_cmdb_ci_patch_routine');
+        ga.addEncodedQuery('active_subscription=false^ORcmdb_ci.u_active_flag=false^ORcmdb_ci.install_status!=1');
+        ga.groupBy('x_equi2_patch_mana_patch_routine');
+        ga.query();
+
+        while (ga.next()) {
+            patchRoutines.push(ga.getValue('x_equi2_patch_mana_patch_routine'));
+        }
+
+        // gs.info("patch Routine" + patchRoutines);
+
+        // 2) Find routines that also have at least one positive ci
+        var gam2m = new GlideAggregate('x_equi2_patch_mana_m2m_cmdb_ci_patch_routine');
+        gam2m.addQuery('x_equi2_patch_mana_patch_routine', 'IN', patchRoutines.join(','));
+        gam2m.addEncodedQuery('active_subscription=true^cmdb_ci.u_active_flag=true^cmdb_ci.install_status=1');
+        gam2m.groupBy('x_equi2_patch_mana_patch_routine');
+        gam2m.query();
+
+        while (gam2m.next()) {
+            routinesToExclude.push(gam2m.getValue('x_equi2_patch_mana_patch_routine'));
+        }
+
+
+        // 3) contact postive and negative routines
+        var excludeSet = {};
+        routinesToExclude.forEach(function(r) {
+            excludeSet[r] = true;
+        });
+
+        var finalRoutines = patchRoutines.filter(function(r) {
+            return !excludeSet[r];
+        });
+
+        // //Get Patch Routines that HAVE M2M records
+
+        var routinesWithM2M = {};
+
+        var m2mGR = new GlideRecord('x_equi2_patch_mana_m2m_cmdb_ci_patch_routine');
+        m2mGR.query();
+        while (m2mGR.next()) {
+            routinesWithM2M[m2mGR.x_equi2_patch_mana_patch_routine.toString()] = true;
+        }
+
+        //Get Patch Routines WITHOUT any M2M records
+
+        var routinesWithoutM2M = [];
+
+        var prGR = new GlideRecord('x_equi2_patch_mana_patch_routine');
+        prGR.query();
+        while (prGR.next()) {
+            var prId = prGR.getUniqueValue();
+            if (!routinesWithM2M[prId]) {
+                routinesWithoutM2M.push(prId);
+            }
+        }
+
+        //Merge both result sets (NO duplicates)
+
+        var finalMap = {};
+        finalRoutines.concat(routinesWithoutM2M).forEach(function(r) {
+            finalMap[r] = true;
+        });
+
+        finalList = Object.keys(finalMap);
+        return finalList;
+    },
+
+    type: 'EQIX_PatchManagement_Utils_Global'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>aling@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-20 05:13:50</sys_created_on>
+        <sys_id>1da238c21b51ba90bd075425604bcbb2</sys_id>
+        <sys_mod_count>46</sys_mod_count>
+        <sys_name>EQIX_PatchManagement_Utils_Global</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_1da238c21b51ba90bd075425604bcbb2</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:53</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1379bdfc0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_1da238c21b51ba90bd075425604bcbb2</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:02:53</sys_created_on>
+        <sys_id>6186205587b5c7904d820e96cebb35c5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:02:53</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>1da238c21b51ba90bd075425604bcbb2</id>
+        <sys_created_by>aling@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-20 05:13:50</sys_created_on>
+        <sys_id>37c3b0061b51ba90bd075425604bcbec</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>aling@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-11-20 05:13:50</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

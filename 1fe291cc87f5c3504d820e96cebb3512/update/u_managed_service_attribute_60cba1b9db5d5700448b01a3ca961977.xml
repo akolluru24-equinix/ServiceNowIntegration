@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="u_managed_service_attribute">
+    <u_managed_service_attribute action="INSERT_OR_UPDATE">
+        <sys_class_name>u_managed_service_attribute</sys_class_name>
+        <sys_created_by>alviana</sys_created_by>
+        <sys_created_on>2018-04-06 20:03:39</sys_created_on>
+        <sys_id>60cba1b9db5d5700448b01a3ca961977</sys_id>
+        <sys_mod_count>23</sys_mod_count>
+        <sys_name>d6bb1c65db915700448b01a3ca9619c2</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>u_managed_service_attribute_60cba1b9db5d5700448b01a3ca961977</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:29</sys_updated_on>
+        <u_attribute display_value="Volume (in GB)" element="u_san_volume" name="cmdb_ci_san">d6bb1c65db915700448b01a3ca9619c2</u_attribute>
+        <u_cascaded_attributes/>
+        <u_cascaded_string_json/>
+        <u_consumption_field>false</u_consumption_field>
+        <u_create_if_not_found>false</u_create_if_not_found>
+        <u_create_order_task>true</u_create_order_task>
+        <u_customer_macd_allowed>false</u_customer_macd_allowed>
+        <u_display_filter>true</u_display_filter>
+        <u_display_on_filter_macd>true</u_display_on_filter_macd>
+        <u_is_reference_attribute>false</u_is_reference_attribute>
+        <u_key>SAN Volume (in GB)</u_key>
+        <u_macd_operating_unit>9d38b7111b121100763d91eebc0713f4,1d38b7111b121100763d91eebc0713f5,4138b7111b121100763d91eebc0713f0,c138b7111b121100763d91eebc0713f0,c138b7111b121100763d91eebc0713f2,4938b7111b121100763d91eebc0713f1,4938b7111b121100763d91eebc0713f0</u_macd_operating_unit>
+        <u_macd_sequence/>
+        <u_managed_service display_value="Managed Storage Type">3ae8a939db5d5700448b01a3ca961973</u_managed_service>
+        <u_order_sub_type>Replacement/Renewal</u_order_sub_type>
+        <u_owner>siebel</u_owner>
+        <u_portal_display_value/>
+        <u_pricing_attribute>SANVolumeInGB</u_pricing_attribute>
+        <u_reference_identification_field/>
+        <u_reference_qual/>
+        <u_select_a_type>number</u_select_a_type>
+    </u_managed_service_attribute>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375b7890000001</claim_timestamp>
+        <metadata_update_name>u_managed_service_attribute_60cba1b9db5d5700448b01a3ca961977</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:29</sys_created_on>
+        <sys_id>0d85201d8775c7904d820e96cebb3514</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:29</sys_updated_on>
+    </sys_claim>
+</record_update>

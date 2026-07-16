@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element db_object_id="aea900df1b3df6502dedc883604bcb03" extends="sys_import_set_row" label="Update Billing with CAN Account - MDM3" max_length="40" name="u_update_billing_with_can_acc_w_mdm3_num" type="collection">
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=can_num" label="can_num" max_length="40" name="u_can_num" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=cur_last_modified_date" label="cur_last_modified_date" max_length="40" name="u_cur_last_modified_date" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=derived_key" label="derived_key" max_length="43" name="u_derived_key" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=legacy_billing_account_type" label="legacy_billing_account_type" max_length="40" name="u_legacy_billing_account_type" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=legacy_billing_account_number" label="legacy_billing_account_number" max_length="40" name="u_legacy_billi_account_number" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=legacy_sales_account_number" label="legacy_sales_account_number" max_length="40" name="u_legacy_sales_account_number" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=legacy_sales_account_type" label="legacy_sales_account_type" max_length="40" name="u_legacy_sales_account_type" type="string"/>
+        <element attributes="edge_encryption_enabled=true,import_attribute_name=search_vector" label="search_vector" max_length="157" name="u_search_vector" type="string"/>
+    </element>
+</database>

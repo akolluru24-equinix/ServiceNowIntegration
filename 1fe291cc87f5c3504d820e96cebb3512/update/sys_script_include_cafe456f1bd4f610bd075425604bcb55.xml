@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>global.EQIX_Global_Products</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Global Products common methods</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_Global_Products</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_Global_Products = Class.create();
+EQIX_Global_Products.prototype = {
+    initialize: function() {},
+	hasAnyContract: function(orgId) {
+        if (!orgId) {
+			orgId = this._getCurrentOrgId();
+        }
+		var MPCPartNum = gs.getProperty('EQIX_PartNumber_MPC');
+		var MPBPartNum = gs.getProperty('EQIX_MPB_POF_PART_NUM');
+		var MPSPartNum = gs.getProperty('EQIX_PartNumber_MPS');
+		var MPFPartNum = gs.getProperty('EQIX_MPF_POF_PART_NUM');
+		var parts = [MPCPartNum, MPBPartNum, MPSPartNum, MPFPartNum];
+
+		var gr = new GlideRecord('sn_customerservice_contract_item');
+        gr.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_numberIN" + parts.join(',') + "^account.u_org_id=" + orgId);
+        gr.setLimit(1);
+        gr.query();
+        if (gr.next()) {
+            return true;
+        }
+        return false;
+	},
+	hasAnyPermission: function(account) {
+		var siCustomerPermission = new EQIX_Customer_Permissions();
+		if (!account) {
+			account = siCustomerPermission.getActiveAccountSysId();
+		}
+		var moduleMpc = 'EQIX_ManagedPrivateCloud';
+		var moduleMpb = 'EQIX_ManagedPrivateBackup';
+		var moduleMps = 'EQIX_ManagedPrivateStorage';
+		var mpcViewable = siCustomerPermission.hasPermission('view', moduleMpc, account);
+		var mpbViewable = siCustomerPermission.hasPermission('view', moduleMpb, account);
+		var mpsViewable = siCustomerPermission.hasPermission('view', moduleMps, account);
+		return mpcViewable || mpbViewable || mpsViewable;
+	},
+    hasContract: function(partNum, orgId) {
+        if (!orgId) {
+			orgId = this._getCurrentOrgId();
+        }
+        var gr = new GlideRecord('sn_customerservice_contract_item');
+        gr.addEncodedQuery("u_siebel_asset_status=Active^u_product.u_part_number=" + partNum + "^account.u_org_id=" + orgId);
+        gr.setLimit(1);
+        gr.query();
+        if (gr.next()) {
+            return true;
+        }
+        return false;
+    },
+	_getCurrentOrgId: function() {
+		var siCustomerPermission = new EQIX_Customer_Permissions();
+		var account = siCustomerPermission.getActiveAccountSysId();
+		var grAccount = new GlideRecord('customer_account');
+		if (!grAccount.get(account)) {
+			return false;
+		}
+		return grAccount.getValue('u_org_id');
+	},
+
+    type: 'EQIX_Global_Products'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-06 06:01:11</sys_created_on>
+        <sys_id>cafe456f1bd4f610bd075425604bcb55</sys_id>
+        <sys_mod_count>9</sys_mod_count>
+        <sys_name>EQIX_Global_Products</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_cafe456f1bd4f610bd075425604bcb55</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:08</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137bcbbd0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_cafe456f1bd4f610bd075425604bcb55</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:08</sys_created_on>
+        <sys_id>9a07a45987b5c7904d820e96cebb35a5</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:08</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>cafe456f1bd4f610bd075425604bcb55</id>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-06 06:01:10</sys_created_on>
+        <sys_id>6e1fc56b1bd4f610bd075425604bcbde</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-06 06:01:10</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

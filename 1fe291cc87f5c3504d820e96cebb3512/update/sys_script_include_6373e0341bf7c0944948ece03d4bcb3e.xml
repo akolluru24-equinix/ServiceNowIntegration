@@ -1,0 +1,251 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>global.EQIX_ShiftSchedule_Utils</api_name>
+        <caller_access/>
+        <client_callable>true</client_callable>
+        <description>Script responsible to keep so utils functions related to Shift Schedule</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_ShiftSchedule_Utils</name>
+        <sandbox_callable>true</sandbox_callable>
+        <script><![CDATA[var EQIX_ShiftSchedule_Utils = Class.create();
+EQIX_ShiftSchedule_Utils.prototype = Object.extendsObject(AbstractAjaxProcessor, {
+
+    /*
+     * Function getAssignedTo will return user from Shift Schedule:
+     * - Match the assigned group with the Shift Schedule group
+     * - Consider the hour to select valid shifts
+     * - Consider only the available analyst (check the User Availability field) inside the selected shifts
+     * - If there is no available Shift Schedules configured the ticket will not be routed
+     * - If there is no match for analyst skill and case (compare Hardware Type, Service Type, and 	* Application Name), then SNOW will consider the analyst with the lowest number of cases in his/her queue.
+     * - Consider to count the analyst queue only cases in the state Open, Working in Progress, Need Net Ops Support, and Need IBX Ops Support
+     * @param {group, serviceType, hardwareType, applicationName, aUsers} 
+     * @return {lowestAssignedTo} Return user
+     */
+
+    getAssignedTo: function(group, serviceType, hardwareType, applicationName, assginedTo, aUsers) {
+
+        //Set control variables
+        var previousAssignedTo = '';
+        var lowestAssignedTo = '';
+        var lowestCaseCount = 0;
+        var currentCaseCount = 0;
+        var skillControl = false;
+
+        //Set arrShifts whith Shift Schedules whith same group and with valid Schedule
+        var arrShifts = "";
+        var grShiftArray = new GlideRecord('u_shift_schedule');
+        grShiftArray.addQuery('u_group', group);
+        grShiftArray.query();
+        while (grShiftArray.next()) {
+            var gsShiftSchedule = new GlideSchedule(grShiftArray.u_schedule);
+
+            if (gsShiftSchedule.isInSchedule(new GlideDateTime())) {
+                arrShifts = grShiftArray.sys_id + ", " + arrShifts;
+            }
+        }
+
+        //Get Shift Schedules in the arrShifts
+        var grShift = new GlideRecord('u_shift_schedule');
+        grShift.addEncodedQuery("sys_idIN" + arrShifts + "^u_active=true");
+        grShift.query();
+        while (grShift.next()) {
+
+            //Get the users with u_available_for_tickets equals true
+            var m2mUserShift = new GlideRecord('u_m2m_users_shift_schedules');
+            m2mUserShift.addQuery('u_shift_schedule', grShift.sys_id);
+            if (aUsers != null && aUsers != '') {
+                m2mUserShift.addQuery('u_user', 'NOT IN', aUsers);
+            }
+            m2mUserShift.addQuery('u_user.u_available_for_tickets', true);
+            m2mUserShift.query();
+            while (m2mUserShift.next()) {
+
+                // //Get the users whith Skills (serviceType, hardwareType, applicationName) 
+                // var m2mSkillUser = new GlideRecord('u_m2m_shift_schedu_users');
+                // m2mSkillUser.addQuery('u_user', m2mUserShift.u_user);		
+                // m2mSkillUser.addQuery('u_shift_schedule_skill.u_service_type', serviceType);
+                // m2mSkillUser.addQuery('u_shift_schedule_skill.u_hardware_type', hardwareType);
+                // m2mSkillUser.addQuery('u_shift_schedule_skill.u_application_name', applicationName);
+                // m2mSkillUser.query();
+                // var grCase;		
+
+                // //Checks if Skill users were found
+                // if (m2mSkillUser.getRowCount() > 0) {	
+                // 	while (m2mSkillUser.next()){
+
+                // 		//Get count of Cases (Open or Working in Progress) for this user
+                // 		grCase = new GlideRecord('sn_customerservice_case');
+                // 		grCase.initialize();
+                // 		grCase.addEncodedQuery('state=10^ORstate=8^ORstate=30^ORstate=29^ORstate=21^assigned_to=' + m2mUserShift.u_user);
+                // 		grCase.query();
+                // 		currentCaseCount = parseInt(grCase.getRowCount());
+
+                // 		//Set lowestCaseCount to 0 in first iteration
+                // 		if (!skillControl) lowestCaseCount = 0;
+
+                // 		//If this user has the fewest number of associated tickets
+                // 		//Set lowestAssignedTo and skillControl to true and control variables
+                // 		if (lowestCaseCount == 0 || currentCaseCount < lowestCaseCount){
+                // 			lowestAssignedTo = m2mSkillUser.getValue('u_user');
+                // 			lowestCaseCount = currentCaseCount + 1;
+                // 			skillControl = true;
+                // 		}						
+                // 	}
+                // } else {		
+                // 	//Checks if no Skill users were found
+                // 	//Do not execute this block if any Skill users are found
+                // 	if (!skillControl){
+
+                if (m2mUserShift.u_user == assginedTo) {
+                    previousAssignedTo = assginedTo;
+                }
+
+                var grCase = new GlideRecord('sn_customerservice_case');
+                grCase.initialize();
+                grCase.addEncodedQuery("u_on_hold_reason=21^ORu_on_hold_reason=4^ORu_on_hold_reason=5^ORu_on_hold_reason=^stateIN21,8,29,30,20^assigned_to.u_available_for_tickets=true^u_typeIN0,1^u_type!=^assigned_to=" + m2mUserShift.u_user);
+                grCase.query();
+                currentCaseCount = parseInt(grCase.getRowCount());
+                //If this user has the fewest number of associated tickets
+                //Set lowestAssignedTo and control variables
+                if (lowestCaseCount == 0 || currentCaseCount < lowestCaseCount) {
+                    lowestAssignedTo = m2mUserShift.getValue('u_user');
+                    lowestCaseCount = currentCaseCount + 1;
+                }
+                //}
+                //}
+            }
+        }
+        if (lowestAssignedTo == '') {
+            var grCaseAvailable = new GlideRecord('sn_customerservice_case');
+            grCaseAvailable.addEncodedQuery('assigned_to.u_available_for_tickets=true^assigned_toISNOTEMPTY^assigned_to=' + assginedTo);
+            grCaseAvailable.query();
+            if (grCaseAvailable.next()) {
+                return grCaseAvailable.assigned_to;
+            } else {
+                return lowestAssignedTo;
+            }
+        } else if (previousAssignedTo == '') {
+            return lowestAssignedTo;
+        } else {
+            return previousAssignedTo;
+        }
+    },
+
+    /*
+     * Function redistributeTickets will set Assigned To of Cases in the queue of selected users
+     * @param {sysparm_aUsers} 
+     * @return {void} 
+     */
+    redistributeTickets: function() {
+
+        //Get sysparm_aUsers
+        var stringM2m = this.getParameter('sysparm_aUsers');
+
+        var aUsers = '';
+
+        //Get users sys_id from stringM2m
+        var grM2m = new GlideRecord('u_m2m_users_shift_schedules');
+        grM2m.addEncodedQuery('sys_idIN' + stringM2m);
+        grM2m.query();
+        while (grM2m.next()) {
+            aUsers = aUsers + ", " + grM2m.u_user;
+        }
+
+        //Update assigned_to from Cases (Open and Working in Progress) in the queue of aUsers
+        var grCase = new GlideRecord('sn_customerservice_case');
+        grCase.addEncodedQuery('state=10^ORstate=8^ORstate=30^ORstate=29^ORstate=21^assigned_to.sys_idIN' + aUsers);
+        grCase.query();
+        while (grCase.next()) {
+            grCase.assigned_to = this.getAssignedTo(grCase.assignment_group, grCase.u_service_type, grCase.u_hardware_type, grCase.u_application_name, aUsers);
+            grCase.update();
+        }
+    },
+
+    checkL2isInSchedule: function(group) {
+        var inShifts = false;
+
+        var grShiftArray = new GlideRecord('u_shift_schedule');
+        grShiftArray.addQuery('u_group', group);
+        grShiftArray.addQuery('u_active', true);
+        grShiftArray.query();
+        while (grShiftArray.next()) {
+            var gsShiftSchedule = new GlideSchedule(grShiftArray.u_schedule);
+
+            if (gsShiftSchedule.isInSchedule(new GlideDateTime())) {
+                inShifts = true;
+            }
+        }
+        return inShifts;
+    },
+
+    checkL2AssigneeAvailability: function(assignee) {
+        var assigneeAvailable = false;
+
+        var grAssignee = new GlideRecord('sys_user');
+        grAssignee.addQuery('sys_id', assignee);
+        grAssignee.addQuery('u_available_for_tickets', true);
+        grAssignee.query();
+        if (grAssignee.next()) {
+            assigneeAvailable = true;
+        }
+        return assigneeAvailable;
+    },
+
+    checkAssigneeAvailability: function(group) {
+        var assigneeAvailableInShift = false;
+        var inShifts = false;
+
+        var grShiftArray = new GlideRecord('u_shift_schedule');
+        grShiftArray.addQuery('u_group', group);
+        grShiftArray.addQuery('u_active', true);
+        grShiftArray.query();
+        while (grShiftArray.next()) {
+            var gsShiftSchedule = new GlideSchedule(grShiftArray.u_schedule);
+
+            //check if anyone available in this shift with available analyst
+            if (gsShiftSchedule.isInSchedule(new GlideDateTime())) {
+                var shiftID = grShiftArray.sys_id;
+                var grm2mShift = new GlideRecord('u_m2m_users_shift_schedules');
+                grm2mShift.addQuery('u_shift_schedule', shiftID);
+                grm2mShift.addQuery('u_user.u_available_for_tickets', true);
+                grm2mShift.query();
+                if (grm2mShift.next()) {
+                    assigneeAvailableInShift = true;
+                }
+            }
+        }
+        return assigneeAvailableInShift;
+    },
+
+    type: 'EQIX_ShiftSchedule_Utils'
+});]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>rodoandrade@equinix.com</sys_created_by>
+        <sys_created_on>2020-03-24 07:25:14</sys_created_on>
+        <sys_id>6373e0341bf7c0944948ece03d4bcb3e</sys_id>
+        <sys_mod_count>158</sys_mod_count>
+        <sys_name>EQIX_ShiftSchedule_Utils</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_6373e0341bf7c0944948ece03d4bcb3e</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:36</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a647d0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_6373e0341bf7c0944948ece03d4bcb3e</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:36</sys_created_on>
+        <sys_id>4cb6609587b5c7904d820e96cebb3581</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:36</sys_updated_on>
+    </sys_claim>
+</record_update>

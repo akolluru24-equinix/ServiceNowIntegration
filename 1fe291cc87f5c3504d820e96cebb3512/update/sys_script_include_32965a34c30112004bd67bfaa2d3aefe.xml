@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>public</access>
+        <active>true</active>
+        <api_name>global.PublicationUtils</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description/>
+        <mobile_callable>false</mobile_callable>
+        <name>PublicationUtils</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var PublicationUtils = Class.create();
+PublicationUtils.prototype = {
+	initialize: function() {
+	},
+
+	createEmailNotification: function(name,collection,generation_type,action_update,condition,template){
+		//Make sure we have at least one user in CC
+		var smtp_address = "";
+		var category = "4a789ea27f3032005f58108c3ffa91af";
+		var gr = new GlideRecord('sys_email_account');
+		gr.addActiveQuery();
+		gr.addQuery('type','smtp');
+		gr.query(); 
+		if (gr.next())
+			smtp_address = gr.getValue('from') ? gr.getValue('from') : gr.getValue('user_name');
+
+		var gr_notif = new GlideRecord('sysevent_email_action');
+		gr_notif.initialize();
+		gr_notif.setValue('name',name);
+		gr_notif.setValue('collection',collection);
+		gr_notif.setValue('generation_type',generation_type);		
+		gr_notif.setValue('action_update',action_update);
+		gr_notif.setValue('condition',condition);
+		gr_notif.setValue('recipient_users',smtp_address);
+		gr_notif.setValue('template',template);
+		gr_notif.setValue('category',category);
+		gr_notif.setValue('include_attachments', true);
+		var notificationId = gr_notif.insert();
+		return notificationId;
+	},
+
+	deleteEmailNotification: function(notificationId){
+		var gr = new GlideRecord('sysevent_email_action');
+		if(gr.get(notificationId)){
+			gr.deleteRecord();
+		}
+	},
+
+	updateEmailNotification: function(notificationId,template){
+		var gr_notif = new GlideRecord('sysevent_email_action');
+		if(gr_notif.get(notificationId)){
+			if(template){
+				gr_notif.setValue('template',template);
+				gr_notif.update();
+			}
+		}
+	},
+
+	checkPublicationPassPublishDate: function(publicationId){
+		var gr = new GlideRecord('sn_publications_publication');
+		if(gr.get(publicationId)){
+			var start = (new GlideDateTime(gr.getValue('publish_date'))).getNumericValue();
+			var now = new GlideDateTime().getNumericValue();
+
+			if (now >= start){
+				return true;
+			}else
+				return false;
+
+		}else
+			return false;
+	},
+
+	getChoiceList: function(table,element){
+		return GlideScriptChoiceList.getChoiceList(table,element);
+	},
+
+	generateURL: function(table,sysId){
+		return gs.generateURL(table,sysId);	
+	},
+
+	scopedGlideRunScriptJob: function(script){
+		return GlideRunScriptJob.scheduleScript(script);
+	},
+	type: 'PublicationUtils'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2016-01-17 01:37:07</sys_created_on>
+        <sys_id>32965a34c30112004bd67bfaa2d3aefe</sys_id>
+        <sys_mod_count>38</sys_mod_count>
+        <sys_name>PublicationUtils</sys_name>
+        <sys_package display_value="Customer Service Base Entities" source="com.snc.cs_base">e6d8e4f34f5e8300f5e08e1f0210c73f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_32965a34c30112004bd67bfaa2d3aefe</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:21</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c020e0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_32965a34c30112004bd67bfaa2d3aefe</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:21</sys_created_on>
+        <sys_id>7517ac5987b5c7904d820e96cebb3579</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:21</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c020d0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_32965a34c30112004bd67bfaa2d3aefe</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.cs_base</previous_claim_name>
+        <previous_claim_scope>com.snc.cs_base</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:21</sys_created_on>
+        <sys_id>b917ac5987b5c7904d820e96cebb3579</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:21</sys_updated_on>
+    </sys_claim>
+</record_update>

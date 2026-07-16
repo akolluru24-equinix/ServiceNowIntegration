@@ -1,0 +1,306 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>global.EQIX_MonitoringEventUtil</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Author: Balaji Charapalli&#13;
+Trigger Points:&#13;
+Called from MS Queue&#13;
+Create Event Storm UI Action.</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_MonitoringEventUtil</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_MonitoringEventUtil = Class.create();
+EQIX_MonitoringEventUtil.prototype = {
+    initialize: function() {},
+    processEvent: function(decodedData) {
+        this._insertEvent(decodedData);
+    },
+    _insertEvent: function(decodedData) {
+
+        var eventMgmt = new GlideRecord("u_imp_monitoring_event");
+        eventMgmt.initialize();
+        eventMgmt.u_trigger_value = decodedData.trigger_value;
+        eventMgmt.u_trigger_severity = decodedData.trigger_severity;
+        eventMgmt.u_trigger_name = decodedData.trigger_name;
+        eventMgmt.u_trigger_id = decodedData.trigger_id;
+        eventMgmt.u_key_orig = decodedData.key_orig;
+        eventMgmt.u_host_name = decodedData.host_name;
+        eventMgmt.u_host_id = decodedData.host_id;
+        eventMgmt.u_event_type = "1"; // Enhancement ANDRAPPS-1033
+        eventMgmt.u_event_id = decodedData.event_id;
+        eventMgmt.u_event_date = decodedData.u_event_date;
+        eventMgmt.u_short_description = decodedData.short_description;
+        eventMgmt.u_message = decodedData.message;
+        eventMgmt.u_source = decodedData.u_monitoring_system;
+        eventMgmt.u_server = decodedData.u_monitoring_server;
+        eventMgmt.u_monitoring_ip = decodedData.u_monitoring_ip;
+
+        eventMgmt.u_autoclose = decodedData.autoclose;
+        eventMgmt.u_event_escalated_contact = decodedData.event_escalated_contact;
+        eventMgmt.u_event_notified = decodedData.event_notified;
+        eventMgmt.u_operation_procedure = decodedData.operation_procedure;
+        eventMgmt.u_monitoring_class = decodedData.monitoring_class;
+        eventMgmt.u_monitoring_object = decodedData.monitoring_object;
+        eventMgmt.u_parameter_value = decodedData.parameter_value;
+
+        eventMgmt.u_assignment_group = decodedData.assignment_group;
+        eventMgmt.u_aditional_comments = decodedData.aditional_comments;
+        eventMgmt.u_assigned_to = decodedData.assigned_to;
+        eventMgmt.u_ops_duration = decodedData.ops_duration;
+        eventMgmt.u_customer_contact = decodedData.customer_contact;
+        eventMgmt.u_watchlist_contact = decodedData.watchlist_contact;
+        eventMgmt.u_state = decodedData.state;
+        eventMgmt.u_create_case = decodedData.create_case;
+
+        eventMgmt.insert();
+
+    },
+
+    closeEvent: function(eventId) {
+        var MS_queue = new EQIX_Message_Queue().create({
+            region: eventId.u_region,
+            action: "closeEvent",
+            service: "eventManagement",
+            priorization: "medium",
+            target: eventId.u_source,
+            data: {
+                event_id: eventId.u_event_id.toString()
+            }
+        });
+    },
+
+    sendEventNumber: function(event) {
+        var MS_queue = new EQIX_Message_Queue().create({
+            region: event.u_region,
+            action: "updateEventNumber",
+            service: "eventManagement",
+            priorization: "medium",
+            target: event.u_source,
+            data: {
+                event_id: event.u_event_id.getDisplayValue(),
+                snow_event: event.u_number.getDisplayValue()
+            }
+        });
+
+    },
+
+    sendEventResponseV3: function(event, eventAction) {
+        var instanceName = gs.getProperty('instance_name');
+        var boomiInstance = (instanceName == 'equinixcsm') ? gs.getProperty('EQIX.boomi.instance') : gs.getProperty('EQIX.boomi.dev.instance');
+        try {
+            var r = new sn_ws.RESTMessageV2('EQIX Event Management', 'POST');
+            r.setMIDServer(gs.getProperty("EQIX.global.midserver"));
+            r.setStringParameterNoEscape('boomi.instance', boomiInstance);
+            r.setStringParameterNoEscape('event_id', event.u_event_id.getDisplayValue());
+            r.setStringParameterNoEscape('snow_event', event.u_number.getDisplayValue());
+            r.setStringParameterNoEscape('message', eventAction);
+            var response = r.execute();
+
+        } catch (ex) {
+            var message = ex.message;
+        } finally {
+            var wsLog = new EQIX_ManagedServiceLog();
+            wsLog.log(
+                "u_event_management",
+                event.getUniqueValue(),
+                r.getEndpoint(),
+                response.getStatusCode(),
+                response.getBody(),
+                r.getRequestBody(),
+                "Event V3 Integration",
+                ""
+            );
+        }
+    },
+
+    createCaseFromEventStorm: function(assignmentGroup, eventSysIDs, eventTaskSysIDs) {
+        //Create a case based on selected Events from List UI Action (Spain feature EMSSR-84).
+        var configurationItem = "";
+        var affectedCIs = [];
+        var account = "";
+        var description = "";
+        var contact = "";
+        if (eventSysIDs == '' && eventTaskSysIDs != '') {
+            eventSysIDs = '';
+            var grEventTasks = new GlideRecord('u_event_task');
+            grEventTasks.addEncodedQuery('sys_idIN' + eventTaskSysIDs);
+            grEventTasks.query();
+            while (grEventTasks.next()) {
+                eventSysIDs += grEventTasks.u_event_number.toString() + ',';
+            }
+        }
+
+        var grCase = new GlideRecord('sn_customerservice_case');
+        grCase.initialize();
+        var caseId = grCase.setNewGuid();
+
+        var grEvents = new GlideRecord('u_event_management');
+        grEvents.addEncodedQuery('u_caseISEMPTY^sys_idIN' + eventSysIDs);
+        grEvents.orderBy('sys_created_on');
+        grEvents.query();
+        var firstRow = true;
+        while (grEvents.next()) {
+
+            //Add cases to those event only whose state is 0-Active Alert or  6-blackout
+            if (grEvents.u_state == 0 || grEvents.u_state == 6) {
+                if (firstRow) {
+                    configurationItem = grEvents.u_equipment;
+                    account = grEvents.u_account;
+                    firstRow = false;
+                } else if (affectedCIs.indexOf(grEvents.u_equipment) == -1 && grEvents.u_equipment != configurationItem) {
+                    affectedCIs.push(grEvents.u_equipment);
+                }
+
+                //description += this.getDescription(grEvents) + "\n\n";
+                description += grEvents.u_number + "\n" + " - Configuration item:" + grEvents.getElement('u_equipment').getDisplayValue() + "\n" + " - Object Class: " + grEvents.u_monitoring_class + "\n" + " - Object: " + grEvents.u_monitoring_object + "\n\n";
+
+                grEvents.u_case = caseId;
+                grEvents.update();
+            }
+        }
+
+        //Getting oldest Master Admin for current account as Case contact.
+        //####### Since its always Internal Case, they dont need contact anymore. #######
+        /*var grMasterAdmin = new GlideRecord('customer_contact');
+        grMasterAdmin.addEncodedQuery('account=' + account + '^u_master_admin=true^active=true');
+        grMasterAdmin.orderBy('sys_created_on');
+        grMasterAdmin.setLimit(1);
+        grMasterAdmin.query();
+        if (grMasterAdmin.next()) {
+            contact = grMasterAdmin.sys_id;
+        }*/
+
+        //Creating new monitoring Case for Event Storm
+        grCase.account = account;
+        grCase.contact = contact;
+        grCase.u_product_category = "";
+        grCase.u_product_line = "";
+        grCase.u_product = "";
+        grCase.u_service = "";
+        grCase.cmdb_ci = configurationItem;
+        grCase.u_internal_cases = true;
+        grCase.assignment_group = assignmentGroup;
+        grCase.contact_type = 'Monitoring';
+        grCase.u_type = 1;
+        grCase.u_has_open_events = true;
+        grCase.short_description = '[Event Storm] - ' + grCase.account.name;
+        grCase.description = description;
+        grCase.insert();
+
+        affectedCIs.forEach(function(ci) {
+            var grTaskCI = new GlideRecord('task_ci');
+            grTaskCI.initialize();
+            grTaskCI.task = caseId;
+            grTaskCI.ci_item = ci;
+            grTaskCI.insert();
+        });
+
+        return caseId;
+    },
+
+    getDescription: function(event) {
+
+        var description = "Message: " + event.u_message.getDisplayValue() + "\n";
+        description += "##### Event Details #######\n";
+        description += "Event Number: " + event.u_event_id.getDisplayValue() + "\n";
+        description += "Created: " + event.u_event_date.getDisplayValue() + "\n";
+        description += "Severity: " + event.u_trigger_severity.getDisplayValue() + "\n";
+        var device = event.u_equipment.getDisplayValue();
+        if (device == '' || device == undefined) {
+            var grEvent = new GlideRecord('u_event_management');
+            grEvent.addEncodedQuery('u_event_id=' + event.u_event_id);
+            grEvent.setLimit(1);
+            grEvent.query();
+            if (grEvent.next()) {
+                device = grEvent.u_equipment.getDisplayValue();
+            }
+        }
+        description += "Device: " + device + "\n";
+        description += "Object: " + event.u_monitoring_object.getDisplayValue() + "\n";
+        description += "Class: " + event.u_monitoring_class.getDisplayValue() + "\n";
+        //         description += "###### PROCEDURE ######\n";
+        //         description += "Event Notified to: " + event.u_event_notified.getDisplayValue() + "\n";
+        //         description += "Event Scalated to: " + event.u_event_escalated_contact.getDisplayValue();                           
+        return description;
+    },
+
+    // To Post the Alert's Worknotes by getting the data from the Event (SSNP-341)
+    //GMSO-2845 added 'alertWorkNotes' parameter
+    getWorkNotes: function(event, alertWorkNotes) {
+        var work_notes = '';
+        if (event.u_event_notified != '' && event.u_event_escalated_contact != '' && event.u_operation_procedure != '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Event Notified to: " + event.u_event_notified.getDisplayValue() + "\n";
+            work_notes += "Event Escalated to: " + event.u_event_escalated_contact.getDisplayValue() + "\n";
+            work_notes += "Operational Procedure: " + event.u_operation_procedure.getDisplayValue();
+        }
+        if (event.u_event_notified != '' && event.u_event_escalated_contact != '' && event.u_operation_procedure == '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Event Notified to: " + event.u_event_notified.getDisplayValue() + "\n";
+            work_notes += "Event Escalated to: " + event.u_event_escalated_contact.getDisplayValue();
+        }
+        if (event.u_event_notified != '' && event.u_event_escalated_contact == '' && event.u_operation_procedure != '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Event Notified to: " + event.u_event_notified.getDisplayValue() + "\n";
+            work_notes += "Operational Procedure: " + event.u_operation_procedure.getDisplayValue();
+        }
+        if (event.u_event_notified == '' && event.u_event_escalated_contact != '' && event.u_operation_procedure != '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Event Escalated to: " + event.u_event_escalated_contact.getDisplayValue() + "\n";
+            work_notes += "Operational Procedure: " + event.u_operation_procedure.getDisplayValue();
+        }
+        if (event.u_event_notified != '' && event.u_event_escalated_contact == '' && event.u_operation_procedure == '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Event Notified to: " + event.u_event_notified.getDisplayValue();
+        }
+        if (event.u_event_notified == '' && event.u_event_escalated_contact != '' && event.u_operation_procedure == '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Event Escalated to: " + event.u_event_escalated_contact.getDisplayValue();
+        }
+        if (event.u_event_notified == '' && event.u_event_escalated_contact == '' && event.u_operation_procedure != '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Operational Procedure: " + event.u_operation_procedure.getDisplayValue();
+        }
+        //GMSO-2845 added conditions to add alert's work notes
+        if (alertWorkNotes != "" && alertWorkNotes != null && work_notes == '') {
+            work_notes += "###### PROCEDURE ######\n";
+            work_notes += "Alert Work Note: " + alertWorkNotes;
+        } else if (alertWorkNotes != "" && alertWorkNotes != null && work_notes != '') {
+            work_notes += "\n" + "Alert Work Note: " + alertWorkNotes;
+        }
+        return work_notes;
+    },
+
+    type: 'EQIX_MonitoringEventUtil'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>bcharapalli@equinix.com</sys_created_by>
+        <sys_created_on>2020-05-15 06:43:12</sys_created_on>
+        <sys_id>8a9c0461dbbc1c10ec3fd8965e9619b6</sys_id>
+        <sys_mod_count>99</sys_mod_count>
+        <sys_name>EQIX_MonitoringEventUtil</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_8a9c0461dbbc1c10ec3fd8965e9619b6</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:03</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137466000000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_8a9c0461dbbc1c10ec3fd8965e9619b6</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:03</sys_created_on>
+        <sys_id>4435a8598775c7904d820e96cebb350b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:03</sys_updated_on>
+    </sys_claim>
+</record_update>

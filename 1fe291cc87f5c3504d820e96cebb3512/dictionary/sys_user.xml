@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="all_tables.text_index_translations=true,allow_data_replicate=true,display_image=photo,global_search_config_handler=UserConfig,hasLabels=true,ih_process_sync_enabled=true,iterativeDelete=true,kagami_csindex_enabled=true,metadata_link_exempt=true,ref_ac_columns=email,ref_ac_columns_search=true,ref_ac_order_by=name,ref_auto_completer=AJAXTableCompleter,slushbucket_omit_embedded=true" audit="true" create_roles="user_admin" db_object_id="e3ecb8014f210300fe09e28d0210c77e" defaultsort="-1" dynamic_creation_script="dynamicUserCreation(current, value);" label="Anwender" max_length="40" name="sys_user" text_index="true" type="collection">
+        <element hint="Holds the information from ECP PortalUserKey; used in Auth0 SSO authentication" label="UCM ID - MDM3" max_length="40" name="u_ucm_id" type="string"/>
+        <index name="index">
+            <element name="u_ucm_id"/>
+        </index>
+    </element>
+</database>

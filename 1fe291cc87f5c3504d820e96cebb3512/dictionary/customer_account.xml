@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="hasLabels=true" audit="true" db_object_id="cbd8e4f34f5e8300f5e08e1f0210c7ff" extends="core_company" label="Cuenta" max_length="40" name="customer_account" type="collection">
+        <element attributes="edge_encryption_enabled=true" choice="1" default="ban" hint="Accounts existent before LTC project are all set as BAN per default. New Legal accounts received from MDM3.0 are set as CAN." label="Account Category" max_length="40" name="u_account_category" type="choice">
+            <choice>
+                <element inactive_on_update="false" label="Billing Account (BAN)" sequence="0" value="ban"/>
+                <element inactive_on_update="false" label="Legal Account (CAN)" sequence="1" value="can"/>
+            </choice>
+        </element>
+        <element hint="Billing accounts have UCM or MDM2 account number. " label="Account Number" max_length="40" name="u_account_number" type="string"/>
+        <element hint="MDM3.0 accountNumber of Legal account (CAN) with values in format &quot;QXH-7786427&quot;, value expected to be received from and sent to SFDC new integrations" label="Account Number MDM 3.0" max_length="40" name="u_account_number_mdm3_0" type="string"/>
+        <element label="Account Number MDM2.0 (Legacy)" max_length="40" name="u_acc_number_mdm2" type="string"/>
+        <element attributes="edge_encryption_enabled=true" hint=" Customer was migrated to MDM 3.0 LTC related" label="Customer migrated MDM3.0" max_length="255" name="u_customer_migrated_mdm3_0" type="boolean"/>
+        <element label="Duns Number" max_length="40" name="u_duns_number" type="string"/>
+        <element attributes="edge_encryption_enabled=true,encode_utf8=false" label="Parent Legal Account " max_length="32" name="u_parent_legal_account" reference="customer_account" type="reference"/>
+        <element hint="Legacy UCM ID value of Billing account info (UCM or MDM2 as source) before LTC" label="UCM or MDM ID 2.0 (Legacy)" max_length="40" name="u_ucmid_legacy" type="string"/>
+        <element hint="Holds the UCM identifier for legacy accounts or MDM3 identifier for new Legal (CAN) accounts LTC migrated. Field used as reference in majority of external integrations" label="UCM ID - MDMID 3.0" max_length="100" name="u_ucm_id" type="string"/>
+        <index name="index">
+            <element name="u_parent_legal_account"/>
+        </index>
+        <index name="index2">
+            <element name="u_account_number"/>
+        </index>
+        <index name="index3">
+            <element name="u_account_number_mdm3_0"/>
+        </index>
+        <index name="index4">
+            <element name="u_ucm_id"/>
+        </index>
+        <index name="index5">
+            <element name="u_ucmid_legacy"/>
+        </index>
+    </element>
+</database>

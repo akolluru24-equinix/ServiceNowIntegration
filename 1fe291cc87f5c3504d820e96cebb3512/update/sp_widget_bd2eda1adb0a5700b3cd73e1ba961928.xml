@@ -1,0 +1,632 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope) {
+	/* widget controller */
+	var c = this;
+
+	$scope.formatDate = function(){
+		var date = moment().month($scope.data.monthServer).year($scope.data.yearServer).format("MMMM/YYYY");
+		return date;
+	};
+
+	setTimeout(function() {
+
+		$scope.severityWarning = c.data.severityWarning;
+		$scope.severityInfomation = c.data.severityInfomation;
+		$scope.severityHigh = c.data.severityHigh;
+		$scope.severityDisaster = c.data.severityDisaster;
+		$scope.securityAverage = c.data.securityAverage;
+
+		var activeData = {
+			datasets: [{
+				data: [$scope.severityInfomation, $scope.severityWarning, $scope.securityAverage , $scope.severityHigh, $scope.severityDisaster],
+				backgroundColor: ['#A8C639', '#FEE700', '#8fdaff', '#F69F2A', '#D80000'],
+				borderWidth: 0,
+				hoverBorderWidth: 0,
+				hoverBackgroundColor:	['#A8C639', '#FEE700', '#8fdaff', '#F69F2A', '#D80000']
+			}],
+			labels: [
+				'Information',
+				'Warning',
+				'Average',
+				'High Priority',
+				'Disaster',
+			]
+		};
+
+		var activeOptions = {
+			responsive: false,
+			cutoutPercentage	: 60,
+			legend: {
+				display: false
+			}
+		};
+
+		var activeChart = document.getElementById('activeChart').getContext('2d');
+
+		$scope.down = c.data.down;
+		$scope.up = c.data.up;
+		
+		var myActiveChart = new Chart(activeChart, {
+			type: 'doughnut',
+			data: activeData,
+			options: activeOptions
+		}); 
+
+		var equipmentsData = {
+			datasets: [{
+				data: [$scope.up, $scope.down],
+				backgroundColor: ['#A8C639', '#D80909'],
+				borderWidth: 0,
+				hoverBorderWidth: 0,
+				hoverBackgroundColor:	['#A8C639', '#D80909']
+			}],
+			labels: [
+				'Up and Running',
+				'Down'
+			]
+		};
+
+		var equipmentsOptions = {
+			responsive: false,
+			cutoutPercentage	: 60,
+			legend: {
+				display: false
+			}
+		};
+		
+		$scope.monitored = c.data.monitored;
+		$scope.unmonitored = c.data.unmonitored;
+
+		var equipmentsChart = document.getElementById('equipmentsChart').getContext('2d');
+
+		var myEquipmentsChart = new Chart(equipmentsChart, {
+			type: 'doughnut',
+			data: equipmentsData,
+			options: equipmentsOptions
+		}); 
+
+		var coverageData = {
+			datasets: [{
+				data: [$scope.monitored, $scope.unmonitored],
+				backgroundColor: ['#A8C639', '#D80909'],
+				borderWidth: 0,
+				hoverBorderWidth: 0,
+				hoverBackgroundColor:	['#A8C639', '#D80909']
+			}],
+			labels: [
+				'Equipments monitored',
+				'Equipments not monitored'
+			]
+		};
+
+		var coverageOptions = {
+			responsive: false,
+			cutoutPercentage	: 60,
+			legend: {
+				display: false
+			}
+		};
+
+		var coverageChart = document.getElementById('coverageChart').getContext('2d');
+
+		var myCoverageChart = new Chart(coverageChart, {
+			type: 'doughnut',
+			data: coverageData,
+			options: coverageOptions
+		}); 
+
+	}, 2000);
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.fullscreen-button {&#13;
+  width: 20px;&#13;
+  height: 20px;&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  justify-content: center;&#13;
+  background: #A8A8A8;&#13;
+  color: #fff;&#13;
+&#13;
+  .fa {&#13;
+    font-size: 1.6rem;&#13;
+  }&#13;
+}&#13;
+&#13;
+.charts-grid {&#13;
+  margin-top: 30px;&#13;
+&#13;
+  &gt; .row &gt; .col-md-6:first-of-type {&#13;
+    padding-right: 0;&#13;
+  }&#13;
+&#13;
+  &gt; .row &gt; .col-md-6:last-of-type {&#13;
+    padding-left: 0;&#13;
+&#13;
+    .chart-box {&#13;
+      border-left: 0;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  &gt; .row:last-of-type &gt; .col-md-6 {&#13;
+    margin-top: -1px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.chart-title {&#13;
+  font-size: 1.2em;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+}&#13;
+&#13;
+.donut-chart {&#13;
+  //margin-top: 8px;&#13;
+  //margin-bottom: 24px;&#13;
+  //position: relative;&#13;
+  margin-left: 200px;&#13;
+  max-height: 200px;&#13;
+  max-width: 400px;&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  justify-content: center;&#13;
+  flex-wrap: wrap;&#13;
+&#13;
+  span {&#13;
+    //margin: auto;&#13;
+    //display: table;&#13;
+    position: absolute;&#13;
+    //top: 0;&#13;
+    //bottom: 0;&#13;
+    left: auto;&#13;
+    //-webkit-transform: translateX(-50%);&#13;
+    //transform: translateX(-50%);&#13;
+    font-size: 1.8em;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-light);&#13;
+&#13;
+    small {&#13;
+      margin-top: -3px;&#13;
+      margin-bottom: 3px;&#13;
+      display: block;&#13;
+      font-size: 12px;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  canvas {&#13;
+    //margin-left: 40%;&#13;
+    //width: 80% !important;&#13;
+    height: auto !important;&#13;
+    //position: absolute;&#13;
+    //margin-top: 50px;&#13;
+  }&#13;
+  &#13;
+  &amp;.no-chart {&#13;
+  	display: block;&#13;
+  }&#13;
+}&#13;
+&#13;
+.chart-box {&#13;
+  padding: 16px;&#13;
+  height: 300px;&#13;
+  border: 1px solid #D9D9D9;&#13;
+&#13;
+  .text-muted {&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-light);&#13;
+    font-size: 1em;&#13;
+  }&#13;
+&#13;
+  .text-large {&#13;
+    margin-top: 48px;&#13;
+    left: 50%;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-semibold);&#13;
+    font-size: 4em;&#13;
+  }&#13;
+}&#13;
+&#13;
+.chart-legend {&#13;
+  max-width: 50%;&#13;
+  position: absolute;&#13;
+  top: 12px;&#13;
+  text-align: initial;&#13;
+&#13;
+  &gt; li {&#13;
+    margin-bottom: 16px;&#13;
+    padding-left: 36px;&#13;
+    width: 100%;&#13;
+    font-size: 1.1em;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-light);&#13;
+    white-space: initial;&#13;
+&#13;
+    &gt; span {&#13;
+      width: 20px;&#13;
+      height: 20px;&#13;
+      top: 3px;&#13;
+      border-radius: 0;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.legend-red {&#13;
+  background: #D80000;&#13;
+}&#13;
+&#13;
+.legend-orange {&#13;
+  background: #FF9002;&#13;
+}&#13;
+&#13;
+.legend-yellow {&#13;
+  background: #FEE700;&#13;
+}&#13;
+&#13;
+.legend-info {&#13;
+  background: #A8C639;&#13;
+}&#13;
+&#13;
+.legend-green {&#13;
+  background: #A8C639;&#13;
+}&#13;
+.legend-average {&#13;
+  background-color: #8fdaff;&#13;
+}&#13;
+&#13;
+.maximize {&#13;
+  .chart-box {&#13;
+    height: 400px;&#13;
+  }&#13;
+  &#13;
+  .donut-chart {&#13;
+  	margin-left: 250px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.pruned-msg {&#13;
+  padding-bottom: 10px;&#13;
+  padding-left: 4px;&#13;
+  text-align: center;&#13;
+}&#13;
+.pruned-msg-filter-pad {&#13;
+  padding-top:8px;&#13;
+}</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>msp-monitoring-dashboard</id>
+        <internal>false</internal>
+        <link><![CDATA[function(scope) {
+	$( document ).ready(function() {
+		$('.chart-box').css('height', '270px');	
+	});
+	
+	scope.toggleFullScreen = function() {
+		$('.panel-fullscreen').toggleClass('maximize');
+		$('.maximize').css('overflow', 'auto');
+		$('.fa-expand').toggleClass('hidden');
+		$('.panel-body').toggleClass('dashboard-width');
+		$('.fa-compress').toggleClass('hidden');
+		$('.chart-box').toggleClass('max-size-chart');
+		
+		if ($('.dashboard-width').length > 0) {
+			$('.dashboard-width').each(function(){
+				$(this).css('margin','auto');
+			  $(this).css('min-width','1200px');
+				//$(this).css('max-width','1090px');
+				$(this).css('height','100%');
+				$(this).css('width','100%');
+			});
+		}else{
+			$('.panel-body').removeAttr("style");
+		}
+	};	
+}]]></link>
+        <name>MSP Monitoring Dashboard</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+	
+   // Get user account
+	var customerPermission = new EQIX_Customer_Permissions();
+	var account_id = customerPermission.getActiveAccountSysId();
+    var userPermission = customerPermission.checkTablePermission('u_event_management');
+	
+	data.amounts = [];
+	data.dates = [];
+	
+	//// at ACL level no restriction at table level, contacts have access to read their changes created by default, even if no records in the query should receive message "no records to display"
+	data.canRead = true;
+
+	var grAccount = new GlideRecord('customer_account');
+	if (!grAccount.get(account_id)) {
+		return;
+	}
+		
+	//get amount of data event for an specific event.
+	var grEvent = new GlideAggregate('u_event_management');	         
+	grEvent.addEncodedQuery('u_equipment.u_monitored=true^u_state=0^u_trigger_value=1^u_normalization_eventISEMPTY^u_trigger_severityIN1,2,3,4,5^u_account='+account_id);
+	grEvent.addAggregate('COUNT','u_trigger_severity');
+	grEvent.query();
+	
+	while(grEvent.next()){
+		var amountEvent = grEvent.getAggregate('COUNT', 'u_trigger_severity');
+		var severity = grEvent.getValue('u_trigger_severity');
+
+		var objEvent = {
+			quant: amountEvent,
+			severity: severity
+		};
+		data.amounts.push(objEvent);
+
+		if(objEvent.severity == 2){
+			data.severityWarning = objEvent.quant;
+		}else if(objEvent.severity == 1){
+			data.severityInfomation = objEvent.quant;
+		}else if(objEvent.severity == 3){
+			data.securityAverage = objEvent.quant;
+		}else if(objEvent.severity == 4){
+			data.severityHigh = objEvent.quant;
+		}else{
+			data.severityDisaster = objEvent.quant;
+		}
+	}
+
+	var grEventTotal = new GlideAggregate('u_event_management');	         
+	grEventTotal.addEncodedQuery('u_equipment.u_monitored=true^u_state=0^u_trigger_value=1^u_normalization_eventISEMPTY^u_normalization_eventISEMPTY^u_trigger_severityIN1,2,3,4,5^u_account='+account_id);
+	grEventTotal.addAggregate('COUNT');
+	grEventTotal.query();
+	
+	while(grEventTotal.next()){
+		var total = grEventTotal.getAggregate('COUNT');
+		data.total = total;
+	}
+
+	var grTotalAlarms = new GlideAggregate('u_event_management');	         
+	grTotalAlarms.addEncodedQuery('u_trigger_value=1^sys_created_onONThis month@javascript:gs.beginningOfThisMonth()@javascript:gs.endOfThisMonth()^u_account='+account_id);
+	grTotalAlarms.addAggregate('COUNT');
+	grTotalAlarms.query();
+	
+	while(grTotalAlarms.next()){
+		var totalAlarms = grTotalAlarms.getAggregate('COUNT');
+		data.totalAlarms = totalAlarms;
+	}
+
+	var nowDateTime=gs.nowDateTime();
+	var gdt = new GlideDateTime(nowDateTime);
+	var month=gdt.getMonth();
+	var year=gdt.getYear();
+
+	data.monthServer = month - 1;
+	data.yearServer = year;
+
+	var ciList = 'sys_class_name=cmdb_ci_server^ORsys_class_name=cmdb_ci_ip_switch^ORsys_class_name=u_cmdb_ci_private_connectivity_lmc^ORsys_class_name=cmdb_ci_firewall_network^ORsys_class_name=cmdb_ci_vm_instance^ORsys_class_name=u_cmdb_ci_virtual_private_servers^ORsys_class_name=cmdb_ci_san^ORsys_class_name=cmdb_ci_vmware_instance^ORsys_class_name=cmdb_ci_ip_router^ORsys_class_name=cmdb_ci_cmp_resource^ORsys_class_name=cmdb_ci_computer^ORsys_class_name=cmdb_ci_dns_name^ORsys_class_name=cmdb_ci_esx_server^ORsys_class_name=cmdb_ci_firewall_cluster_fortinet^ORsys_class_name=cmdb_ci_firewall_device_fortinet^ORsys_class_name=cmdb_ci_hyper_v_instance^ORsys_class_name=cmdb_ci_ids_network^ORsys_class_name=cmdb_ci_ip_firewall^ORsys_class_name=cmdb_ci_lb_a10^ORsys_class_name=cmdb_ci_linux_server^ORsys_class_name=cmdb_ci_msd^ORsys_class_name=cmdb_ci_net_app_server^ORsys_class_name=cmdb_ci_net_traffic^ORsys_class_name=cmdb_ci_outofband_device^ORsys_class_name=cmdb_ci_storage_server^ORsys_class_name=cmdb_ci_storage_switch^ORsys_class_name=cmdb_ci_vcenter^ORsys_class_name=cmdb_ci_vcenter_cluster^ORsys_class_name=cmdb_ci_web_site^ORsys_class_name=cmdb_ci_win_cluster^ORsys_class_name=cmdb_ci_win_cluster_resource^ORsys_class_name=cmdb_ci_win_server^ORsys_class_name=u_cmdb_ci_cloud_management_compute^ORsys_class_name=u_cmdb_ci_cloud_management_container^ORsys_class_name=u_cmdb_ci_cloud_management_database^ORsys_class_name=u_cmdb_ci_cloud_management_gateway_firewall^ORsys_class_name=u_cmdb_ci_cloud_management_object^ORsys_class_name=u_cmdb_ci_cloud_management_storage^ORsys_class_name=u_cmdb_ci_customer_vm_instance^ORsys_class_name=u_cmdb_ci_data_hardware_storage^ORsys_class_name=u_cmdb_ci_nhlb^ORsys_class_name=u_cmdb_ci_tape_library^ORsys_class_name=u_cmdb_ci_vip_cluster^ORsys_class_name=u_cmdb_ci_virtual_network_edge_device^ORsys_class_name=u_customer_provider_equipment^ORsys_class_name=u_private_connectivity_branch_locations';
+	var count = new GlideAggregate('cmdb_ci');
+count.addEncodedQuery('u_account='+account_id+'^u_active_flag=true^' + ciList + '^NQu_account='+account_id+'^u_active_flag=true^sys_class_name=u_cmdb_ci_custom_product^u_custom_typeINAnti-DDoS,Dedicated Backup,Hardware - Load Balancer,Hardware - Blade Chassis,Hardware - Firewall,Hardware - Router,Hardware - Server,Hardware - Storage,Hardware - Switch,Hardware - Tape Library,Private Cloud');	
+	count.addAggregate('COUNT','u_monitored');
+	count.query();
+
+	var countMonitored = 0;
+	var countNotMonitored = 0;
+	var down = 0;
+	var up = 0;
+	
+    var grEventDown = new GlideAggregate('u_event_management');	
+	var query = 'u_equipment.u_monitored=true^u_trigger_value=1^u_normalization_eventISEMPTY^u_account='+account_id+'^u_key_origSTARTSWITHicmpping';
+	var ou = grAccount.getValue('u_operating_unit');
+	if (ou == 'JP') {
+		query = query + '^NQu_operating_unit=JP^u_trigger_value=1^u_normalization_eventISEMPTY^u_state=0^u_monitoring_parameter=PING^u_account=' + account_id;
+	} else if (ou == 'ES') {
+		query = query + '^NQu_operating_unit=ES^u_trigger_value=1^u_normalization_eventISEMPTY^u_state=0^u_monitoring_class=PPM_Device^u_account=' + account_id;
+	}
+
+	grEventDown.addEncodedQuery(query);
+	grEventDown.addAggregate('COUNT','u_equipment');
+	grEventDown.query();
+	
+	while(grEventDown.next()){
+		down += 1;
+	}
+
+	data.monitored = 0;
+    data.unmonitored = 0;
+	while(count.next()){
+		if (count.u_monitored == true){
+			countMonitored = count.getAggregate('COUNT','u_monitored');
+			data.monitored = countMonitored;
+		}
+		else{
+			countNotMonitored = count.getAggregate('COUNT','u_monitored');
+			data.unmonitored = countNotMonitored;
+		}
+	}
+	
+    var countUp = new GlideAggregate('cmdb_ci');
+    countUp.addQuery('u_account', account_id);
+    countUp.addQuery('u_monitored', true);
+    countUp.query();
+    if(countUp.next()){
+        up = countUp.getRowCount();
+    }
+	
+	data.down = down;
+	data.up = up - down;
+	var porcentage =  (parseInt(countMonitored) * 100) / (parseInt(countMonitored) + parseInt(countNotMonitored));
+	data.porcentage = porcentage.toFixed(0) + "%";
+  
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>organize.gustavo</sys_created_by>
+        <sys_created_on>2018-05-15 19:48:12</sys_created_on>
+        <sys_id>bd2eda1adb0a5700b3cd73e1ba961928</sys_id>
+        <sys_mod_count>418</sys_mod_count>
+        <sys_name>MSP Monitoring Dashboard</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_bd2eda1adb0a5700b3cd73e1ba961928</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:38</sys_updated_on>
+        <template><![CDATA[<div class="row">
+  <div class="col-md-12">
+    <div class="fullscreen-button pull-right" ng-click="toggleFullScreen()" ng-if="data.canRead">
+      <i class="fa fa-expand" aria-hidden="true"></i>
+      <i class="fa fa-compress hidden" aria-hidden="true"></i>
+    </div>
+  </div>
+</div>
+
+<div class="panel-body">
+  <div ng-if="!data.canRead" class="pruned-msg pruned-msg-filter-pad">
+    <span>${You do not have permission to see this content due to security constraints}</span>
+  </div>
+  <div class="charts-grid" ng-if="data.canRead">
+    <div class="row">
+
+      <div class="col-md-6 col-xs-6 col-sm-6">
+        <div class="chart-box">
+          <div class="chart-title">
+            ${Active Alarms} 
+          </div>
+          <span class="text-muted">${Now}</span>
+          <div class="row">    
+            <div class="col-md-12">
+              <ul class="chart-legend">
+                <li>
+                  <span class="legend-red"></span>
+                  ${Disaster}
+                </li>
+
+                <li>
+                  <span class="legend-orange"></span>
+                  ${High Priority}
+                </li>
+                <li>
+                  <span class="legend-average"></span>
+                  ${Average}
+                </li>
+                <li>
+                  <span class="legend-yellow"></span>
+                  ${Warning}
+                </li>
+
+                <li>
+                  <span class="legend-info"></span>
+                  ${Information}
+                </li>
+              </ul>
+              <div class="donut-chart label-centered">
+                <canvas id="activeChart">
+                </canvas>
+                <span class="text-center">{{data.total}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-6 col-sm-6">
+        <div class="chart-box">
+          <div class="chart-title">
+            ${Equipments Health} 
+          </div>
+          <span class="text-muted">${Now}</span>
+          <div class="row">    
+            <div class="col-md-12">
+              <ul class="chart-legend">
+                <li>
+                  <span class="legend-red"></span>
+                  ${msp_monitoring_down}
+                </li>
+
+                <li>
+                  <span class="legend-green"></span>
+                  ${Up and running}
+                </li>
+              </ul>
+              <div class="donut-chart label-centered">
+                <canvas id="equipmentsChart">
+                </canvas>
+                <span class="text-center">
+                  {{data.down}}
+                  <small>${msp_monitoring_down}</small>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <div class="col-md-6 col-xs-6 col-sm-6">
+        <div class="chart-box">
+          <div class="chart-title">
+            ${Total Alarms} 
+          </div>
+          <span class="text-muted">{{formatDate()}}</span>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="donut-chart label-centered no-chart">
+                <span class="text-muted text-large">{{data.totalAlarms}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 col-xs-6 col-sm-6">
+        <div class="chart-box">
+          <div class="chart-title">
+            ${Monitoring Coverage %} 
+          </div>
+          <span class="text-muted">${Environment}</span>
+          <div class="row">    
+            <div class="col-md-12">
+              <ul class="chart-legend">
+                <li>
+                  <span class="legend-red"></span>
+                  {{data.unmonitored}} ${equipments not monitored}
+                </li>
+
+                <li>
+                  <span class="legend-green"></span>
+                  {{data.monitored}} ${equipments monitored}
+                </li>
+              </ul>
+              <div class="donut-chart label-centered">
+                <canvas id="coverageChart">
+                </canvas>
+                <span class="text-center">{{data.porcentage}}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375dbe40000001</claim_timestamp>
+        <metadata_update_name>sp_widget_bd2eda1adb0a5700b3cd73e1ba961928</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:38</sys_created_on>
+        <sys_id>5b85241d8775c7904d820e96cebb35d7</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:38</sys_updated_on>
+    </sys_claim>
+</record_update>

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update>
+    <sys_choice action="INSERT_OR_UPDATE" field="u_account_type" table="customer_account" version="3">
+        <sys_choice_set action="INSERT_OR_UPDATE">
+            <element>u_account_type</element>
+            <name>customer_account</name>
+            <sys_class_name>sys_choice_set</sys_class_name>
+            <sys_created_by>oneto@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-09 18:41:45</sys_created_on>
+            <sys_mod_count>1</sys_mod_count>
+            <sys_name>u_account_type</sys_name>
+            <sys_package display_value="Global" source="global">global</sys_package>
+            <sys_policy/>
+            <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+            <sys_update_name>sys_choice_customer_account_u_account_type</sys_update_name>
+            <sys_updated_by>oneto@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-06-29 12:58:24</sys_updated_on>
+        </sys_choice_set>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_account_type</element>
+            <hint/>
+            <inactive>true</inactive>
+            <label>Billing Account (BAN)</label>
+            <language>en</language>
+            <name>customer_account</name>
+            <sequence>0</sequence>
+            <synonyms/>
+            <sys_created_by>oneto@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-09 18:42:03</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_mod_count>10</sys_mod_count>
+            <sys_updated_by>alviana@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-01-08 21:04:01</sys_updated_on>
+            <u_order>1</u_order>
+            <value>ban</value>
+        </sys_choice>
+        <sys_choice action="INSERT_OR_UPDATE">
+            <dependent_value/>
+            <element>u_account_type</element>
+            <hint/>
+            <inactive>true</inactive>
+            <label>Legal Account (CAN)</label>
+            <language>en</language>
+            <name>customer_account</name>
+            <sequence>1</sequence>
+            <synonyms/>
+            <sys_created_by>oneto@equinix.com</sys_created_by>
+            <sys_created_on>2025-12-09 18:41:45</sys_created_on>
+            <sys_domain>global</sys_domain>
+            <sys_domain_path>/</sys_domain_path>
+            <sys_mod_count>13</sys_mod_count>
+            <sys_updated_by>alviana@equinix.com</sys_updated_by>
+            <sys_updated_on>2026-01-08 21:04:01</sys_updated_on>
+            <u_order>1</u_order>
+            <value>can</value>
+        </sys_choice>
+    </sys_choice>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375a4ec0000001</claim_timestamp>
+        <metadata_update_name>sys_choice_customer_account_u_account_type</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:24</sys_created_on>
+        <sys_id>4c85acd98775c7904d820e96cebb3524</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:24</sys_updated_on>
+    </sys_claim>
+</record_update>

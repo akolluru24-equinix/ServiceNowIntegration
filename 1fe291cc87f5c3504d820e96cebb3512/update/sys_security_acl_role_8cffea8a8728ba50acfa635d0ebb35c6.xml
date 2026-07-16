@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_security_acl_role">
+    <sys_security_acl_role action="INSERT_OR_UPDATE">
+        <sys_class_name>sys_security_acl_role</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-14 07:29:30</sys_created_on>
+        <sys_id>8cffea8a8728ba50acfa635d0ebb35c6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_name>u_managed_service_report.snc_internal</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_security_acl display_value="u_managed_service_report">8272a55287e3aa14acfa635d0ebb358c</sys_security_acl>
+        <sys_update_name>sys_security_acl_role_8cffea8a8728ba50acfa635d0ebb35c6</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:52</sys_updated_on>
+        <sys_user_role display_value="snc_internal" name="snc_internal">7fcaa702933002009c8579b4f47ffbde</sys_user_role>
+    </sys_security_acl_role>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137610800000001</claim_timestamp>
+        <metadata_update_name>sys_security_acl_role_8cffea8a8728ba50acfa635d0ebb35c6</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:52</sys_created_on>
+        <sys_id>fa95e81d8775c7904d820e96cebb351d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:52</sys_updated_on>
+    </sys_claim>
+</record_update>

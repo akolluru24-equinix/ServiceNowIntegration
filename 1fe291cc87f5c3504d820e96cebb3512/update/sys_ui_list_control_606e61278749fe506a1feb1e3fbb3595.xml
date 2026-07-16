@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_list_control">
+    <sys_ui_list_control action="INSERT_OR_UPDATE">
+        <columns_condition/>
+        <disable_nlq>false</disable_nlq>
+        <edit_condition/>
+        <edit_default_filter/>
+        <edit_roles>snc_internal</edit_roles>
+        <empty_condition/>
+        <filter_condition/>
+        <filter_roles/>
+        <hierarchical_lists>false</hierarchical_lists>
+        <label/>
+        <link_condition/>
+        <link_roles/>
+        <list_edit_insert_row>false</list_edit_insert_row>
+        <list_edit_ref_qual_tag/>
+        <list_edit_type/>
+        <name>change_request</name>
+        <new_condition><![CDATA[ var answer;
+ var gr = new GlideRecord("change_request");
+ gr.addEncodedQuery("u_patch_execution=" + parent.u_patch_execution);
+ gr.query();
+
+ if (gr.next()) {
+	
+     var implementer = gr.u_person_s_who_wil_implement_the_change;
+     var assignee = gr.assigned_to;
+     var state = gr.state;
+     var user = gs.getUserID();
+
+     if (gs.getUser().isMemberOf(parent.u_patch_execution.u_change.assignment_group.getDisplayValue()) && state != -1 && state != -2 && state != 0) {
+         answer = false;
+     } else if (implementer == user && (state == -6 || state == -5)) {
+         answer = false;
+     } else {
+         answer = true;
+     }
+ }]]></new_condition>
+        <new_roles/>
+        <omit_columns_if_empty>false</omit_columns_if_empty>
+        <omit_count>false</omit_count>
+        <omit_count_views>false</omit_count_views>
+        <omit_count_views_list/>
+        <omit_drilldown_link>false</omit_drilldown_link>
+        <omit_edit_button>false</omit_edit_button>
+        <omit_filters>false</omit_filters>
+        <omit_if_empty>false</omit_if_empty>
+        <omit_links>false</omit_links>
+        <omit_new_button>false</omit_new_button>
+        <omit_related_list_count>false</omit_related_list_count>
+        <related_list>REL:725d2bb28749b250acfa635d0ebb35b9</related_list>
+        <sys_class_name>sys_ui_list_control</sys_class_name>
+        <sys_created_by>fadedoni@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-12 15:05:32</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>606e61278749fe506a1feb1e3fbb3595</sys_id>
+        <sys_mod_count>32</sys_mod_count>
+        <sys_name>change_request</sys_name>
+        <sys_overrides display_value="">global</sys_overrides>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_ui_list_control_606e61278749fe506a1feb1e3fbb3595</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:05</sys_updated_on>
+    </sys_ui_list_control>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137559fd0000001</claim_timestamp>
+        <metadata_update_name>sys_ui_list_control_606e61278749fe506a1feb1e3fbb3595</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:05</sys_created_on>
+        <sys_id>d765a4d98775c7904d820e96cebb3534</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:05</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>606e61278749fe506a1feb1e3fbb3595</id>
+        <sys_created_by>fadedoni@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-12 13:29:16</sys_created_on>
+        <sys_id>ef28f3cd87b93290acfa635d0ebb3598</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_updated_by>fadedoni@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-12-16 16:25:43</sys_updated_on>
+        <table>sys_ui_list_control</table>
+        <use_es_latest>false</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

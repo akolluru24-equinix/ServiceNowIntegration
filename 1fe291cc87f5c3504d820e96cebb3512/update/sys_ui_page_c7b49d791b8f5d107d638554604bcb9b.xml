@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_ui_page">
+    <sys_ui_page action="INSERT_OR_UPDATE">
+        <category>general</category>
+        <client_script><![CDATA[addLoadEvent(function() {
+	populateProcessSelect();
+});
+
+function populateProcessSelect() {
+	// Mandatory styling for Type
+	$j('#type').on('change', function(e) {
+		if (e.target.value != '')
+			$j('#process_select_type_form_group').removeClass('is-required').addClass('is-filled');
+		else
+			$j('#process_select_type_form_group').addClass('is-required').removeClass('is-filled');
+	});
+	
+	// Mandatory styling for Type
+	$j('#customer_visible').on('change', function(e) {
+		if (e.target.value != '') {
+			$j('#process_select_customer_visible_form_group').removeClass('is-required').addClass('is-filled');
+			if (e.target.value == 'yes')
+                $j('#internal_case').val('no');
+            else
+                $j('#internal_case').val('yes');
+		} else {
+			$j('#process_select_customer_visible_form_group').addClass('is-required').removeClass('is-filled');
+			$j('#internal_case').val('');
+		}			
+	});
+
+	var esAccountId = gel('eqix_es_account').value;
+	var ou = gel('alert_account_ou').value;
+	var acc = JSON.parse(esAccountId)[ou];
+	var eventAccountId = gel('alert_account_id').value;
+	if (ou == 'GB') {
+        for (var i in acc) {
+            var accounts = acc[i];	            
+            if (accounts.indexOf(eventAccountId) != -1) {
+                $j('#customer_visible').val("no");
+                $j('#customer_visible').attr("disabled", true);
+                $j('#process_select_customer_visible_form_group').removeClass('is-required').addClass('is-filled');
+                $j('#internal_case').val("yes");
+            }
+        }
+	}
+	// If Account is Equinix Spain, Set Intercase as True and Read-only
+	if (eventAccountId == acc) {
+		$j('#customer_visible').val("no");
+		$j('#customer_visible').attr("disabled", true); 
+		$j('#process_select_customer_visible_form_group').removeClass('is-required').addClass('is-filled');
+		$j('#internal_case').val("yes");
+	}
+}
+
+function submitOk() {	
+	var caseType = gel('type').value;
+	var customerVisible = gel('customer_visible').value;
+	
+	// Case type is required
+	if (caseType == '') {
+		alert("Please select Case type");
+		return false;
+	}
+	
+	// Customer Visible is required
+	if (customerVisible == '') {
+        alert("Please select Customer visibility");
+        return false;
+    }
+	
+	var c = gel('cancelled');
+    c.value = "false";
+	
+	g_form.modified = false;
+	
+	return true;
+}
+
+function onCancel() {
+    GlideDialogWindow.get().destroy();
+    return false;
+}]]></client_script>
+        <description/>
+        <direct>false</direct>
+        <endpoint/>
+        <html><![CDATA[<?xml version="1.0" encoding="utf-8" ?>
+<j:jelly trim="false" xmlns:j="jelly:core" xmlns:g="glide" xmlns:j2="null" xmlns:g2="null">	
+	<g:evaluate var="jvar_alert_id" expression="RP.getWindowProperties().get('alert_id')" />
+	<!--<g:evaluate var="jvar_notes" expression="RP.getWindowProperties().get('notes')" />
+	<g:evaluate var="jvar_assigned_to" expression="RP.getWindowProperties().get('assigned_to')" />-->	
+	<g:evaluate var="jvar_alert_account_id" jelly="true">
+		var alertID = RP.getWindowProperties().get('alert_id');
+		var grEvnt = new GlideRecord('u_event_task'); 
+		grEvnt.addEncodedQuery('sys_idIN' + alertID);
+		grEvnt.query();
+		grEvnt.next();
+
+		grEvnt.u_event_number.u_account.toString();
+	</g:evaluate>
+	
+	<g:evaluate var="jvar_alert_account_ou" jelly="true">
+		var alertID = RP.getWindowProperties().get('alert_id');
+		var grEvnt = new GlideRecord('u_event_task'); 
+		grEvnt.addEncodedQuery('sys_idIN' + alertID);
+		grEvnt.query();
+		grEvnt.next();
+
+		grEvnt.u_operating_country.toString();
+	</g:evaluate>
+
+	<g:ui_form>
+		<!-- Spain Account sys_id -->
+		<input type="hidden" id="eqix_es_account" name="eqix_es_account" value= "$[gs.getProperty('eqix_global_alert_wf_eqxAccounts')]" />
+		<!-- Events sys IDs -->
+		<input type="hidden" id="alert_id" name="alert_id" value="${jvar_alert_id}" />
+		<!-- Event Task Work notes -->
+		<!--<input type="hidden" id="notes" name="notes" value="${jvar_notes}" />-->
+		<!-- Event Account -->
+		<input type="hidden" id="alert_account_id" name="alert_account_id" value="${jvar_alert_account_id}" />
+		<!-- Event Account OU -->
+		<input type="hidden" id="alert_account_ou" name="alert_account_ou" value="${jvar_alert_account_ou}" />
+		<!-- Event Task Assgined To -->
+		<!--<input type="hidden" id="event_assigned_to" name="event_assigned_to" value="${jvar_assigned_to}" />-->
+		<div class="form-horizontal">
+			<!-- Type -->
+			<div class="form-group is-required" id="process_select_type_form_group">
+				<label for="type" class="control-label col-sm-4 text-right">
+					<span class="required-marker sn-tooltip-basic" 
+						  title="${gs.getMessage('Required')}" data-original-title="${gs.getMessage('Required')}" aria-label="${gs.getMessage('Required')}"></span>
+					Case Type
+				</label>
+				<span class="col-sm-8">
+					<select id="type" name="type" class="form-control" required="true" aria-required="true">
+						<option value="">-- None --</option>
+						<option value="0">Service Request</option>
+						<option value="1">Trouble</option>
+					</select>
+				</span>
+			</div>
+			<!-- Customer Visible -->
+			<div class="form-group is-required" id="process_select_customer_visible_form_group">
+				<label for="customer_visible" class="control-label col-sm-4 text-right">
+					<span class="required-marker sn-tooltip-basic" 
+						  title="${gs.getMessage('Required')}" data-original-title="${gs.getMessage('Required')}" aria-label="${gs.getMessage('Required')}"></span>
+					Customer Visible
+				</label>
+				<span class="col-sm-8">
+					<select id="customer_visible" name="customer_visible" class="form-control" required="true" aria-required="true" >
+						<option value="">-- None --</option>
+						<option value="yes">Yes</option>
+						<option value="no">No</option>
+					</select>
+				</span>
+			</div>
+			<!-- Internal Case -->
+			<input type="hidden" id="internal_case" name="internal_case" value="" />
+		</div>
+		<!-- Info message -->
+		<!-- <div class="form-group" id="processStatus" style="display: none;margin-left: 11px;padding-top:11px;">
+			<p style="color:SlateBlue;text-align:left;font-size:12px;">Creating Case...</p>
+		</div> -->
+		<!-- OK and Cancel buttons -->
+		<div class="modal-footer" id="dialog_buttons" style="text-align:right;padding-top:20px;">
+			<g:dialog_buttons_ok_cancel ok="return submitOk()" cancel="return onCancel()" ok_text="${gs.getMessage('Submit')}" />
+			<input type="hidden" id="cancelled" name="cancelled" value="true"/>
+		</div>
+	</g:ui_form>
+</j:jelly>
+]]></html>
+        <name>EQIX_Create_EventStorm_From_Alerts</name>
+        <processing_script><![CDATA[if (cancelled == "false") {
+    createCaseFromEventTask();
+}
+// Create case and associate to Event
+function createCaseFromEventTask() {
+
+    try {
+        var alertIDs = alert_id;
+        var caseType = type;
+        var caseInternal = internal_case;
+        var evntAccount = alert_account_id;
+        var evntOU = alert_account_ou;
+        var affectedCIs = [];
+
+        var description = '';
+        var alert = new GlideRecord('u_event_task');
+        alert.addEncodedQuery('u_event_number.u_caseISEMPTY^sys_idIN' + alertIDs + '^stateIN1,2^u_autoclose_dateISEMPTY');
+        alert.query();
+        //https://equinixjira.atlassian.net/browse/CORE-175
+        var alertIDsArray = alertIDs.split(',');
+        var totalSelected = alertIDsArray.length;
+        var validCount = alert.getRowCount();
+        // 1. NONE valid → STOP
+        if (validCount == 0) {
+            gs.addErrorMessage("All Alerts selected are now closed or ready to be closed. Please review them and, if still necessary, return to the Alert list to select new active Alerts for your Event Storm.");
+            response.sendRedirect('u_event_task_list.do?sysparm_query=sys_idIN' + alertIDs);
+            return;
+        }
+
+        // 2. SOME valid, SOME invalid → WARNING
+        if (validCount < totalSelected) {
+            gs.addWarningMessage("Some of the selected Alerts are now closed or ready to be closed. The Event Storm has been created with the Events of the rest of the active Alerts.");
+        }
+
+        var firstRow = true;
+        while (alert.next()) {
+            description += alert.number + '\n' + '- Configuration Item: ' + alert.u_event_number.u_equipment.getDisplayValue() + '\n' + '- Short Description: ' + alert.short_description + '\n\n';
+
+            if (affectedCIs.indexOf(alert.u_event_number.u_equipment.toString()) == -1) {
+                affectedCIs.push(alert.u_event_number.u_equipment.toString());
+            }
+        }
+
+        // var obj = gs.getProperty('eqix_alert_assignment');
+        // var assignmentGroup = JSON.parse(obj)[evntOU];
+
+        var grAlert = new GlideRecord("u_event_task");
+        grAlert.addEncodedQuery('sys_idIN' + alertIDs);
+        grAlert.query();
+
+        if (grAlert.next()) {
+            var newRecord = new GlideRecord("sn_customerservice_case");
+            newRecord.initialize();
+            newRecord.setValue("account", grAlert.u_event_number.u_account.toString());
+            newRecord.setValue('contact_type', 'Monitoring');
+            newRecord.setValue('u_type', caseType);
+            newRecord.setValue('state', 10);
+            newRecord.setValue('impact', 3);
+            newRecord.setValue('urgency', 3);
+            //newRecord.setValue('assignment_group',assignmentGroup);
+            newRecord.setValue('u_operating_country', grAlert.u_operating_country);
+            newRecord.setValue('u_operational_scope', grAlert.u_operational_scope);
+
+            if (caseInternal == 'yes') {
+                newRecord.setValue('u_internal_cases', true);
+            } else {
+                newRecord.setValue('u_internal_cases', false);
+            }
+
+            newRecord.setValue('short_description', '[' + 'Event Storm' + ']' + ' - ' + grAlert.u_event_number.u_account.getDisplayValue());
+            newRecord.setValue('description', description);
+            var newsys_id = newRecord.insert();
+
+            var evntStorm = new GlideRecord('u_event_task');
+            evntStorm.addEncodedQuery('sys_idIN' + alertIDs + '^stateIN1,2');
+            evntStorm.query();
+
+            while (evntStorm.next()) {
+                //                 evntStorm.setValue('u_event_number.u_case',newsys_id);
+                //                 evntStorm.update();
+                var grEvent = new GlideRecord('u_event_management');
+                grEvent.addEncodedQuery('u_caseISEMPTY^sys_idIN' + evntStorm.u_event_number + '^u_stateIN0,6');
+                grEvent.query();
+
+                if (grEvent.next()) {
+                    grEvent.u_case = newsys_id;
+                    grEvent.update();
+                }
+
+
+            }
+
+            // Create affected CI List
+            affectedCIs.forEach(function(ci) {
+                var grTaskCI = new GlideRecord('task_ci');
+                grTaskCI.initialize();
+                grTaskCI.task = newsys_id;
+                grTaskCI.ci_item = ci;
+                grTaskCI.insert();
+            });
+
+
+            // response.sendRedirect('u_event_task.do?sys_id=' + eventTaskID);
+            response.sendRedirect('sn_customerservice_case.do?sys_id=' + newsys_id);
+        }
+
+    } catch (e1) {
+
+    }
+
+
+}]]></processing_script>
+        <sys_class_name>sys_ui_page</sys_class_name>
+        <sys_created_by>skalesha@equinix.com</sys_created_by>
+        <sys_created_on>2022-11-09 11:42:10</sys_created_on>
+        <sys_id>c7b49d791b8f5d107d638554604bcb9b</sys_id>
+        <sys_mod_count>80</sys_mod_count>
+        <sys_name>EQIX_Create_EventStorm_From_Alerts</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_ui_page_c7b49d791b8f5d107d638554604bcb9b</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:57</sys_updated_on>
+    </sys_ui_page>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137ab8bf0000001</claim_timestamp>
+        <metadata_update_name>sys_ui_page_c7b49d791b8f5d107d638554604bcb9b</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:57</sys_created_on>
+        <sys_id>99c6a89587b5c7904d820e96cebb35c0</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:57</sys_updated_on>
+    </sys_claim>
+</record_update>

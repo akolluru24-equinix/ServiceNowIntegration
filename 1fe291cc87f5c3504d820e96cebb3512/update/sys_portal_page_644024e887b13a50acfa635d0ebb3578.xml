@@ -1,0 +1,595 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update node_type="sys_portal_page" unload_date="2026-07-10 11:41:57">
+    <sys_portal_page action="INSERT_OR_UPDATE">
+        <layout/>
+        <order/>
+        <read_roles>snc_internal</read_roles>
+        <roles/>
+        <selectable>false</selectable>
+        <sys_class_name>sys_portal_page</sys_class_name>
+        <sys_created_by>syahmad@equinix.com</sys_created_by>
+        <sys_created_on>2025-12-10 08:28:55</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>644024e887b13a50acfa635d0ebb3578</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Monitoring EventsV3</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_portal_page_644024e887b13a50acfa635d0ebb3578</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:31</sys_updated_on>
+        <title>Monitoring EventsV3</title>
+        <user/>
+        <view>new_tab_8_3</view>
+        <related_items_node>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Events created today</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 08:36:30</sys_created_on>
+                <sys_id>2ff1ec2087f13a50acfa635d0ebb35a5</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 08:40:32</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 00:36:30">2ff1ec2087f13a50acfa635d0ebb35a5</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:36:30</sys_created_on>
+                        <sys_id>2bf1ec2087f13a50acfa635d0ebb35a7</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:36:30</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 00:36:30">2ff1ec2087f13a50acfa635d0ebb35a5</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:36:30</sys_created_on>
+                        <sys_id>63f1ec2087f13a50acfa635d0ebb35a8</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:40:32</sys_updated_on>
+                        <value>Events created today</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 00:36:30">2ff1ec2087f13a50acfa635d0ebb35a5</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:36:30</sys_created_on>
+                        <sys_id>6bf1ec2087f13a50acfa635d0ebb35a6</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:40:32</sys_updated_on>
+                        <value>a2e2eca087f13a50acfa635d0ebb35ae</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 00:36:30">2ff1ec2087f13a50acfa635d0ebb35a5</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:36:30</sys_created_on>
+                        <sys_id>aff1ec2087f13a50acfa635d0ebb35a7</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:36:30</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 00:36:30">2ff1ec2087f13a50acfa635d0ebb35a5</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:36:30</sys_created_on>
+                        <sys_id>ebf1ec2087f13a50acfa635d0ebb35a7</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:36:30</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Countries creating events this week</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 09:09:57</sys_created_on>
+                <sys_id>69a9ace887353a50acfa635d0ebb35b3</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 09:11:31</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 01:09:57">69a9ace887353a50acfa635d0ebb35b3</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:09:57</sys_created_on>
+                        <sys_id>29a9e42c87353a50acfa635d0ebb35d7</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:09:57</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 01:09:57">69a9ace887353a50acfa635d0ebb35b3</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:09:57</sys_created_on>
+                        <sys_id>65a9e42c87353a50acfa635d0ebb35d7</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:09:57</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 01:09:57">69a9ace887353a50acfa635d0ebb35b3</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:09:57</sys_created_on>
+                        <sys_id>a1a9ace887353a50acfa635d0ebb35b4</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:11:31</sys_updated_on>
+                        <value>2c0aa4ac87353a50acfa635d0ebb3598</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 01:09:57">69a9ace887353a50acfa635d0ebb35b3</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:09:57</sys_created_on>
+                        <sys_id>a1a9e42c87353a50acfa635d0ebb35d7</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:09:57</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 01:09:57">69a9ace887353a50acfa635d0ebb35b3</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:09:57</sys_created_on>
+                        <sys_id>e9a9e42c87353a50acfa635d0ebb35d7</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:11:31</sys_updated_on>
+                        <value>Countries creating events this week</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Monthly events trend</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 09:15:05</sys_created_on>
+                <sys_id>78daecec87f13a50acfa635d0ebb35e2</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 09:25:53</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 01:15:05">78daecec87f13a50acfa635d0ebb35e2</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:15:05</sys_created_on>
+                        <sys_id>3cdaecec87f13a50acfa635d0ebb35e3</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:25:53</sys_updated_on>
+                        <value>Monthly events trend</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 01:15:05">78daecec87f13a50acfa635d0ebb35e2</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:15:05</sys_created_on>
+                        <sys_id>78daecec87f13a50acfa635d0ebb35e3</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:15:05</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 01:15:05">78daecec87f13a50acfa635d0ebb35e2</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:15:05</sys_created_on>
+                        <sys_id>7cdaecec87f13a50acfa635d0ebb35e2</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:25:53</sys_updated_on>
+                        <value>f64d60e887753a50acfa635d0ebb3594</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 01:15:05">78daecec87f13a50acfa635d0ebb35e2</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:15:05</sys_created_on>
+                        <sys_id>b4daecec87f13a50acfa635d0ebb35e3</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:15:05</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 01:15:05">78daecec87f13a50acfa635d0ebb35e2</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:15:05</sys_created_on>
+                        <sys_id>f0daecec87f13a50acfa635d0ebb35e3</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:15:05</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Countries creating events this month</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 08:57:46</sys_created_on>
+                <sys_id>8bd660ac87f13a50acfa635d0ebb3505</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 09:09:26</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 00:57:46">8bd660ac87f13a50acfa635d0ebb3505</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:57:46</sys_created_on>
+                        <sys_id>07d660ac87f13a50acfa635d0ebb3506</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:57:46</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 00:57:46">8bd660ac87f13a50acfa635d0ebb3505</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:57:46</sys_created_on>
+                        <sys_id>4fd660ac87f13a50acfa635d0ebb3506</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:09:26</sys_updated_on>
+                        <value>Countries creating events this month</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 00:57:46">8bd660ac87f13a50acfa635d0ebb3505</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:57:46</sys_created_on>
+                        <sys_id>8bd660ac87f13a50acfa635d0ebb3506</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:57:46</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 00:57:46">8bd660ac87f13a50acfa635d0ebb3505</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:57:46</sys_created_on>
+                        <sys_id>8fd660ac87f13a50acfa635d0ebb3505</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:09:26</sys_updated_on>
+                        <value>f1896ce887353a50acfa635d0ebb35d3</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 00:57:46">8bd660ac87f13a50acfa635d0ebb3505</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:57:46</sys_created_on>
+                        <sys_id>c7d660ac87f13a50acfa635d0ebb3506</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:57:46</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Events created this week</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 08:51:10</sys_created_on>
+                <sys_id>a655a4a887f13a50acfa635d0ebb35df</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 08:52:58</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 00:51:10">a655a4a887f13a50acfa635d0ebb35df</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:51:10</sys_created_on>
+                        <sys_id>2255a4a887f13a50acfa635d0ebb35e1</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:51:10</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 00:51:10">a655a4a887f13a50acfa635d0ebb35df</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:51:10</sys_created_on>
+                        <sys_id>6e55a4a887f13a50acfa635d0ebb35e0</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:51:10</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 00:51:10">a655a4a887f13a50acfa635d0ebb35df</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:51:10</sys_created_on>
+                        <sys_id>aa55a4a887f13a50acfa635d0ebb35e0</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:51:10</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 00:51:10">a655a4a887f13a50acfa635d0ebb35df</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:51:10</sys_created_on>
+                        <sys_id>e255a4a887f13a50acfa635d0ebb35e1</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:52:58</sys_updated_on>
+                        <value>Events created this week</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 00:51:10">a655a4a887f13a50acfa635d0ebb35df</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:51:10</sys_created_on>
+                        <sys_id>ee55a4a887f13a50acfa635d0ebb35df</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:52:58</sys_updated_on>
+                        <value>2cc5e0e887f13a50acfa635d0ebb3511</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Events created this month</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 08:53:13</sys_created_on>
+                <sys_id>acd528e887f13a50acfa635d0ebb3548</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 08:54:49</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 00:53:13">acd528e887f13a50acfa635d0ebb3548</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:53:13</sys_created_on>
+                        <sys_id>28d528e887f13a50acfa635d0ebb3549</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:53:13</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 00:53:13">acd528e887f13a50acfa635d0ebb3548</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:53:13</sys_created_on>
+                        <sys_id>60d528e887f13a50acfa635d0ebb354a</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:54:49</sys_updated_on>
+                        <value>Events created this month</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 00:53:13">acd528e887f13a50acfa635d0ebb3548</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:53:13</sys_created_on>
+                        <sys_id>a0d528e887f13a50acfa635d0ebb3549</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:54:49</sys_updated_on>
+                        <value>3f26282c87f13a50acfa635d0ebb35b9</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 00:53:13">acd528e887f13a50acfa635d0ebb3548</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:53:13</sys_created_on>
+                        <sys_id>acd528e887f13a50acfa635d0ebb3549</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:53:13</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 00:53:13">acd528e887f13a50acfa635d0ebb3548</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:53:13</sys_created_on>
+                        <sys_id>e8d528e887f13a50acfa635d0ebb3549</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:53:13</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Countries creating events today</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 08:55:14</sys_created_on>
+                <sys_id>b546682c87f13a50acfa635d0ebb35be</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 08:57:22</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 00:55:14">b546682c87f13a50acfa635d0ebb35be</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:55:14</sys_created_on>
+                        <sys_id>3d462c2c87f13a50acfa635d0ebb35ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:55:14</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 00:55:14">b546682c87f13a50acfa635d0ebb35be</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:55:14</sys_created_on>
+                        <sys_id>79462c2c87f13a50acfa635d0ebb35ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:55:14</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 00:55:14">b546682c87f13a50acfa635d0ebb35be</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:55:14</sys_created_on>
+                        <sys_id>b1462c2c87f13a50acfa635d0ebb35cf</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:57:22</sys_updated_on>
+                        <value>Countries creating events today</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 00:55:14">b546682c87f13a50acfa635d0ebb35be</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:55:14</sys_created_on>
+                        <sys_id>f1462c2c87f13a50acfa635d0ebb35ce</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:57:22</sys_updated_on>
+                        <value>ddc6eca887f13a50acfa635d0ebb35cb</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 00:55:14">b546682c87f13a50acfa635d0ebb35be</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 08:55:14</sys_created_on>
+                        <sys_id>fd462c2c87f13a50acfa635d0ebb35ce</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 08:55:14</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+            <sys_portal action="INSERT_OR_UPDATE">
+                <dropzone/>
+                <offset/>
+                <page display_value="Monitoring EventsV3">644024e887b13a50acfa635d0ebb3578</page>
+                <summary>Today's hourly events trend</summary>
+                <sys_created_by>syahmad@equinix.com</sys_created_by>
+                <sys_created_on>2025-12-10 09:39:41</sys_created_on>
+                <sys_id>c5707c6087b53a50acfa635d0ebb352c</sys_id>
+                <sys_mod_count>2</sys_mod_count>
+                <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                <sys_updated_on>2025-12-10 09:41:38</sys_updated_on>
+                <related_items_node>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>help_text_window</name>
+                        <portal_section display_value="Created 2025-12-10 01:39:41">c5707c6087b53a50acfa635d0ebb352c</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:39:41</sys_created_on>
+                        <sys_id>05707c6087b53a50acfa635d0ebb352d</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:39:41</sys_updated_on>
+                        <value>report_widget_description</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>renderer</name>
+                        <portal_section display_value="Created 2025-12-10 01:39:41">c5707c6087b53a50acfa635d0ebb352c</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:39:41</sys_created_on>
+                        <sys_id>41707c6087b53a50acfa635d0ebb352d</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:39:41</sys_updated_on>
+                        <value>com.glide.ui.portal.RenderReport</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>title</name>
+                        <portal_section display_value="Created 2025-12-10 01:39:41">c5707c6087b53a50acfa635d0ebb352c</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:39:41</sys_created_on>
+                        <sys_id>89707c6087b53a50acfa635d0ebb352d</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:41:38</sys_updated_on>
+                        <value>Today's hourly events trend</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>can_subscribe</name>
+                        <portal_section display_value="Created 2025-12-10 01:39:41">c5707c6087b53a50acfa635d0ebb352c</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:39:41</sys_created_on>
+                        <sys_id>c5707c6087b53a50acfa635d0ebb352d</sys_id>
+                        <sys_mod_count>0</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:39:41</sys_updated_on>
+                        <value>true</value>
+                    </sys_portal_preferences>
+                    <sys_portal_preferences action="INSERT_OR_UPDATE">
+                        <name>sys_id</name>
+                        <portal_section display_value="Created 2025-12-10 01:39:41">c5707c6087b53a50acfa635d0ebb352c</portal_section>
+                        <sys_created_by>syahmad@equinix.com</sys_created_by>
+                        <sys_created_on>2025-12-10 09:39:41</sys_created_on>
+                        <sys_id>c9707c6087b53a50acfa635d0ebb352c</sys_id>
+                        <sys_mod_count>1</sys_mod_count>
+                        <sys_updated_by>syahmad@equinix.com</sys_updated_by>
+                        <sys_updated_on>2025-12-10 09:41:38</sys_updated_on>
+                        <value>3de078e087b53a50acfa635d0ebb3536</value>
+                    </sys_portal_preferences>
+                </related_items_node>
+            </sys_portal>
+        </related_items_node>
+    </sys_portal_page>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137c282f0000001</claim_timestamp>
+        <metadata_update_name>sys_portal_page_644024e887b13a50acfa635d0ebb3578</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:05:31</sys_created_on>
+        <sys_id>8027e09987b5c7904d820e96cebb3581</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:05:31</sys_updated_on>
+    </sys_claim>
+</record_update>

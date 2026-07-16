@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function($scope, $location, $timeout, $rootScope) {
+    /* widget controller */
+    var c = this;
+
+    if (c.data.accountOU === 'JP' ||c.data.accountOU === 'ES') {
+        $scope.tabs = ['${Dashboard}', '${History}']
+    } else if (c.data.pemission == true) {
+        $scope.tabs = ['${Dashboard}', '${History}', '${Maintenance}', '${My Plan}'];
+    } else {
+        $scope.tabs = ['${Dashboard}', '${History}', '${Maintenance}'];
+    }
+
+
+    // Default tab
+    c.active_tab = 'Dashboard';
+    identifyPageTracking($scope.data.pageTitle, 'Monitoring', c.data.trackingEnabled, c.data.categoriesTrackingEnabled);
+
+
+}]]></client_script>
+        <controller_as>c</controller_as>
+        <css>#backup-tab-content {&#13;
+  position: relative;&#13;
+}&#13;
+&#13;
+.modal-dialog {&#13;
+  @media screen and (min-width: 992px) {&#13;
+    width: 79vw;&#13;
+    height: 90vh;&#13;
+  }&#13;
+}&#13;
+&#13;
+.panel {&#13;
+	position: relative;&#13;
+}&#13;
+&#13;
+.panel-fullscreen {&#13;
+	transition: 0.6s;&#13;
+}&#13;
+&#13;
+.maximize {&#13;
+  width: 100%;&#13;
+  height: 100%;&#13;
+	position: fixed;&#13;
+  top: 0;&#13;
+  left: 0;&#13;
+  z-index: 99;&#13;
+  transition: 0.6s;&#13;
+}&#13;
+&#13;
+.panel-heading h4 {&#13;
+	margin-top: 0;&#13;
+}&#13;
+&#13;
+.divider {&#13;
+  margin-top: 24px;&#13;
+  margin-left: -20px;&#13;
+  border-bottom: 1px solid #D9D9D9;&#13;
+  width: calc(100% + 40px);&#13;
+  height: 0px;&#13;
+}&#13;
+&#13;
+.title {&#13;
+  font-size: 16px;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-normal);&#13;
+  color: #404040;&#13;
+  margin-top: 10px;&#13;
+  margin-bottom: 10px;&#13;
+}&#13;
+&#13;
+.margin-top {&#13;
+  margin-top: 16px;&#13;
+}&#13;
+&#13;
+.dropdown-menu &gt; li &gt; a {&#13;
+  display: block;&#13;
+  padding: 3px 20px;&#13;
+  clear: both;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+  line-height: 1.42857;&#13;
+  color: #ADADAD;&#13;
+  white-space: nowrap;&#13;
+}&#13;
+&#13;
+.dropdown-menu &gt; li &gt; a &gt; i {&#13;
+  color: #898989;&#13;
+  margin-right: 5px;&#13;
+}&#13;
+&#13;
+.summary-actions {&#13;
+  position: absolute;&#13;
+  right: 10px;&#13;
+  top: 5px;&#13;
+}&#13;
+&#13;
+.equipment-info &gt; .type {&#13;
+  color: #ACA9A9;&#13;
+  font-size: 12px;&#13;
+  line-height: 12px;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+}&#13;
+&#13;
+.equipment-info &gt; .name {&#13;
+  color: #6C6C6C;&#13;
+}&#13;
+&#13;
+.equipment-info &gt; .name&gt; i {&#13;
+  color: #FFE200;&#13;
+}&#13;
+&#13;
+.equipment-info &gt; .name&gt; i:first-child {&#13;
+  margin-left: 10px;&#13;
+}&#13;
+&#13;
+.backup-status {&#13;
+  padding: 12px 0px;&#13;
+  color: #8E9B70;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+&#13;
+}&#13;
+&#13;
+.backup-status div {&#13;
+  margin-bottom: 3px;&#13;
+}&#13;
+&#13;
+.backup-status i {&#13;
+  color: #A3D15E;&#13;
+  margin-right: 3px;&#13;
+  font-size: 18px;&#13;
+}&#13;
+&#13;
+.backup-status i.info {&#13;
+  color: #FF8600;&#13;
+}&#13;
+.backup-status a{&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+}&#13;
+&#13;
+.restore-status {&#13;
+  color: #B0D73A;&#13;
+  padding: 10px 0px;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+}&#13;
+&#13;
+&#13;
+.restore-status i {&#13;
+  color: #A3D15E;&#13;
+  font-size: 18px;&#13;
+  margin-right: 10px;&#13;
+}&#13;
+&#13;
+.tag.success {&#13;
+  background-color: #9DCD00;&#13;
+  color: #FFF;&#13;
+}&#13;
+&#13;
+.tag.danger {&#13;
+  background-color: #E90000;&#13;
+  color: #FFF;&#13;
+}&#13;
+&#13;
+.tag-stats &gt; .tag {&#13;
+  display: inline-block;&#13;
+  padding: 1px 15px;&#13;
+  border-radius: 30px;&#13;
+  font-size: 10px;&#13;
+  margin-right: 3px;&#13;
+}&#13;
+&#13;
+.tag-stats {&#13;
+  padding: 10px 0px 15px 0px;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+}&#13;
+&#13;
+.vpn-section {&#13;
+  padding: 12px 0px;&#13;
+  font-size: 1.3rem;&#13;
+  line-height: 1.6;&#13;
+}&#13;
+&#13;
+.v7f3de4ecdb199f80b3cd73e1ba961935 .panel-title {&#13;
+  margin-bottom: 8px;&#13;
+  font-family: var(--eq-font-family);&#13;
+  font-weight: var(--eq-font-weight-light);&#13;
+  font-size: 1.8rem;&#13;
+}&#13;
+&#13;
+.dropdown {&#13;
+  .btn {&#13;
+    padding: 0 8px !important;&#13;
+    color: $info;&#13;
+    font-size: 18px !important;&#13;
+&#13;
+    &amp;:focus,&#13;
+    &amp;:hover {&#13;
+      background: none;&#13;
+      outline: none;&#13;
+    }&#13;
+&#13;
+    &amp;:active {&#13;
+      box-shadow: none;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.dropdown-menu {&#13;
+  padding: 8px 0;&#13;
+  min-width: 110px;&#13;
+  left: -83px;&#13;
+  border-radius: 0;&#13;
+  border-color: #C8D0D8;&#13;
+&#13;
+  &gt; li &gt; a {&#13;
+    padding: 4px 16px;&#13;
+    color: $info;&#13;
+    font-size: 12px;&#13;
+&#13;
+    .fa, .icon-trash-eqx-icon {&#13;
+      margin-right: 8px;&#13;
+      position: relative;&#13;
+      top: 2px;&#13;
+      color: $text-color;&#13;
+      font-size: 16px;&#13;
+    }&#13;
+&#13;
+    .icon-trash-eqx-icon {&#13;
+      font-size: 14px;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.arrow-up {&#13;
+  position: absolute;&#13;
+  margin: auto;&#13;
+  top: -3px;&#13;
+  left: 80px;&#13;
+  right: 0;&#13;
+  width: 5px;&#13;
+  height: 5px;&#13;
+  background: #fff;&#13;
+  transform: rotate(-135deg);&#13;
+  -webkit-transform: rotate(-135deg);&#13;
+  -moz-transform: rotate(-135deg);&#13;
+  -o-transform: rotate(-135deg);&#13;
+  -ms-transform: rotate(-135deg);&#13;
+  border-right: 1px solid #C8D0D8;&#13;
+  border-bottom: 1px solid #C8D0D8;&#13;
+}&#13;
+&#13;
+.server-dropdown {&#13;
+	position: absolute;&#13;
+  right: 12px;&#13;
+  top: 12px;&#13;
+}&#13;
+&#13;
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>msp-monitoring-tab</id>
+        <internal>false</internal>
+        <link/>
+        <name>MSP Monitoring Tab</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+    /* populate the 'data' object */
+    /* e.g., data.table = $sp.getValue('table'); */
+    data.trackingEnabled = gs.getProperty('EQIX_ANALYTICS_SEGMENT_ENABLED');
+    data.categoriesTrackingEnabled = gs.getProperty('EQIX_ANALYTICS_CATEGORIES_ENABLED');
+	data.pageTitle = 'Monitoring';
+    // Services
+	var siCustomerPermission = new EQIX_Customer_Permissions();
+
+    var account = siCustomerPermission.getActiveAccountSysId();
+	data.accountOU  = siCustomerPermission.getAccountOuc(account);
+
+    var dashboardOptions = {};
+    data.dashboardWidget = $sp.getWidget('msp-monitoring-dashboard', dashboardOptions);
+
+    var alarmsPerDayOptions = {};
+    data.alarmsPerDayWidget = $sp.getWidget('msp-alarms-per-day', alarmsPerDayOptions);
+
+    var alarmsHistoryOptions = {
+        table: 'u_event_management'
+    };
+    data.alarmsHistoryWidget = $sp.getWidget('msp-alarms-history-data-table', alarmsHistoryOptions);
+
+    var topTriggersOptions = {
+        table: 'u_event_management'
+    };
+    data.topTriggersWidget = $sp.getWidget('msp-top-10-triggers', topTriggersOptions);
+
+	if (data.accountOU != 'JP' && data.accountOU != 'ES') {
+		var maintenanceOptions = {
+			table: 'u_mto_maintenance'
+		};
+		data.maintenanceWidget = $sp.getWidget('msp-maintenance-data-table', maintenanceOptions);
+    }
+
+
+    var model_number = "1-2FDQN8F6"; // - Monitoring 
+    var relaxCIPortal = new EQUIX_RelaxCI();
+    var result = relaxCIPortal.getServiceManagedAccount(model_number, account);
+    data.pemission = result.permission;
+    
+	if (result.permission == true) {
+        data.managedService = $sp.getWidget('msp-view-product-multiple-cis', {
+            "model_number": model_number
+        });
+        data.createButtonAddComponent = $sp.getWidget('msp-view-button-add-component', {
+            "model_number": model_number,
+			"href_add_components": "/msp?action=new&autofill=true&u_type=0&u_product_line=e5fd2865dbdadf00448b01a3ca9619ba&u_product_category=85c068a9db5adf00448b01a3ca9619b1&u_product=6b43b0e9dbdadf00448b01a3ca961960&u_service=3478f55c1bd510d08ca477741a4bcb4d"
+        });
+//gs.addInfoMessage(result.model_number);
+		
+        var tableComponentOptions = {
+            "table": 'cmdb_ci',
+					  "field_list":'u_hostname,ip_address,sys_class_name,location',
+            "model_number": result.model_number,
+					  "sys_id_ci": result.sys_id_CI
+        };
+
+        data.createTableComponent = $sp.getWidget('msp-table-assigned-components',tableComponentOptions);
+    }
+
+    /*var reportsOptions = {
+    	table: 'task'
+    };
+    data.reportsWidget = $sp.getWidget('msp-reports-data-table', reportsOptions);*/
+
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>organize.gustavo</sys_created_by>
+        <sys_created_on>2018-05-15 13:52:05</sys_created_on>
+        <sys_id>3dbc8d52db825700b3cd73e1ba961904</sys_id>
+        <sys_mod_count>180</sys_mod_count>
+        <sys_name>MSP Monitoring Tab</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_3dbc8d52db825700b3cd73e1ba961904</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:52</sys_updated_on>
+        <template><![CDATA[<ul class="nav nav-tabs" id="maintenanceTab" role="tablist">
+  <li ng-repeat="tab in tabs" class="nav-item" ng-class="{active: c.active_tab == tab}">
+    <a class="nav-link" ng-click="c.active_tab = tab">{{tab}}</a>
+  </li>
+</ul>
+
+<div class="panel panel-fullscreen">
+  <div class="tab-pane" id="dashboard-tab-content" ng-show="c.active_tab == 'Dashboard'">
+    <sp-widget widget="data.dashboardWidget"></sp-widget>
+  </div>
+
+  <div class="tab-pane" id="dashboard-tab-content" ng-show="c.active_tab == '${History}'">
+    <sp-widget widget="data.alarmsPerDayWidget"></sp-widget>
+    
+    <div class="divider"></div>
+    
+    <sp-widget widget="data.alarmsHistoryWidget"></sp-widget>
+    
+    <div class="divider"></div>
+    
+    <sp-widget widget="data.topTriggersWidget"></sp-widget>
+  </div>
+
+  <div class="tab-pane" id="dashboard-tab-content" ng-show="c.active_tab == '${Maintenance}'">
+    <sp-widget widget="data.maintenanceWidget"></sp-widget>
+  </div>
+  <!-- DEVELOPER: Edgar Gomes - Relax CI -  MRC-55 -->
+  <div class="tab-pane" id="dashboard-tab-content" ng-show="c.active_tab == '${My Plan}'">
+    <!--<sp-widget widget="data.managedService"></sp-widget>
+    <hr>-->
+    <sp-widget widget="data.createButtonAddComponent"></sp-widget>
+    <sp-widget widget="data.createTableComponent"></sp-widget>
+  </div>
+ <!-- END -->
+  <!--<div class="tab-pane" id="dashboard-tab-content" ng-show="c.active_tab == 'Reports'">
+    <sp-widget widget="data.reportsWidget"></sp-widget>
+  </div>-->
+</div>
+]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f13760fa20000001</claim_timestamp>
+        <metadata_update_name>sp_widget_3dbc8d52db825700b3cd73e1ba961904</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:52</sys_created_on>
+        <sys_id>2295e81d8775c7904d820e96cebb3513</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:52</sys_updated_on>
+    </sys_claim>
+</record_update>

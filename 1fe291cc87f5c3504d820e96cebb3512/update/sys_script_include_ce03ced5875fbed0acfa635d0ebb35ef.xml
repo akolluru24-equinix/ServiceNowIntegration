@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_include">
+    <sys_script_include action="INSERT_OR_UPDATE">
+        <access>package_private</access>
+        <active>true</active>
+        <api_name>global.EQIX_MDM3_Contact_REST</api_name>
+        <caller_access/>
+        <client_callable>false</client_callable>
+        <description>Used on EQIX_MDM3_Account_and_Contact&#13;
+ImportMDM3Contact Scripted REST API</description>
+        <mobile_callable>false</mobile_callable>
+        <name>EQIX_MDM3_Contact_REST</name>
+        <sandbox_callable>false</sandbox_callable>
+        <script><![CDATA[var EQIX_MDM3_Contact_REST = Class.create();
+EQIX_MDM3_Contact_REST.prototype = {
+    initialize: function() {},
+
+    process: function(request) {
+        var payload = null;
+        try {
+
+            if (request && request.body && request.body.data) {
+                payload = request.body.data;
+
+            } else if (request && request.body) {
+                try {
+                    payload = (typeof request.body === 'string') ? JSON.parse(request.body) : request.body;
+                } catch (e) {
+                    gs.error('REST Import Contact:Invalid JSON in request.body.data - ' + e.message);
+                    throw e;
+                }
+            }
+
+            // Support either { data: [...] } or just [...]
+            var arr = [];
+            if (payload && Array.isArray(payload.data)) {
+                arr = payload.data;
+            } else if (Array.isArray(payload)) {
+                arr = payload;
+
+            } else if (payload && payload.data && typeof payload.data === 'object') {
+                // In case data is a single object instead of array
+                arr = [payload.data];
+            }
+
+            if (!arr || arr.length === 0) {
+                throw new Error('REST Import Contacts: No data records found in payload (expected data[0]).');
+            }
+
+            // var obj = arr[0];
+            var sysIds = [];
+            arr.forEach(function(obj) {
+                    // Create GlideRecord for u_imp_legal_account_mdm3
+                    var grImpContact = new GlideRecord('u_imp_contact_mdm3_0');
+                    grImpContact.initialize();
+
+                    // Root / account-level
+                    grImpContact.u_accountname = obj.accountName || '';
+                    grImpContact.u_accountnumber = obj.accountNumber || '';
+                    grImpContact.u_mdmid = obj.mdmId || '';
+                    grImpContact.u_createdby = obj.createdBy || '';
+                    grImpContact.u_createddatetime = obj.createdDateTime || '';
+                    grImpContact.u_updatedby = obj.updatedBy || '';
+
+
+                    // Name / person info
+                    grImpContact.u_firstname = obj.firstName || '';
+                    grImpContact.u_middlename = obj.middleName || '';
+                    grImpContact.u_lastname = obj.lastName || '';
+                    grImpContact.u_name = obj.name || '';
+                    grImpContact.u_nameprefix = obj.namePrefix || '';
+                    grImpContact.u_namesuffix = obj.nameSuffix || '';
+                    grImpContact.u_salutation = obj.salutation || '';
+                    grImpContact.u_pronouns = obj.pronouns || '';
+                    grImpContact.u_gender = obj.gender || '';
+                    grImpContact.u_dateofbirth = obj.dateOfBirth || '';
+                    grImpContact.u_title = obj.title || '';
+                    grImpContact.u_designation = obj.designation || '';
+                    grImpContact.u_jobtitlegroup = obj.jobTitleGroup || '';
+                    grImpContact.u_senioritylevel = obj.seniorityLevel || '';
+
+                    // Status / lifecycle
+                    grImpContact.u_status = obj.status || '';
+                    grImpContact.u_statuschangedatetime = obj.statusChangeDateTime || '';
+                    grImpContact.u_isdeleted = obj.isDeleted;
+                    grImpContact.u_isprimary = obj.isPrimary || '';
+                    grImpContact.u_leadsource = obj.leadSource || '';
+                    grImpContact.u_purgestatus = obj.purgeStatus || '';
+
+                    // Region
+                    grImpContact.u_region = obj.region || '';
+
+                    // Comments, communication, employment
+                    grImpContact.u_commenters = obj.commenters || '';
+                    grImpContact.u_communication = obj.communication || '';
+                    grImpContact.u_employmenthistory = obj.employmentHistory || '';
+
+                    // Preferred communication
+                    grImpContact.u_preferredmodeofcommunication = obj.preferredModeOfCommunication || '';
+
+                    // --- Email block ---
+                    if (obj.email) {
+                        grImpContact.u_email_email = obj.email[0].email || '';
+                        grImpContact.u_email_emailtype = obj.email[0].emailType || '';
+                    }
+                    // --- Phone block ---
+                    if (obj.phone) {
+                        var mobile = obj.phone.find(item => item.type.toLowerCase().includes('mobile'));
+                        var business = obj.phone.find(item => item.type.toLowerCase().includes('business'));
+                        grImpContact.u_phone_number = business.number || '';
+                        grImpContact.u_mobile_number = mobile.number || '';
+                        grImpContact.u_phone_extension = business.extension || '';
+                        // grImpContact.u_phone_type = obj.phone[0].type || '';
+                        // grImpContact.u_phone_number = obj.phone[0].number || '';
+                    }
+
+                    /*// --- Privacy preferences ---
+                    grImpContact.u_privacyprefe_e_donotcontact = (obj.privacyPreference?.doNotContact ?? '').toString();
+                    grImpContact.u_privacyprefe_ce_emailoptout = (obj.privacyPreference?.emailOptOut ?? '').toString();
+                    grImpContact.u_privacypreference_faxoptout = (obj.privacyPreference?.faxOptOut ?? '').toString();*/
+
+                    // --- Associated accounts array ---
+                    // Store raw JSON as string (matching your example where value is a JSON array in a single field)
+                    grImpContact.u_associatedaccounts_arraydata = JSON.stringify(obj.associatedAccounts);
+
+
+
+                    // Insert the record
+                    sysIds.push(grImpContact.insert());
+                    // gs.info('Record created in u_imp_legal_account_mdm3 with sys_id: ' + sysId);
+                }
+
+            );
+
+
+            return "ImpMDM3contact created: " + sysIds.join(',');
+
+        } catch (e) {
+            /*var msLog = new EQIX_ManagedServiceLog();
+            msLog.errorLog('u_imp_legal_account_mdm3', case_id, 'Script REST', '/api/equi2/eqix_novation/createCase', e.message, 'create');*/
+            gs.error('REST Import Contact: Not possible to create Record  in u_imp_legal_contact_mdm3 with : ' + e.stack);
+            var mslog = new EQIX_ManagedServiceLog();
+            mslog.errorLog('customer_contact', '', 'Scripted REST API', 'EQIX_MDM3_Account_and_Contact.ImportMDM3Contact', (request.getHeader('CORRELATION-ID') || '') + '. Error: ' + e.message, '/api/equi2/eqix_mdm3/importContact');
+            // gs.eventQueue('EQIX.accounts.contacts.error', null, 'REST Import Contact \n' + request.path + '. ' + request.getHeader('CORRELATION-ID') + 'Error: ' + e.message);
+
+        }
+    },
+
+    type: 'EQIX_MDM3_Contact_REST'
+};]]></script>
+        <sys_class_name>sys_script_include</sys_class_name>
+        <sys_created_by>alviana@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-25 13:14:11</sys_created_on>
+        <sys_id>ce03ced5875fbed0acfa635d0ebb35ef</sys_id>
+        <sys_mod_count>5</sys_mod_count>
+        <sys_name>EQIX_MDM3_Contact_REST</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_include_ce03ced5875fbed0acfa635d0ebb35ef</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:15</sys_updated_on>
+    </sys_script_include>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137aff0e0000001</claim_timestamp>
+        <metadata_update_name>sys_script_include_ce03ced5875fbed0acfa635d0ebb35ef</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:15</sys_created_on>
+        <sys_id>e9d664d587b5c7904d820e96cebb3535</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:15</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>ce03ced5875fbed0acfa635d0ebb35ef</id>
+        <sys_created_by>alviana@equinix.com</sys_created_by>
+        <sys_created_on>2026-02-25 13:14:10</sys_created_on>
+        <sys_id>4ef30a59875fbed0acfa635d0ebb359d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>alviana@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-02-25 13:14:10</sys_updated_on>
+        <table>sys_script_include</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

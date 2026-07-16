@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sysevent_in_email_action">
+    <sysevent_in_email_action action="INSERT_OR_UPDATE">
+        <action>record_action</action>
+        <active>true</active>
+        <assignment_operator/>
+        <condition_script/>
+        <description>This inbound email action is triggered when an email is sent to ServiceNow and:&#13;
+&#13;
+1. The email is a reply.&#13;
+2. The email being replied to was sent by ServiceNow due to creation or update of an Approval Request.&#13;
+&#13;
+This inbound email action can update the state field of an Approval Request, if the subject of the email contains either "approve" or "reject", or if the state is set within the body of the email.&#13;
+&#13;
+In addition to being able to explicitly set the value of the state field, the whole email is added to the Approval Request as a comment.&#13;
+&#13;
+Example reply email: this reply will update comments for the Approval Request with "This seems fine.", and set the state to "approved". &#13;
+&#13;
+-----&#13;
+&#13;
+From: 	Fred Luddy &lt;fred.luddy@example.com&gt;&#13;
+Subject: 	Re: Approval request has been assigned to you&#13;
+Date: 	June 11, 2013 3:10:54 PM PDT&#13;
+To: 	        ServiceNow&#13;
+&#13;
+This seems fine.&#13;
+&#13;
+state: approved&#13;
+&#13;
+On Jun 11, 2013, at 3:08 PM, IT Service Desk wrote:&#13;
+&#13;
+Ref:MSG0000107&#13;
+&#13;
+----- </description>
+        <event_name>email.read</event_name>
+        <filter_condition/>
+        <from/>
+        <name>OI: Approval Request</name>
+        <order>100</order>
+        <redact_action>false</redact_action>
+        <reply_email/>
+        <required_roles/>
+        <script><![CDATA[if(current.getTableName() == 'sysapproval_approver'){
+	if (validUser()) {
+		if (current.state != 'cancelled' && current.state != 'approved' && current.state != 'rejected') {
+			if (email.subject.indexOf("approve") >= 0)
+				current.state = "approved";
+			if (email.subject.indexOf("reject") >= 0)
+				current.state = "rejected";
+		}
+	}
+}
+
+current.update();
+
+function validUser() {
+   var gr = new GlideRecord("sys_user");
+    gr.addQuery("sys_id",current.approver);
+	gr.addQuery("email",email.from);
+	gr.query();
+    if(gr.next()){
+        return true;
+    }
+	// check if the email is from a delegate of the approver
+	var g = new GlideRecord("sys_user_delegate");
+	g.addQuery("user", current.approver.toString());
+	g.addQuery("delegate", email.from_sys_id);
+	g.addQuery("approvals", "true");
+	g.addQuery("starts", "<=", gs.daysAgo(0));
+	g.addQuery("ends", ">=", gs.daysAgo(0));
+	g.query();
+	return g.hasNext();
+}]]></script>
+        <stop_processing>false</stop_processing>
+        <sys_class_name>sysevent_in_email_action</sys_class_name>
+        <sys_created_by>organize.marcio</sys_created_by>
+        <sys_created_on>2018-01-09 15:54:34</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>13607479db27cf40b3cd73e1ba9619bd</sys_id>
+        <sys_mod_count>24</sys_mod_count>
+        <sys_name>OI: Approval Request</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sysevent_in_email_action_13607479db27cf40b3cd73e1ba9619bd</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:33</sys_updated_on>
+        <table>sysapproval_approver</table>
+        <template/>
+        <type>reply</type>
+    </sysevent_in_email_action>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375c7cd0000001</claim_timestamp>
+        <metadata_update_name>sysevent_in_email_action_13607479db27cf40b3cd73e1ba9619bd</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:33</sys_created_on>
+        <sys_id>8e85a01d8775c7904d820e96cebb35a6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:33</sys_updated_on>
+    </sys_claim>
+</record_update>

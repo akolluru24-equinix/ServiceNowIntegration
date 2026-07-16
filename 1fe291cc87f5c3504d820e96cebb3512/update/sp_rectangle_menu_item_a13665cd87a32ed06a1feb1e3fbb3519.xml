@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_rectangle_menu_item">
+    <sp_rectangle_menu_item action="INSERT_OR_UPDATE">
+        <active>false</active>
+        <color>default</color>
+        <condition/>
+        <display_1/>
+        <display_2/>
+        <display_date/>
+        <filter/>
+        <glyph>empty</glyph>
+        <hint/>
+        <kb_article/>
+        <kb_category/>
+        <kb_topic/>
+        <label>Report Center</label>
+        <order>100</order>
+        <record_script/>
+        <sc_cat_item/>
+        <sc_category/>
+        <short_description>Create and Manage Reports</short_description>
+        <sp_page display_value="msp_report_center">63e4298d87a32ed06a1feb1e3fbb35e9</sp_page>
+        <sp_rectangle_menu/>
+        <sp_rectangle_menu_item/>
+        <sys_class_name>sp_rectangle_menu_item</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-08-22 06:30:43</sys_created_on>
+        <sys_id>a13665cd87a32ed06a1feb1e3fbb3519</sys_id>
+        <sys_mod_count>3</sys_mod_count>
+        <sys_name>Report Center</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_rectangle_menu_item_a13665cd87a32ed06a1feb1e3fbb3519</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:41</sys_updated_on>
+        <table/>
+        <type>page</type>
+        <u_badge/>
+        <url/>
+        <url_target/>
+    </sp_rectangle_menu_item>
+    <sys_translated_text action="delete_multiple" query="documentkey=a13665cd87a32ed06a1feb1e3fbb3519"/>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>label</fieldname>
+        <language>es</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:46:09</sys_created_on>
+        <sys_id>4157610387e03a90acfa635d0ebb35cb</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:46:09</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Centro de informes</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>label</fieldname>
+        <language>fq</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:46:25</sys_created_on>
+        <sys_id>1b67a50387e03a90acfa635d0ebb3523</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:46:25</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Centre de rapports</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>label</fieldname>
+        <language>ja</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:44:59</sys_created_on>
+        <sys_id>cbf6e5cf87a03a90acfa635d0ebb35a5</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:45:31</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>レポートセンター</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>label</fieldname>
+        <language>pb</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:46:35</sys_created_on>
+        <sys_id>5377210387e03a90acfa635d0ebb353d</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:46:35</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Central de Relatórios</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>es</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:47:14</sys_created_on>
+        <sys_id>c0a7214387e03a90acfa635d0ebb3582</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:47:14</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Crear y administrar informes</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>fq</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:47:27</sys_created_on>
+        <sys_id>b3a7ed0387e03a90acfa635d0ebb3580</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:47:27</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Créer et gérer des rapports</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>ja</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:46:59</sys_created_on>
+        <sys_id>3787210387e03a90acfa635d0ebb3540</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:46:59</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>レポートの作成と管理</value>
+    </sys_translated_text>
+    <sys_translated_text action="INSERT_OR_UPDATE">
+        <documentkey>a13665cd87a32ed06a1feb1e3fbb3519</documentkey>
+        <fieldname>short_description</fieldname>
+        <language>pb</language>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2025-10-17 04:47:37</sys_created_on>
+        <sys_id>32b7a54387e03a90acfa635d0ebb35c2</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>chpiao@equinix.com</sys_updated_by>
+        <sys_updated_on>2025-10-17 04:47:37</sys_updated_on>
+        <tablename>sp_rectangle_menu_item</tablename>
+        <value>Criar e gerenciar relatórios</value>
+    </sys_translated_text>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1375e4ca0000001</claim_timestamp>
+        <metadata_update_name>sp_rectangle_menu_item_a13665cd87a32ed06a1feb1e3fbb3519</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:41</sys_created_on>
+        <sys_id>c895641d8775c7904d820e96cebb35d6</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:41</sys_updated_on>
+    </sys_claim>
+</record_update>

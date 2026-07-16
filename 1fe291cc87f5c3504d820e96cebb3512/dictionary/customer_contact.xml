@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?><database>
+    <element attributes="hasLabels=true" audit="true" db_object_id="17d828f34f5e8300f5e08e1f0210c722" extends="sys_user" label="Contacto" max_length="40" name="customer_contact" type="collection">
+        <element attributes="edge_encryption_enabled=true" label="MDM3 Contact" max_length="255" name="u_mdm3_contact" type="boolean"/>
+    </element>
+</database>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_ui_action">
+    <sys_ui_action action="INSERT_OR_UPDATE">
+        <action_name/>
+        <active>true</active>
+        <client>true</client>
+        <client_script_v2><![CDATA[function onClick(g_form) {
+
+}]]></client_script_v2>
+        <comments/>
+        <condition>(current.u_event_number.u_case == "" &amp;&amp; current.u_event_number.u_account != "" &amp;&amp; (current.state == 1 || current.state == 2 ) &amp;&amp; current.u_autoclose_date == "" &amp;&amp; current.u_has_open_events == true) </condition>
+        <form_action>false</form_action>
+        <form_button>false</form_button>
+        <form_button_icon/>
+        <form_button_v2>false</form_button_v2>
+        <form_context_menu>false</form_context_menu>
+        <form_link>false</form_link>
+        <form_menu_button_v2>false</form_menu_button_v2>
+        <form_style/>
+        <format_for_configurable_workspace>false</format_for_configurable_workspace>
+        <hint/>
+        <isolate_script>true</isolate_script>
+        <list_action>true</list_action>
+        <list_banner_button>false</list_banner_button>
+        <list_button>false</list_button>
+        <list_button_icon/>
+        <list_choice>true</list_choice>
+        <list_context_menu>false</list_context_menu>
+        <list_link>false</list_link>
+        <list_save_with_form_button>false</list_save_with_form_button>
+        <list_style/>
+        <messages/>
+        <name>Add to an Event Storm</name>
+        <onclick>addToEventStormFromList()</onclick>
+        <order>99</order>
+        <script><![CDATA[function addToEventStormFromList() {
+    var answer = "true";
+    var eventTasksList = g_list.getChecked().toString();
+    var checkedCount = g_list.getChecked().toString().split(',').length;
+
+    if (checkedCount > 1) {
+        var ga = new GlideAjax('EQIX_MonitoringEventUtilAJAX');
+        ga.addParam('sysparm_name', 'eventStormSameAccount');
+        ga.addParam('sysparm_event_task', eventTasksList);
+        ga.getXMLWait();
+        answer = ga.getAnswer();
+    }
+    if (answer == "true") {
+        casebyEvent(eventTasksList);
+    } else {
+        alert(answer);
+    }
+}
+
+function casebyEvent(eventTasksList) {
+    //Initialize and open the dialog
+    var dialog = new GlideDialogWindow("EQIX_Add_EventStorm_From_Alerts");
+    dialog.setTitle(getMessage(""));
+    dialog.setSize(400, 300);
+    dialog.setPreference("alert_id", eventTasksList);
+    dialog.render();
+}]]></script>
+        <show_form_icon_only>false</show_form_icon_only>
+        <show_insert>true</show_insert>
+        <show_list_icon_only>false</show_list_icon_only>
+        <show_multiple_update>false</show_multiple_update>
+        <show_query>false</show_query>
+        <show_update>true</show_update>
+        <sys_class_name>sys_ui_action</sys_class_name>
+        <sys_created_by>vpankar@equinix.com</sys_created_by>
+        <sys_created_on>2026-03-04 19:14:41</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>0b99976f87db3294acfa635d0ebb35ca</sys_id>
+        <sys_mod_count>28</sys_mod_count>
+        <sys_name>Add to an Event Storm</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_ui_action_0b99976f87db3294acfa635d0ebb35ca</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:32</sys_updated_on>
+        <table>u_event_task</table>
+        <ui11_compatible>true</ui11_compatible>
+        <ui16_compatible>false</ui16_compatible>
+    </sys_ui_action>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a57bc0000001</claim_timestamp>
+        <metadata_update_name>sys_ui_action_0b99976f87db3294acfa635d0ebb35ca</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:32</sys_created_on>
+        <sys_id>0ba6209587b5c7904d820e96cebb3554</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:32</sys_updated_on>
+    </sys_claim>
+</record_update>

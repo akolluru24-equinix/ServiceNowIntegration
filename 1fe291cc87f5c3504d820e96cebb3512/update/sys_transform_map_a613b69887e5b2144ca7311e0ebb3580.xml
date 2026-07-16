@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_transform_map">
+    <sys_transform_map action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <copy_empty_fields>false</copy_empty_fields>
+        <create_new_record_on_empty_coalesce_fields>false</create_new_record_on_empty_coalesce_fields>
+        <enforce_mandatory_fields>No</enforce_mandatory_fields>
+        <name>Imp Legal Account - TM MDM3.0</name>
+        <order>100</order>
+        <run_business_rules>false</run_business_rules>
+        <run_script>true</run_script>
+        <script><![CDATA[(function transformRow(source, target, map, log, isUpdate) {
+
+    //nullify city 
+    if (gs.nil(source.u_accountaddress_city) && !(gs.nil(target.city))) {
+        target.city = "";
+    }
+    //nullify zip
+    if (gs.nil(source.u_accountaddress_postalcode) && !(gs.nil(target.zip))) {
+        target.zip = "";
+    }
+    
+	//default values
+	target.u_account_category = "can"; //CAN Legal accounts only received from MDM3
+	target.u_customer_migrated_mdm3_0 = "true"; //Any customer on MDM3 is a migrated LTC customer
+
+
+})(source, target, map, log, action === "update");]]></script>
+        <source_table>u_imp_legal_account_mdm3_0</source_table>
+        <sys_class_name>sys_transform_map</sys_class_name>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2025-11-27 14:16:19</sys_created_on>
+        <sys_id>a613b69887e5b2144ca7311e0ebb3580</sys_id>
+        <sys_mod_count>12</sys_mod_count>
+        <sys_name>Imp Legal Account - TM MDM3.0</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_transform_map_a613b69887e5b2144ca7311e0ebb3580</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:48</sys_updated_on>
+        <target_table>customer_account</target_table>
+    </sys_transform_map>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a96360000001</claim_timestamp>
+        <metadata_update_name>sys_transform_map_a613b69887e5b2144ca7311e0ebb3580</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:48</sys_created_on>
+        <sys_id>8bb6e49587b5c7904d820e96cebb3546</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:48</sys_updated_on>
+    </sys_claim>
+</record_update>

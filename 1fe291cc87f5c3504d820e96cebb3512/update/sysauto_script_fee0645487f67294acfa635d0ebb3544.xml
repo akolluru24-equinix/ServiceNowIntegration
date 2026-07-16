@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sysauto_script">
+    <sysauto_script action="INSERT_OR_UPDATE">
+        <active>true</active>
+        <advanced>false</advanced>
+        <business_calendar/>
+        <condition/>
+        <conditional>false</conditional>
+        <entered_run_end/>
+        <entered_run_start/>
+        <entered_time/>
+        <max_drift/>
+        <name>Delete kb attachments olderthan 5 years</name>
+        <offset/>
+        <offset_type>0</offset_type>
+        <repeat_every/>
+        <run_as display_value="System  Administrator">6816f79cc0a8016401c5a33be04be441</run_as>
+        <run_as_tz/>
+        <run_dayofmonth>1</run_dayofmonth>
+        <run_dayofweek>5</run_dayofweek>
+        <run_daysofweek/>
+        <run_end/>
+        <run_month/>
+        <run_period/>
+        <run_start>2026-01-28 06:56:06</run_start>
+        <run_time>1970-01-01 21:00:00</run_time>
+        <run_type>weekly</run_type>
+        <run_weekinmonth/>
+        <script><![CDATA[var tableName = 'kb_knowledge';
+var totalRecordCount = 0;
+var totalAttachmentCount = 0;
+var recordsWithAttachments = [];
+var gr = new GlideRecord(tableName);
+if (!gr.isValid()) {
+    gs.print('Invalid table: ' + tableName);
+} else {
+    gr.addEncodedQuery(
+        'sys_updated_onRELATIVELT@year@ago@5' +
+        '^ORsys_created_onRELATIVELT@year@ago@5' +
+        '^retiredISNOTEMPTY'
+    );
+    //gr.setLimit(5);
+    gr.query();
+    //gs.print('Total records: ' + gr.getRowCount());
+    while (gr.next()) {
+        totalRecordCount++;
+        var hasAttachment = false;
+        var attGR = new GlideRecord('sys_attachment');
+        attGR.addQuery('table_name', tableName);
+        attGR.addQuery('table_sys_id', gr.sys_id);
+        attGR.query();
+        while (attGR.next()) {
+            hasAttachment = true;
+            totalAttachmentCount++;
+            gs.print(
+                'Deleting attachment: ' + attGR.file_name +
+                ' | KB Sys ID: ' + gr.sys_id
+            );
+            new GlideSysAttachment().deleteAttachment(attGR.sys_id);
+        }
+        if (hasAttachment) {
+            recordsWithAttachments.push(gr.sys_id.toString());
+        }
+    }
+
+    gs.print('Total Records Processed: ' + totalRecordCount);
+    gs.print('Total Attachments Deleted: ' + totalAttachmentCount);
+    gs.print('Records with attachments: ' + recordsWithAttachments.length);
+
+    if (recordsWithAttachments.length > 0) {
+        gs.print('Record Sys IDs: ' + recordsWithAttachments.join(', '));
+    }
+}]]></script>
+        <sys_class_name>sysauto_script</sys_class_name>
+        <sys_created_by>sareddy@equinix.com</sys_created_by>
+        <sys_created_on>2026-01-28 07:00:17</sys_created_on>
+        <sys_id>fee0645487f67294acfa635d0ebb3544</sys_id>
+        <sys_mod_count>2</sys_mod_count>
+        <sys_name>Delete kb attachments olderthan 5 years</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sysauto_script_fee0645487f67294acfa635d0ebb3544</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:34</sys_updated_on>
+        <time_zone/>
+        <upgrade_safe>false</upgrade_safe>
+    </sysauto_script>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a5fc20000001</claim_timestamp>
+        <metadata_update_name>sysauto_script_fee0645487f67294acfa635d0ebb3544</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:34</sys_created_on>
+        <sys_id>a7a6609587b5c7904d820e96cebb350f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:34</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>fee0645487f67294acfa635d0ebb3544</id>
+        <sys_created_by>sareddy@equinix.com</sys_created_by>
+        <sys_created_on>2026-01-28 07:00:17</sys_created_on>
+        <sys_id>ffd1a01087767294acfa635d0ebb35d9</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>sareddy@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-01-28 07:00:17</sys_updated_on>
+        <table>sysauto_script</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

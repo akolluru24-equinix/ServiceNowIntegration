@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sys_script_fix">
+    <sys_script_fix action="INSERT_OR_UPDATE">
+        <before>false</before>
+        <description>De-activating Case schedules created due to script error.</description>
+        <name>Case schedule deactivation</name>
+        <record_for_rollback>true</record_for_rollback>
+        <script><![CDATA[var grSCCS = new GlideRecord('sn_customerservice_case_schedule');
+grSCCS.addEncodedQuery("u_active=true^u_backend=false^u_ticket_reference.account.nameISEMPTY");
+grSCCS.setLimit(10000);
+grSCCS.query();
+while (grSCCS.next()) {
+	grSCCS.setValue("u_active", "false");
+	grSCCS.update();
+}]]></script>
+        <sys_class_name>sys_script_fix</sys_class_name>
+        <sys_created_by>vpanikanth@equinix.com</sys_created_by>
+        <sys_created_on>2026-01-28 09:35:56</sys_created_on>
+        <sys_id>7254cdd0873a76d46a1feb1e3fbb354c</sys_id>
+        <sys_mod_count>1</sys_mod_count>
+        <sys_name>Case schedule deactivation</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_fix_7254cdd0873a76d46a1feb1e3fbb354c</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:03</sys_updated_on>
+        <unloadable>false</unloadable>
+    </sys_script_fix>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137552940000001</claim_timestamp>
+        <metadata_update_name>sys_script_fix_7254cdd0873a76d46a1feb1e3fbb354c</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:58:03</sys_created_on>
+        <sys_id>726564d98775c7904d820e96cebb353b</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:58:03</sys_updated_on>
+    </sys_claim>
+    <sys_es_latest_script action="INSERT_OR_UPDATE">
+        <id>7254cdd0873a76d46a1feb1e3fbb354c</id>
+        <sys_created_by>vpanikanth@equinix.com</sys_created_by>
+        <sys_created_on>2026-01-28 09:35:55</sys_created_on>
+        <sys_id>7b75c5d4873a76d46a1feb1e3fbb3585</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>vpanikanth@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-01-28 09:35:55</sys_updated_on>
+        <table>sys_script_fix</table>
+        <use_es_latest>true</use_es_latest>
+    </sys_es_latest_script>
+</record_update>

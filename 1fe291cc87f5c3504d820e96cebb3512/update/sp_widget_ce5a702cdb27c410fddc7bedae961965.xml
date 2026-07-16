@@ -1,0 +1,3282 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[function ($scope, $rootScope, $timeout, spUtil, $interval, $window) {
+	/* widget controller. */
+	var c = this;
+	$scope.data.volume = {};
+	$scope.maxAllowed = 25000; //25.000 GB
+	var runningIntegration = false;
+
+	$scope.noTriggerMeasurementTB = true;
+	$scope.noTriggerMeasurementGB = true;
+	// $window.createScope = $scope;
+
+	//Step Size
+	//Get value that should be shown on size step when setting volume size
+	$scope.getAlocationUsage = function (percentage) {	
+		var size = $scope.data.volume.used_size + $scope.data.volume.size;
+		if ($scope.data.step3_form.volume_size.$error.max)
+			size = $scope.data.volume.total_size; 
+		else if ($scope.data.step3_form.volume_size.$error.min && $scope.editVolume)
+			size = $scope.data.volume.used_size + $scope.editVolume.size || 0;
+		else if ($scope.data.step3_form.volume_size.$error.min)
+			size = $scope.data.volume.used_size;
+		if (percentage) return (size / $scope.data.volume.total_size) * 100;
+		else return size;
+	};
+
+	//Step USERS (SMB Share)
+	$scope.redirectCreateUser = function () {
+		//window.open('?id=msp_id_page&tab=user&action=new');
+		$rootScope.$broadcast("openUsersTab", "createUser");
+		$("#create-volume").modal("hide");
+	};
+
+	var aux = [];
+	c.selectedUsers = [];
+	c.selectedUsersAux = [];
+
+	c.changed = function () {
+		var index;
+		aux = $("#select-users").select2("data");
+		for (var j in c.selectedUsers) {
+			index = c.find(aux, "id", c.selectedUsers[j].id);
+			if (!index) c.selectedUsers.splice(j, 1);
+		}
+		for (var k in c.selectedUsersAux) {
+			index = c.find(aux, "id", c.selectedUsersAux[k]);
+			if (!index) c.selectedUsersAux.splice(k, 1);
+		}
+		for (var l in aux) {
+			index = c.find(c.selectedUsers, "id", aux[l].id);
+			if (!index)
+				c.selectedUsers.push({
+					id: aux[l].id,
+					username: aux[l].text
+				});
+
+			index = c.selectedUsersAux.indexOf(aux[l].id);
+			if (index < 0) c.selectedUsersAux.push(aux[l].id);
+		}
+	};
+
+	c.find = function (array, key, value) {
+		for (var i in array) {
+			try{
+				if (array[i][key] == value) 
+					return i;
+			}catch(e){}
+		}
+		return false;
+	};
+
+	c.removeSelectedValue = function (id) {
+		if (c.selectedUsersAux.indexOf(id) > -1) {
+			c.selectedUsersAux.splice(c.selectedUsersAux.indexOf(id), 1);
+			$("#select-users").select2("val", c.selectedUsersAux);
+			c.changed();
+		}
+	};
+
+	$scope.updatePermissions = function (username, permission) {
+		//Get Permission Array
+		var checkPermission = c.data.userPermission[permission];
+		var vindex = c.find(c.data.users, "username", username);
+
+		//Default Read
+		c.data.userPermission.read[username] = true;
+		c.data.users[vindex].permission = "r";
+
+		//checkPermission[username] check add/remove
+
+		if (
+			permission == "read" ||
+			(permission == "write" && !checkPermission[username])
+		) {
+			//Remove user permission
+			c.data.users[vindex].permission = "r";
+			c.data.userPermission.read[username] = true;
+			c.data.userPermission.write[username] = false;
+		} else {
+			//Add user permission
+			c.data.users[vindex].permission = "rw";
+			c.data.userPermission.write[username] = true;
+		}
+	};
+	/********** END STEP USERS (SMB Share) **********/
+
+	/********** START Step HOSTS (NFS Share) **********/
+
+	var auxHosts = [];
+	c.selectedHosts = [];
+	c.selectedHostsAux = [];
+
+	c.hostChanged = function () {
+		var index;
+		auxHosts = $("#select-hosts").select2("data");
+		for (var j in c.selectedHosts) {
+			index = c.find(auxHosts, "id", c.selectedHosts[j].id);
+			if (!index) c.selectedHosts.splice(j, 1);
+		}
+		for (var k in c.selectedHostsAux) {
+			index = c.find(auxHosts, "id", c.selectedHostsAux[k]);
+			if (!index) c.selectedHostsAux.splice(k, 1);
+		}
+		for (var l in auxHosts) {
+			index = c.find(c.selectedHosts, "id", auxHosts[l].id);
+			if (!index) {
+				var vindex = c.find(c.data.hosts_list, "id", auxHosts[l].id);
+				c.selectedHosts.push({
+					id: auxHosts[l].id,
+					display_value: auxHosts[l].text,
+					ip_address: c.data.hosts_list[vindex].ip_address,
+					ip_list: c.data.hosts_list[vindex].ip_list,
+					iqn: c.data.hosts_list[vindex].iqn + "",
+					old_iqn: c.data.hosts_list[vindex].iqn + ""
+				});
+			}
+			index = c.selectedHostsAux.indexOf(auxHosts[l].id);
+			if (index < 0) c.selectedHostsAux.push(auxHosts[l].id);
+		}
+	};
+
+	c.removeHostSelectedValue = function (id) {
+		if (c.selectedHostsAux.indexOf(id) > -1) {
+			c.selectedHostsAux.splice(c.selectedHostsAux.indexOf(id), 1);
+			$("#select-hosts").select2("val", c.selectedHostsAux);
+			c.hostChanged();
+		}
+	};
+
+	function getIQNHostsResult() {
+		runningIntegration = true;
+		$scope.server
+			.get({
+			action: "getIQNHostsResult",
+			ms_queue_hosts_sys_id: $scope.data.ms_queue_hosts_sys_id
+		})
+			.then(function (response) {
+			$scope.data.iqn_hosts = response.data.iqn_hosts;
+			$scope.data.hosts_list = response.data.hosts_list;
+			$scope.loading = false;
+			runningIntegration = false;
+		});
+	}
+
+	$scope.getIQNHosts = function () {
+		//Save CI IQN and Run Integration
+		$scope.loading = true;
+		$scope.server
+			.get({
+			action: "getIQNHosts"
+		})
+			.then(function (res) {
+			$scope.data.ms_queue_hosts_sys_id = res.data.ms_queue_hosts_sys_id;
+			initRecordWatcher(getIQNHostsResult, "iqn_hosts");
+			$scope.loading = false;
+		});
+	};
+
+	function getSaveIqnResult() {
+		runningIntegration = true;
+		$scope.server.get({ action: "getSaveIqnResult" }).then(function (response) {
+			if (response.data.result) {
+				$scope.data.savedIqn = true;
+				$scope.loading = false;
+			}
+			runningIntegration = false;
+		});
+	}
+
+	$scope.saveIqn = function (sys_id, iqn) {
+		//Save CI IQN and Run Integration
+		$scope.loading = true;
+		$scope.server
+			.get({
+			action: "saveIqn",
+			cmdb_ci: sys_id,
+			iqn: iqn
+		})
+			.then(function (res) {
+			$scope.data.savedIqn = false;
+			initRecordWatcher(getSaveIqnResult, "savedIqn");
+			$scope.loading = false;
+		});
+	};
+
+	$scope.saveIp = function (host_id, new_ip, new_ip_subnet, ip_id) {
+		if (!new_ip || new_ip == "" || !new_ip_subnet || new_ip_subnet == "") {
+			$scope.editIp[ip_id] = !$scope.editIp[ip_id];
+			return;
+		}
+		//Save new IP
+		$scope.data.errorMessage = '';
+		$scope.loading = true;
+		$scope.server.get({
+			action: "saveIp",
+			host_id: host_id,
+			new_ip: new_ip,
+			new_ip_subnet: new_ip_subnet,
+			hosts_list: $scope.data.hosts_list
+		}).then(function (res) {
+			$scope.loading = false;
+			if (res.data.new_ip_obj && res.data.new_ip_obj.display_value == new_ip){
+				//Insert new IP in selected host list
+				var host_index = c.find(c.data.hosts_list, "id", host_id);
+				$scope.data.hosts_list[host_index].ip_list.push(res.data.new_ip_obj);
+			}
+			if (res.data.errorMessage && res.data.errorMessage != ''){
+				$scope.data.errorMessage = res.data.errorMessage;
+			}
+		});
+	};
+	/********** END STEP Hosts (NFS Share) **********/	
+
+	function loadProjectList() {
+		$scope.server
+			.get({
+			action: "getProjects",
+			volume: $scope.data.volume,
+			ibx: $rootScope.selectedIbx
+		})
+			.then(function (response) {
+			$scope.data.ms_queue_project_sys_id =
+				response.data.ms_queue_project_sys_id;
+			initRecordWatcher(getProjectsResult, "projects");
+		});
+	}
+
+	function loadUserList() {
+		$scope.server.get({
+			action: "getUsers",
+			volume: $scope.data.volume,
+			ibx: $rootScope.selectedIbx
+		}).then(function (response) {
+			$scope.data.ms_queue_users_sys_id = response.data.ms_queue_users_sys_id;
+			initRecordWatcher(getUsersResult, "users");
+		});
+	}
+
+	function loadCustomerMetrics() {
+		// Ask for CustomerMetrics list to the queue
+		$scope.server
+			.get({
+			action: "getCustomerMetrics",
+			ibx: $rootScope.selectedIbx,
+			volume: $scope.data.volume
+		})
+			.then(function (response) {
+			$scope.data.ms_queue_metrics_sys_id =
+				response.data.ms_queue_metrics_sys_id;
+			initRecordWatcher(getCustomerMetricsResult, "customerMetrics");
+		});
+	}
+
+	$scope.redirectOnDemand = function () {
+		//window.open('?id=msp_id_page&action=toggleOndemand');
+		$("#create-volume").modal("hide");
+		$rootScope.$broadcast("openOnDemandModal");
+	};
+
+	$scope.redirectToHostTicket = function () {
+		$window.open("/msp?action=new");
+	};
+
+	$scope.switchSizeMeasurement = function (unit) {
+		if ($scope.editVolume && $scope.editVolume.display_values.type == 'Block') {
+			return;
+		}
+		$scope.data.volume.size_measurement = unit; 
+		$scope.data.volume.size = 0
+	};
+
+
+	// Select Install type
+	$scope.selectVolumeType = function (id, title) {
+		//if($scope.loading)
+		//return;
+
+		$scope.data.volume.type = id;
+		$scope.data.modal_title = title;
+
+		switch ($scope.data.volume.type) {
+			case "file_server_smb":
+				$scope.type = "${SMB}";
+				break;
+			case "file_server_nfs":
+				$scope.type = "${NFS}";
+				break;
+			case "object":
+				$scope.type = "Object";
+				break;
+			case "block":
+				$scope.type = "Block";
+				break;
+		}
+	};
+
+	// Watch changes on measurement and recalculate de values
+	$scope.$watch("data.volume.size_measurement", function (newValue, oldValue, scope) {
+		if($scope.noTriggerMeasurementTB == false){
+			$scope.data.volume.size_measurement = 'tb'
+			return;
+		}
+		if($scope.noTriggerMeasurementGB == false){
+			$scope.data.volume.size_measurement = 'gb'
+			return;
+		}
+		scope.loading = true;
+		if($scope.vrCreateVolume){
+			$scope.data.measurement = (newValue).toUpperCase();
+		}
+
+		scope.server.get({
+			action: "changeMeasurement",
+			volume: $scope.data.volume,
+			from: oldValue || 'gb',
+			to: newValue, 
+			total_quota: $scope.data.volume.total_size,
+			total_use: $scope.data.volume.used_size,
+			available_size: $scope.data.volume.available_size,
+			max_size: $scope.data.volume.max_size,
+			max_allowed: $scope.data.volume.max_allowed
+
+		}).then(function (res) {
+			scope.data.volume = res.data.volume;
+			scope.loading = false;
+			$scope.maxAllowedFlag = false;
+			$scope.maxAllowedFlagTB = false;
+		});
+
+	});
+
+	$scope.verifyMaxAllowed = function(){
+		$scope.maxAllowedFlagTB = false;
+		$scope.maxAllowedFlag = false;
+		if($scope.data.volume.size > 25 && $scope.data.measurement == "TB" ){
+			$scope.maxAllowedFlagTB = true;
+		}
+		if ($scope.data.volume.size < 25 && $scope.data.measurement == "TB" ){
+			$scope.maxAllowedFlagTB = false;
+		}
+		if ($scope.data.volume.size > $scope.maxAllowed && $scope.data.measurement == "GB" ){
+			$scope.maxAllowedFlag = true;
+		}
+		if ($scope.data.volume.size < $scope.maxAllowed && $scope.data.measurement == "GB" ){
+			$scope.maxAllowedFlag = false;
+		}
+	};
+
+	// Watch project sys id changes
+	$scope.$watch("data.volume.project.sys_id", function (newValue, oldValue, scope) {
+		if (typeof newValue != "undefined" && newValue != "") {
+			$scope.data.addNewProject = false;
+			if($scope.data.projects){
+				var project = $scope.data.projects.find(function (obj) {
+					return obj.id == newValue;
+				});
+				scope.data.volume.project.name = project.name;
+			}
+		}
+	});
+
+	// Wizard Navigation
+	$scope.nextStep = function () {
+		/*
+			STEPs MAPPING
+				1: Select Volume Type
+				2: Select Users
+				3: Select Size
+				4: Select Project
+				5: Select Name
+				6: Select Hosts
+				7: Confirmation Screen
+				8: Success Screen
+		*/
+
+		$scope.data.errorMessage = '';
+
+		if ($scope.step < 8) {
+			//Before Wizard Steps is completed
+			// If NFS or Block was selected, exclude USERS step and include HOSTS step
+			if (
+				$scope.step + 1 == 2 &&
+				($scope.data.volume.type == "file_server_nfs" ||
+				 $scope.data.volume.type == "block")
+			) {
+				$scope.step = $scope.step + 2; //NFS and Block should skip USERs step
+			} else if (
+				$scope.step + 1 == 6 &&
+				$scope.data.volume.type != "file_server_nfs" &&
+				$scope.data.volume.type != "block"
+			) {
+				$scope.step = $scope.step + 2; //SMB and OBJECT should skip HOSTs step
+			} else {
+				$scope.step++;
+			}
+
+			//Run current step Integration
+			if ($scope.step == 2) {
+				loadUserList();
+			} else if ($scope.step == 3) {
+				loadCustomerMetrics();
+			} else if ($scope.step == 4) {
+				loadProjectList();
+			} else if ($scope.step == 6) {
+				$scope.getIQNHosts();
+			}
+
+			//Wait step loading
+			if (
+				$scope.step == 2 ||
+				$scope.step == 3 ||
+				$scope.step == 4 ||
+				$scope.step == 6
+			) {
+				$scope.loading = true;
+				$scope.loadingModal = true;
+
+				var loadingInterval = $interval(function () {
+					if (
+						($scope.step == 2 && $scope.data.users && $scope.data.users != null) ||
+						($scope.step == 3 && $scope.data.customerMetrics && $scope.data.customerMetrics != null) ||
+						($scope.step == 4 && $scope.data.projects && $scope.data.projects != null) ||
+						($scope.step == 6 && $scope.data.iqn_hosts && $scope.data.iqn_hosts != null)
+					) {
+						//Stop interval loop
+						$interval.cancel(loadingInterval);
+
+						//Edit Volume ->  Complete Volume fields after ends each integration loading
+						switch($scope.step){
+							case 2:
+								$scope.fillEditVolumeUsers();
+								break;
+							case 4:
+								if($scope.data.projects){
+									var project = $scope.data.projects.find(function (obj) {
+										return obj.id == $scope.data.volume.project.sys_id;
+									});
+
+									if(project.name != undefined) $scope.data.volume.project.name = project.name;
+
+								}
+								break;
+							case 6:
+								$scope.fillEditVolumeHosts();
+								break;
+						}
+
+						$scope.loading = false;
+						$scope.loadingModal = false;
+					}
+				}, 1000);
+			}
+
+			//Configure Users Variable inside Volume when USERs step is done
+			if (
+				$scope.step > 2 &&
+				$scope.data.volume.type != "file_server_nfs" &&
+				$scope.data.volume.type != "block"
+			) {
+				var users = c.selectedUsers;
+				var username;
+				var vindex;
+				for (var i in users) {
+					try {
+						username = users[i].username;
+						vindex = c.find(c.data.users, "username", username);
+						users[i].permission = c.data.users[vindex].permission;
+						c.data.userPermission.write[username] = false;
+					} catch (e) {
+						users[i].permission = "";
+					}
+				}
+				c.data.volume.users = users;
+			}
+
+			//Configure Hosts Variable inside Volume when HOSTs step is done
+			if (
+				$scope.step > 6 &&
+				($scope.data.volume.type == "block" ||
+				 $scope.data.volume.type == "file_server_nfs")
+			) {
+				var hosts = c.selectedHosts;
+				if (hosts) {
+					c.data.volume.hosts = hosts;
+				}
+
+				var selectedHosts = c.data.selectedHosts;
+				if (selectedHosts) {
+					var host_obj;
+					for (var host in selectedHosts) {
+						host_obj = selectedHosts[host];
+						var selected_ips = [];
+						var selected_ips_id = [];
+						var v_host_index = c.find(c.data.volume.hosts, "id", host);
+
+						for (var ip_id in host_obj.selectedIps) {
+							if (host_obj.selectedIps[ip_id] && v_host_index) {
+								var v_ip_list_index = c.find(
+									c.data.volume.hosts[v_host_index].ip_list,
+									"id",
+									ip_id
+								);
+								c.data.volume.hosts[v_host_index].ip_list[
+									v_ip_list_index
+								].selected = true;
+								selected_ips_id.push(ip_id + "");
+								selected_ips.push(
+									c.data.volume.hosts[v_host_index].ip_list[v_ip_list_index]
+									.display_value + ""
+								);
+							}
+						}
+						if (selected_ips_id && v_host_index) {
+							c.data.volume.hosts[
+								v_host_index
+							].selected_ips_id = selected_ips_id;
+							c.data.volume.hosts[v_host_index].selected_ips = selected_ips;
+							var s_host_index = c.find(c.selectedHosts, "id", host);
+							c.selectedHosts[s_host_index].selected_ips = selected_ips;
+						}
+					}
+				}  
+			}
+		}
+	};
+
+	$scope.previousStep = function () {
+		if ($scope.step > 1) {
+			if (
+				$scope.step == 3 &&
+				($scope.data.volume.type == "file_server_nfs" ||
+				 $scope.data.volume.type == "block")
+			) {
+				$scope.step = $scope.step - 2;
+			} else if (
+				$scope.step == 7 &&
+				$scope.data.volume.type != "file_server_nfs" &&
+				$scope.data.volume.type != "block"
+			) {
+				$scope.step = $scope.step - 2;
+			} else {
+				$scope.step--;
+			}
+		}
+	};
+
+	function validHosts(hosts) {
+		if ($scope.step != 7 && $scope.data.volume.type == "block") {
+			for (var i in hosts) {
+				var iqn = hosts[i].iqn + "";
+				if (!iqn || iqn == "" || iqn == "undefined") {
+					return false;
+				}
+			}
+		}
+		if($scope.step == 7 && $scope.data.volume.type == "file_server_nfs") {
+			for (var j in hosts) {
+				if (hosts[j].ip_list.length == 0) {
+					return false;
+					//add edgar
+				} else if(hosts[j].selected_ips_id == undefined || hosts[j].selected_ips_id == null ) {
+					return false;
+
+				} else if((hosts[j].selected_ips.length == 0 && hosts[j].selected_ips_id.length == 0)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	$scope.isStepValid = function () {
+		switch ($scope.step) {
+			case 1: //TYPE
+				return $scope.data.volume.type;
+			case 2: //USERS
+				return c.selectedUsers.length != 0;
+			case 3: //SIZE
+				return $scope.data.step3_form.$valid && $scope.data.volume.size > 0 && $scope.data.volume.size_measurement && !$scope.maxAllowedFlag && !$scope.maxAllowedFlagTB;
+			case 4: //PROJECT
+				return $scope.data.step4_form.$valid;
+			case 5: //NAME
+				return $scope.data.step5_form.$valid;
+			case 6: //Hosts
+				return c.selectedHosts.length != 0 && validHosts(c.selectedHosts);
+			case 7: //Confirmation
+				return $scope.data.volume.length != 0 && validHosts(c.selectedHosts);
+		}
+		return false;
+	};
+
+	$scope.prepareWizard = function () {
+		$scope.data.modal_title = "";
+
+		// Select volume type
+		if ($scope.data.volume.type) {
+			var modal_title = "";
+			if ($scope.editVolume) {
+				modal_title = $scope.data.volume.name;
+			}
+			$scope.selectVolumeType($scope.data.volume.type, modal_title);
+		}
+
+		// Wizard Step
+		$scope.step = 1;
+
+		// Error count
+		$scope.applyErrorCount = 0;
+		$scope.modalErrorCount = 0;
+
+		// Display New Project Form
+		$scope.data.addNewProject = false;
+
+		// Clear host lists
+		$scope.data.selectedHosts = "";
+
+		// Clear ips lists
+		$scope.data.selectedIps = "";
+
+		// Reload Project Field
+		$rootScope.$broadcast("reloadProjectSelector");
+
+		// Reset Validations
+		$scope.data.step3_form.volume_size.$setPristine(true);
+		$scope.data.step5_form.volume_name.$setPristine(true);
+
+		// Reset IP Selector
+		$scope.data.ip = {
+			permission: "read"
+		};
+
+	};
+
+	$scope.apply = function () {
+		$scope.loading = true;
+
+		if ($scope.data.addNewProject) {
+			createProject();
+
+			var createProjectInterval = $interval(function () {
+				if ($scope.data.createProject != null) {
+					$interval.cancel(createProjectInterval);
+					createVolume();
+				} else {
+					return;
+				}
+			}, 1000);
+		} else {
+			createVolume();
+		}
+	};
+
+	// Look for response on the queue, related to the getProjects request
+	function getProjectsResult() {
+		runningIntegration = true;
+		$scope.server
+			.get({
+			action: "getProjectsResult",
+			ms_queue_project_sys_id: $scope.data.ms_queue_project_sys_id,
+			ibx: $rootScope.selectedIbx,
+			volume: $scope.data.volume,
+			editVolume: $scope.editVolume
+		})
+			.then(function (response) {
+			$scope.data.projects = response.data.projects;
+			if (response.data.volume && response.data.volume.project.name) {
+				$scope.data.volume = response.data.volume;
+			}
+			$scope.loading = false;
+		});
+		runningIntegration = false;
+	}
+
+	// Look for response on the queue, related to the getUsers request
+	function getUsersResult() {
+		$scope.server.get({
+			action: "getUsersResult",
+			ms_queue_users_sys_id: $scope.data.ms_queue_users_sys_id
+		}).then(function (response) {
+			$scope.data.users = response.data.users;
+			if ($scope.data.users) {
+				$scope.loading = false;
+			}
+		});
+	}
+
+	// Look for response on the queue, related to the geCustomerMetrics request
+	function getCustomerMetricsResult() {
+		$scope.server
+			.get({
+			action: "getCustomerMetricsResult",
+			volume: $scope.data.volume,
+			ibx: $rootScope.selectedIbx,
+			ms_queue_metrics_sys_id: $scope.data.ms_queue_metrics_sys_id
+		})
+			.then(function (response) {
+			if (response.data.customerMetrics) {
+				$scope.data.volume = response.data.volume;
+				$scope.data.customerMetrics = response.data.customerMetrics;
+				if ($scope.data.volume)
+					$scope.data.volume.customerMetrics = response.data.customerMetrics;
+				$scope.data.onDemandActive = response.data.onDemandActive;
+
+				// Load Volume Sizes
+				if ($scope.data.customerMetrics) {
+
+					if($scope.editVolume != null){
+						if($scope.editVolume.size_unit == 'Tb' ){
+							$scope.data.max_allowed = $scope.maxAllowed / 1000;
+							$scope.data.customerMetrics.total_allocated = $scope.data.customerMetrics.total_allocated / 1000;
+							$scope.data.customerMetrics.total_quota     = $scope.data.customerMetrics.total_quota / 1000;
+							$scope.data.loadingTB = false;
+							$scope.data.loadingGB = true;
+							$scope.noTriggerMeasurementTB = false;
+							$scope.data.volume.size_measurement = 'tb';
+						}else if($scope.editVolume.size_unit == 'Gb' ){
+							$scope.data.loadingTB = true;
+							$scope.data.loadingGB = false;
+							$scope.noTriggerMeasurementGB = false;
+							$scope.data.volume.size_measurement = 'gb';
+						}
+					}
+
+					$scope.data.volume.customerMetrics = $scope.data.customerMetrics;
+
+					$scope.data.volume.used_size =	$scope.data.customerMetrics.total_allocated;
+					$scope.data.volume.available_size =	$scope.data.customerMetrics.total_quota - $scope.data.customerMetrics.total_allocated;
+					$scope.data.volume.total_size =	$scope.data.customerMetrics.total_quota;
+					$scope.data.volume.max_size = $scope.data.volume.available_size;
+
+					if ($scope.editVolume) {
+						$scope.data.volume.max_size = $scope.data.volume.available_size + $scope.editVolume.size;
+						$scope.data.volume.used_size = $scope.data.customerMetrics.total_allocated - $scope.editVolume.size;
+					}
+				}
+
+				$scope.loading = false;
+			}
+		});
+	}
+
+	// Look for response on the queue, related to the getProjects request
+	function getVolumeResult() {
+		$scope.server.get({
+			action: "getVolumeResult",
+			ms_queue_edit_volume_sys_id: $scope.data.ms_queue_edit_volume_sys_id
+		}).then(function (response) {
+			$scope.data.editVolumeData = response.data.editVolumeData;
+
+			$scope.loading = false;
+			if($scope.data.editVolumeData) {
+
+				$scope.load();
+			}
+		});
+	}
+
+	// Init record watcher to listen changes on the queue, used to get request results
+	function initRecordWatcher(callback, value) {
+		$scope.data[value] = null;
+		var interval = $interval(function () {
+			if(runningIntegration)
+				return;
+			if ($scope.data[value]) {
+				$interval.cancel(interval);
+			} else if (!runningIntegration) {
+				callback();
+			}
+		}, 1000);
+	}
+
+	$scope.fillEditVolumeHosts = function(){
+		var edit = $scope.data.editVolumeData;
+		if (edit) {
+			var type = (
+				$scope.data.editVolumeData.volume.share.type + "").toLowerCase();
+			var hosts;
+			switch (type) {
+				case "block":
+					hosts = $scope.data.editVolumeData.volume.hosts;
+					break;
+				case "iscsi":
+					hosts = $scope.data.editVolumeData.volume.hosts;
+					break;
+				case "nfs":
+					hosts = $scope.data.editVolumeData.volume.hosts;
+					break;
+				default:
+					return;
+			}
+
+			var host_list = [];
+			if (hosts) {
+				for (var i in hosts) {
+					host_list.push(hosts[i].id.replace(/-/g, ""));
+				}
+
+				$timeout(function () {
+					$("#select-hosts").select2("val", host_list);
+					c.hostChanged();
+					if(type == "nfs") {
+						$timeout(function() {
+							for(var i in c.selectedHosts) {
+								var host = c.selectedHosts[i];
+								var ips = $scope.data.editVolumeData.authorized_ips;
+								for(var k in ips) {
+									for(var l in host.ip_list) {
+										//if(host.ip_list[l].display_value == ips[k].split("/")[0] && host.ip_list[l].subnet.cidr == ips[k].split("/")[1]) {
+										if(host.ip_list[l].display_value == ips[k].split("/")[0] && c.data.selectedHosts[host.id] != undefined ) {
+											c.data.selectedHosts[host.id].selectedIps[host.ip_list[l].id] = true;
+										}
+									}
+								}
+							}
+
+							/*for(var i in c.selectedHosts) {
+								var host = c.selectedHosts[i];
+								console.log("edgarline 808  host " + JSON.stringify(host));
+								//var ips = $scope.data.editVolumeData.authorized_ips;
+								var ips = host.ip_list
+								console.log("edgarline 810  ips " + JSON.stringify(ips));
+								for(var k in ips) {
+									if(host.ip_address == ips[k].display_value){
+										console.log("edgar entrou 814")
+										$scope.data.selectedHosts[host.id].selectedIps[ips[k].id] = true;
+									}
+
+								}
+							}*/
+						}, 300);
+
+
+					}
+				}, 100);
+
+			}
+		}
+	};
+
+	$scope.fillEditVolumeUsers = function(){
+		var edit = $scope.data.editVolumeData;
+		if (edit) {
+			var type = (edit.volume.share.type + "").toLowerCase();
+			var users;
+			var lun_id = edit.lun_id;
+			if (lun_id && lun_id != "") {
+				$scope.editVolume.lun_id = lun_id;
+			}
+			switch (type) {
+				case "bucket":
+					users = edit.bucket_users;
+					break;
+				case "smb":
+					users = edit.smb_users;
+					break;
+				default:
+					return;
+			}
+
+			var user_list = [];
+			if (users) {
+				for (var i in users) {
+					user_list.push(users[i].user + "");
+				}
+
+				$("#select-users").select2("val", user_list);
+				c.changed();
+
+				//Load User Permissions
+				var selectedUsers = c.selectedUsers;
+				var username;
+				var id;
+				var vindex;
+				var zindex;
+
+				if(!c.data.userPermission){
+
+					c.data.userPermission = {};
+					c.data.userPermission.write = [];
+				}
+
+				for (var i in selectedUsers) {
+					try {
+						username = selectedUsers[i].username;
+						c.data.userPermission.write[username] = false;
+						id = selectedUsers[i].id;
+						vindex = c.find(c.data.users, "username", username);
+						zindex = c.find(users, "user", id);
+						c.data.users[vindex].permission = users[zindex].permissions;
+						var permission = users[zindex].permissions + '';
+						permission = permission.toLowerCase();
+						if (users[zindex].permissions && permission.indexOf('w') != -1 && permission.indexOf('r') != -1) {
+							c.data.userPermission.write[username] = true;
+						} else {
+							c.data.userPermission.write[username] = false;
+						}
+					} catch (e) {
+
+					}
+				}
+			}
+		}
+	};
+
+	// Event Listener to trigger the Create Volume Modal
+	$rootScope.$on("createEditVolume", function (event, obj) {
+		//Loading
+		$scope.loadingModal = true;
+		$scope.loading = true;
+
+		// Reset error count
+		$scope.applyErrorCount = 0;
+		$scope.data.errorMessage = '';
+
+		// Reset primary variables
+		$scope.editVolume = null;
+		$scope.data.editVolumeData = null;
+		$scope.data.volume = null;
+		$scope.data.users = null;
+
+		// Reset integration selectors
+		c.selectedUser = null;
+		c.selectedHost = null;
+		$("#select-users").select2("data", null);
+		$("#select-hosts").select2("data", null);
+		c.changed();
+		c.hostChanged();
+
+		//Open Create/Edit Volume modal
+		$("#create-volume").modal("show");
+
+		if (obj) {
+			//Edit Volume Section
+			$scope.data.volume = {};
+			$scope.data.title = "${Edit Volume}";
+			var type = obj.share.type + "";
+			$scope.editVolume = obj;
+			$scope.vrCreateVolume = false;
+
+			// Ask for selected volume data to the queue
+			$scope.server.get({
+				action: "getVolume",
+				editVolume: obj
+			}).then(function (response){
+				$scope.data.ms_queue_edit_volume_sys_id = response.data.ms_queue_edit_volume_sys_id;
+				initRecordWatcher(getVolumeResult, "editVolumeData");
+			});
+		} else {
+			//Create Volume Section
+			$scope.data.title = "${Create Volume}";
+			$scope.editVolume = null;
+			$scope.editVolumeData = null;
+			$scope.data.volume = {};
+			$scope.data.volume.max_allowed = $scope.maxAllowed;
+			$scope.data.volume.size_measurement = "gb";
+			$scope.data.measurement = 'GB';
+			c.selectedUsers = [];
+			c.selectedUsersAux = [];
+			c.selectedHosts = [];
+			c.selectedHostsAux = [];
+			$scope.vrCreateVolume = true;
+			$scope.data.loadingGB = false;
+			$scope.data.loadingTB = false;
+			$scope.noTriggerMeasurementTB = true;
+			$scope.noTriggerMeasurementGB = true;
+			$scope.msg_lunID = false;
+
+			$scope.load();
+		}
+
+	});
+
+	$scope.load = function(){
+		var lun_id = "";
+		if($scope.data.editVolumeData != null){
+			lun_id =	$scope.data.editVolumeData.lun_id;
+			$scope.msg_lunID = true;
+		}
+		$scope.server.get({
+			action: "load",
+			projects: $scope.data.projects,
+			volume: $scope.editVolume,
+			lun_id: lun_id,
+			ibx: $rootScope.selectedIbx
+		}).then(function (response) {
+			// Set skip measurement
+			//response.data.volume.skipMeasurement = true;
+			// Fill volume type list
+			$scope.data.volume_type_list = response.data.volume_type_list;
+			// Get volume data
+			$scope.data.volume = response.data.volume;
+			// Get hosts select options
+			$scope.data.host_select_options = response.data.host_select_options;
+			// Get project list
+			$scope.data.project_list = response.data.project_list;
+			// Get hosts list
+			$scope.data.hosts_list = response.data.hosts_list;
+			// Get ips list
+			$scope.data.ips_list = response.data.ips_list;
+
+			$scope.data.measurement = (response.data.volume.size_measurement).toUpperCase();
+
+			// Prepare wizard
+			$scope.prepareWizard();
+
+			if ($scope.editVolume) {
+				//Go to 1st step of given type and wait the integration loading
+				$scope.nextStep();
+			} else {
+				//Type screen is ready to create a new volume
+				$scope.loading = false;
+				$scope.loadingModal = false;
+			}
+		});
+
+	};
+
+
+	// Listening for form validation
+	$rootScope.$on("hostFormValid", function (event, valid) {
+		$scope.addNewHostValid = valid;
+	});
+
+	$scope.showNewProjectForm = function () {
+		// Clear project selector
+		$scope.data.volume.project = {};
+
+		// Clear CI Field
+		$rootScope.$broadcast("reloadProjectSelector");
+
+		$scope.data.addNewProject = true;
+	};
+
+	// Validate volume name, check it it is unique
+	$scope.validateVolumeName = function () {
+		$scope.loading = true;
+		$scope.server
+			.get({
+			action: "validateName",
+			name: $scope.data.volume.name
+		})
+			.then(function (response) {
+			$scope.loading = false;
+			if (response.data.result) {
+				$scope.data.step5_form.volume_name.$setValidity("unique", true);
+			} else {
+				$scope.data.step5_form.volume_name.$setValidity("unique", false);
+			}
+		});
+	};
+
+	function getSaveVolumeResult() {
+		$scope.server
+			.get({
+			action: "getSaveVolumeResult",
+			volume: $scope.data.volume,
+			ms_queue_new_volume_sys_id: $scope.data.ms_queue_new_volume_sys_id,
+			ibx: $rootScope.selectedIbx
+		})
+			.then(function (response) {
+			$scope.data.saveVolume = response.data.saveVolume;
+			if (response.data.saveVolume) {
+				if (response.data.saveVolume.success == "true") {
+					$scope.step = 8;
+					$rootScope.$broadcast("reloadVolumesList");
+					$rootScope.$broadcast("reloadProjectList");
+					$scope.loading = false;
+				} else {
+					// Sum first try on error count
+					$scope.applyErrorCount += 1;
+					// stop loading
+					$scope.loading = false;
+					$scope.msgErroEAR = response.data.dataVolumeMsg;
+				}
+			}
+		});
+	}
+
+	// Init error count
+	$scope.applyErrorCount = 0;
+
+	function createVolume() {
+		// Retry function
+		$scope.applyRetry = createVolume;
+
+		$scope.loading = true; // start loading
+		$scope.server
+			.get({
+			action: "save",
+			ibx: $rootScope.selectedIbx,
+			volume: $scope.data.volume,
+			editVolume: $scope.editVolume
+		})
+			.then(function (res) {
+			$scope.data.ms_queue_new_volume_sys_id = res.data.result;
+			if ($scope.data.ms_queue_new_volume_sys_id) {
+				// Reset error count
+				$scope.applyErrorCount = 0;
+				// Go to Success step
+				$scope.step = 7;
+				// Wait for queue response
+				initRecordWatcher(getSaveVolumeResult, "saveVolume");
+				//$scope.loading = false;
+			} else {
+				// Sum first try on error count
+				$scope.applyErrorCount += 1;
+				// stop loading
+				$scope.loading = false;
+			}
+		});
+	}
+
+	function createProject() {
+		$scope.loading = true;
+		$scope.server
+			.get({
+			action: "createProject",
+			ibx: $rootScope.selectedIbx,
+			project_name: $scope.data.volume.project.name,
+			project_description: $scope.data.volume.project.description
+		})
+			.then(function (response) {
+			$scope.data.ms_queue_new_project_sys_id =
+				response.data.ms_queue_new_project_sys_id;
+			initRecordWatcher(getCreateProjectResult, "createProject");
+		});
+	}
+
+	function getCreateProjectResult() {
+		runningIntegration = true;
+		$scope.server
+			.get({
+			action: "getCreateProjectResult",
+			ms_queue_new_project_sys_id: $scope.data.ms_queue_new_project_sys_id,
+			ibx: $rootScope.selectedIbx
+		})
+			.then(function (response) {
+			$scope.data.createProject = response.data.createProject;
+			if (response.data.createProject) {
+				$scope.data.volume.project = {};
+				$scope.data.volume.project.name = $scope.data.createProject.name;
+				$scope.data.volume.project.sys_id = $scope.data.createProject.id;
+			}
+		});
+		runningIntegration = false;
+	}
+}
+]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.loading-data {&#13;
+  height: 100%;&#13;
+  width: 100%;&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  justify-content: center;&#13;
+  height: 540px;&#13;
+}&#13;
+.panel {&#13;
+  min-height: 469px;&#13;
+}&#13;
+.error {&#13;
+  color: red;&#13;
+  margin-left: 15px;&#13;
+}&#13;
+&#13;
+form .tab-pane,&#13;
+form.tab-pane {&#13;
+  margin-top: 18px;&#13;
+  padding-top: 10px;&#13;
+  border-top: 1px solid #ddd;&#13;
+}&#13;
+&#13;
+.nav.nav-tabs li {&#13;
+  width: auto !important;&#13;
+}&#13;
+&#13;
+.panel-body {&#13;
+  overflow: initial;&#13;
+  padding: 0px;&#13;
+}&#13;
+&#13;
+.btn-danger {&#13;
+  margin-right: 5px;&#13;
+}&#13;
+&#13;
+.modal-body {&#13;
+  .step-indicator {&#13;
+    margin: auto;&#13;
+    margin-top: 10px;&#13;
+    width: 10px;&#13;
+    height: 10px;&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+    background: #cbd0d8;&#13;
+    border-radius: 50%;&#13;
+    z-index: 2;&#13;
+&#13;
+    &amp;.active {&#13;
+      background: $info;&#13;
+    }&#13;
+&#13;
+    &amp;:before {&#13;
+      content: "";&#13;
+      width: 50%;&#13;
+      height: 2px;&#13;
+      display: block;&#13;
+      left: -5px;&#13;
+      background: #cbd0d8;&#13;
+      position: absolute;&#13;
+      z-index: 1;&#13;
+    }&#13;
+&#13;
+    &amp;:after {&#13;
+      content: "";&#13;
+      width: 50%;&#13;
+      height: 2px;&#13;
+      display: block;&#13;
+      right: -5px;&#13;
+      background: #cbd0d8;&#13;
+      position: absolute;&#13;
+      z-index: 1;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  .steps {&#13;
+    padding: 30px 30px 20px 30px;&#13;
+    margin-top: -15px;&#13;
+    margin-left: -15px;&#13;
+    margin-right: -15px;&#13;
+    background: #f4f6f8;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-semibold);&#13;
+&#13;
+    ul {&#13;
+      margin-bottom: 0;&#13;
+      padding-left: 0;&#13;
+      list-style: none;&#13;
+&#13;
+      li {&#13;
+        width: 16.3%; /*width: 19.6%;*/&#13;
+        display: inline-block;&#13;
+        position: relative;&#13;
+        text-align: center;&#13;
+&#13;
+        &amp;:first-of-type .step-indicator:before {&#13;
+          display: none;&#13;
+        }&#13;
+&#13;
+        &amp;:last-of-type .step-indicator:after {&#13;
+          display: none;&#13;
+        }&#13;
+      }&#13;
+    }&#13;
+  }&#13;
+&#13;
+  @media screen and (min-width: 992px) {&#13;
+    .separator {&#13;
+      border-left: 1px solid #cbd0d8;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.modal .modal-dialog.modal-lg {&#13;
+  @media screen and (min-width: 992px) {&#13;
+    width: 700px;&#13;
+  }&#13;
+}&#13;
+&#13;
+#create-volume {&#13;
+  .modal-dialog {&#13;
+    @media screen and (min-width: 992px) {&#13;
+      width: 900px;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+&#13;
+.select-option-caret {&#13;
+  float: right;&#13;
+  top: 10px;&#13;
+  position: relative;&#13;
+}&#13;
+&#13;
+.min-height {&#13;
+  padding-bottom: 80px !important;&#13;
+}&#13;
+&#13;
+.h5 {&#13;
+  font-size: 16px;&#13;
+}&#13;
+&#13;
+.width-100 {&#13;
+  width: 100%;&#13;
+}&#13;
+&#13;
+.step-2.active:before,&#13;
+.step-3.active:before,&#13;
+.step-4.active:before,&#13;
+.step-5.active:before,&#13;
+.step-6.active:before,&#13;
+.step-7.active:before {&#13;
+  width: 100%;&#13;
+  left: -50%;&#13;
+  background: $info;&#13;
+}&#13;
+&#13;
+.radiobox {&#13;
+  margin-bottom: 10px;&#13;
+  .radiobox-label {&#13;
+    top: 0px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.volume-options {&#13;
+  margin-top: 0px;&#13;
+  margin-bottom: 5px;&#13;
+}&#13;
+&#13;
+.volume-options__option {&#13;
+  label {&#13;
+    margin: 0px 0;&#13;
+    padding: 30px 30px;&#13;
+    width: 100%;&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+    border: 1px solid #e5e5e5;&#13;
+    line-height: 1.3;&#13;
+&#13;
+    &gt; span {&#13;
+      width: 100%;&#13;
+      color: $info;&#13;
+      font-size: 16px;&#13;
+    }&#13;
+&#13;
+    small {&#13;
+      font-size: 12px;&#13;
+      min-height: 15px;&#13;
+    }&#13;
+  }&#13;
+&#13;
+  &amp;.active &gt; label,&#13;
+  label:hover {&#13;
+    background-color: $info;&#13;
+    border-color: $info;&#13;
+&#13;
+    span,&#13;
+    .text-muted {&#13;
+      color: #fff;&#13;
+    }&#13;
+  }&#13;
+  display: inline-block;&#13;
+  display: inline-block;&#13;
+  width: calc(100% / 4 - 8px);&#13;
+  margin-right: 4px;&#13;
+  margin-left: 4px;&#13;
+  margin-bottom: 8px;&#13;
+}&#13;
+&#13;
+.min-height {&#13;
+  min-height: 400px !important;&#13;
+  padding-bottom: 0px !important;&#13;
+}&#13;
+&#13;
+.no-worries span {&#13;
+  margin-bottom: 40px;&#13;
+}&#13;
+&#13;
+.no-margin-bottom {&#13;
+  margin-bottom: 0px;&#13;
+}&#13;
+&#13;
+.icon-check-eqx-icon {&#13;
+  margin-top: 50px;&#13;
+  display: block;&#13;
+  color: #58ad25;&#13;
+  font-size: 36px;&#13;
+}&#13;
+&#13;
+.step-title {&#13;
+  margin-top: 20px;&#13;
+  /*margin-bottom: 20px;*/&#13;
+  display: block;&#13;
+  font-size: 16px;&#13;
+}&#13;
+&#13;
+.step-title.file-server {&#13;
+  margin-bottom: 5px;&#13;
+}&#13;
+.activation-step .step-title {&#13;
+  font-size: 18px;&#13;
+  /*margin-top: 50px;*/&#13;
+}&#13;
+&#13;
+.activation-step p {&#13;
+  font-size: 12px;&#13;
+  font-weight: 100;&#13;
+  color: #adadad;&#13;
+}&#13;
+&#13;
+.activation-step .progress-message {&#13;
+  max-width: 380px;&#13;
+  margin: auto;&#13;
+  padding: 20px;&#13;
+  background-color: #f9f9f9;&#13;
+  color: #000;&#13;
+  font-size: 12px;&#13;
+  /*margin-bottom: 70px;*/&#13;
+}&#13;
+&#13;
+.activation-step {&#13;
+  a {&#13;
+    display: block;&#13;
+    margin-top: 5px;&#13;
+  }&#13;
+  .btn {&#13;
+    margin-top: 20px;&#13;
+    margin-bottom: 20px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.pointer {&#13;
+  cursor: pointer;&#13;
+}&#13;
+&#13;
+/* All Step */&#13;
+.form-group label &gt; span {&#13;
+  color: red !important;&#13;
+}&#13;
+&#13;
+/* Step 3 */&#13;
+.step3_form .form-group {&#13;
+  width: 120px;&#13;
+  display: inline-block;&#13;
+}&#13;
+&#13;
+.step3_form .form-group input {&#13;
+  text-align: right;&#13;
+}&#13;
+&#13;
+.step3_form .form-group label {&#13;
+  width: 120px;&#13;
+  margin-bottom: 0px;&#13;
+}&#13;
+&#13;
+.measurement {&#13;
+  // width: 90px;&#13;
+  display: inline;&#13;
+  font-size: 12px;&#13;
+  .btn-filter {&#13;
+    padding: 7px 2px !important;&#13;
+    text-align: center;&#13;
+    font-size: 10px !important;&#13;
+    font-weight: 600 !important;&#13;
+    width: 50px;&#13;
+    height: 30px;&#13;
+    display: inline-block;&#13;
+    margin-right: -4px !important;&#13;
+  }&#13;
+}&#13;
+&#13;
+/* Step 4*/&#13;
+&#13;
+.panel.new-project-panel {&#13;
+  background: #f5f6f8;&#13;
+  min-height: 100px;&#13;
+  display: inline-block;&#13;
+  width: 100%;&#13;
+}&#13;
+&#13;
+.panel.new-project-panel input {&#13;
+  width: 50%;&#13;
+}&#13;
+&#13;
+.panel.new-project-panel textarea {&#13;
+  width: 70%;&#13;
+  height: 110px !important;&#13;
+}&#13;
+&#13;
+.new-project-title {&#13;
+  margin-top: 20px;&#13;
+  margin-bottom: 10px;&#13;
+  display: block;&#13;
+  font-size: 16px;&#13;
+}&#13;
+&#13;
+.protocol input[type="radio"] {&#13;
+  position: relative;&#13;
+  display: inline-block;&#13;
+  width: 20px;&#13;
+  height: 20px !important;&#13;
+  margin-right: 5px;&#13;
+  margin-left: 5px;&#13;
+}&#13;
+.protocol .protocol-label {&#13;
+  position: relative;&#13;
+  display: inline-block;&#13;
+  height: 20px !important;&#13;
+  line-height: 20px;&#13;
+  vertical-align: super;&#13;
+}&#13;
+&#13;
+/* Step 5*/&#13;
+.step5_form input[name="volume_name"] {&#13;
+  width: 45%;&#13;
+}&#13;
+.step5_form input[name="volume_lun_id"] {&#13;
+  width: 45%;&#13;
+}&#13;
+&#13;
+.step5_form .SumoSelect &gt; .optWrapper &gt; .options {&#13;
+  border-radius: 2px;&#13;
+  position: relative;&#13;
+  max-height: 160px;&#13;
+}&#13;
+&#13;
+.input-group-addon {&#13;
+  padding: 6px 12px;&#13;
+  font-size: 14px;&#13;
+  font-weight: normal;&#13;
+  line-height: 1;&#13;
+  color: #595a5d;&#13;
+  text-align: center;&#13;
+  background-color: #fff;&#13;
+  border: 1px solid #ccc;&#13;
+  border-radius: 4px;&#13;
+}&#13;
+&#13;
+.panel.new-host {&#13;
+  min-height: 0px;&#13;
+  background: #f6f6f6;&#13;
+  padding-bottom: 30px;&#13;
+}&#13;
+&#13;
+.form-group-ip {&#13;
+  display: inline-block;&#13;
+  margin-right: 20px;&#13;
+}&#13;
+&#13;
+.form-group-ip .SumoSelect {&#13;
+  width: 280px;&#13;
+}&#13;
+&#13;
+.form-group-ip label.btn {&#13;
+  margin-right: 10px;&#13;
+  border-radius: 0px !important;&#13;
+}&#13;
+&#13;
+.form-group-ip label.btn.btn-primary.active {&#13;
+  color: #fff;&#13;
+  background-color: #00a0e4;&#13;
+  border: 1px solid #008ecb !important;&#13;
+}&#13;
+&#13;
+.form-group-ip label.btn.btn-primary {&#13;
+  color: #737373;&#13;
+  background-color: #ffffff;&#13;
+  border: 1px solid #737373 !important ;&#13;
+  box-shadow: none;&#13;
+}&#13;
+&#13;
+.users {&#13;
+  th {&#13;
+    font-size: larger;&#13;
+  }&#13;
+  td {&#13;
+    font-size: small;&#13;
+  }&#13;
+  table {&#13;
+    margin-top: 15px;&#13;
+  }&#13;
+}&#13;
+&#13;
+.filters {&#13;
+  margin-bottom: 12px;&#13;
+  display: flex;&#13;
+  align-items: center;&#13;
+  &gt; span {&#13;
+    position: relative;&#13;
+    font-size: 15px;&#13;
+    font-family: var(--eq-font-family);&#13;
+    font-weight: var(--eq-font-weight-light);&#13;
+  }&#13;
+  .filters-badge {&#13;
+    margin-left: 4px;&#13;
+    width: 22px;&#13;
+    height: 22px;&#13;
+    display: inline-flex;&#13;
+    justify-content: center;&#13;
+    align-items: center;&#13;
+    background: $info;&#13;
+    border-radius: 50%;&#13;
+    color: #fff;&#13;
+    font-size: 12px;&#13;
+    line-height: 1;&#13;
+    //text-indent: -1px;&#13;
+  }&#13;
+  .filter-plus {&#13;
+    margin-left: 20px;&#13;
+    margin-right: 4px;&#13;
+    vertical-align: middle;&#13;
+    font-size: 26px;&#13;
+    font-weight: 900;&#13;
+    font-family: var(--eq-font-family);&#13;
+  }&#13;
+  .filter-border {&#13;
+    border: 1px solid #a9b2bd;&#13;
+    border-radius: 3px;&#13;
+    padding: 2px;&#13;
+    padding-left: 6px;&#13;
+    display: flex;&#13;
+    align-items: center;&#13;
+  }&#13;
+  .filter-row {&#13;
+    margin-left: 0px;&#13;
+    width: 100% !important;&#13;
+  }&#13;
+  .filter-row.no-border {&#13;
+    margin-bottom: 0;&#13;
+    border-bottom: 0;&#13;
+  }&#13;
+&#13;
+  .filter-row &gt; .row-dropdowns {&#13;
+    margin-left: -4px;&#13;
+    margin-right: -4px;&#13;
+    &gt; .col-md-4,&#13;
+    &gt; .col-md-6 {&#13;
+      padding: 0 4px;&#13;
+    }&#13;
+  }&#13;
+  .filter-row &gt; .row &gt; .col-md-12,&#13;
+  .filter-row &gt; .row &gt; .col-md-6 {&#13;
+    margin-left: -4px;&#13;
+    margin-right: -4px;&#13;
+    display: flex;&#13;
+    input[type="checkbox"] {&#13;
+      display: none;&#13;
+    }&#13;
+    label.button {&#13;
+      margin: 0 4px;&#13;
+      padding: 6px 8px;&#13;
+      border: 1px solid #ddd;&#13;
+      color: #404040;&#13;
+      white-space: nowrap;&#13;
+      cursor: pointer;&#13;
+      font-size: 12px;&#13;
+    }&#13;
+    label.button:hover {&#13;
+      border-color: $info;&#13;
+    }&#13;
+    input[type="checkbox"]:checked + label.button {&#13;
+      background: #6c6c6c;&#13;
+      border-color: #6c6c6c;&#13;
+      color: #fff;&#13;
+    }&#13;
+  }&#13;
+  .filter-buttons {&#13;
+    a {&#13;
+      margin-right: 24px;&#13;
+    }&#13;
+  }&#13;
+}&#13;
+.filter-row .light {&#13;
+  background: #ebebeb;&#13;
+  padding: 10px 10px;&#13;
+  display: block;&#13;
+  margin-bottom: 20px;&#13;
+  margin-top: 20px;&#13;
+  border: 1px solid #dedede;&#13;
+}&#13;
+.filter-row .no-margin-top {&#13;
+  margin-top: 0px !important;&#13;
+}&#13;
+.filter-options.filter-buttons label {&#13;
+  margin: 0px !important;&#13;
+  margin-right: 4px !important;&#13;
+}&#13;
+.filter-row .title {&#13;
+  min-width: 510px;&#13;
+}&#13;
+.filter-row .form-group {&#13;
+  margin-bottom: 0px;&#13;
+}&#13;
+.filter-row .filter-buttons .light {&#13;
+  background: #fff;&#13;
+}&#13;
+.onoffswitch-switch {&#13;
+  display: block;&#13;
+  position: absolute;&#13;
+  top: 0;&#13;
+  margin-top: 6px;&#13;
+}&#13;
+.replicate-eti-question-answered {&#13;
+  display: block;&#13;
+  margin-left: 80px;&#13;
+  margin-top: -22px;&#13;
+}&#13;
+&#13;
+.field-label {&#13;
+  font-size: medium;&#13;
+}&#13;
+&#13;
+.progress {&#13;
+  height: 10px !important;&#13;
+  width: 40%;&#13;
+  min-width: 123px;&#13;
+  margin-bottom: 0;&#13;
+&#13;
+  .progress-bar-info {&#13;
+    background-color: $info;&#13;
+  }&#13;
+}&#13;
+#btnCancel, #btnBack {&#13;
+  background: transparent;&#13;
+  border: 1px solid #009AFF !important;&#13;
+}&#13;
+&#13;
+#boxError {&#13;
+  height: 82px;&#13;
+  background: #f2f2f2;&#13;
+  width: 60%;&#13;
+  margin-left: 20%;&#13;
+&#13;
+}&#13;
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description>This widget provides a wizard to create and edit volumes</description>
+        <docs/>
+        <field_list/>
+        <has_preview>false</has_preview>
+        <id>msp-id-create-volume</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) { 
+	$("#select-users").select2({});
+	$("#select-hosts").select2({});
+ }]]></link>
+        <name>MSP ID Create Volume</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function () {
+	/* populate the 'data' object */
+	var result = null;
+	var default_project_name = "Default project";
+	data.title = "Create Volume";
+
+	// Get user account
+	var customerPermission = new EQIX_Customer_Permissions();
+	var account_id = customerPermission.getActiveAccountSysId();
+
+	data.account_id = account_id;
+
+	var subnets = [];
+	var grSubnet = new GlideRecord('u_subnet');
+	grSubnet.addEncodedQuery('u_account=' + data.account_id + '^u_active_flag=true');
+	grSubnet.query();
+	while(grSubnet.next()){
+		var obj = {};
+		obj.id = grSubnet.getValue('sys_id');
+		obj.ip = grSubnet.getValue('ip_address');
+		obj.mask = grSubnet.getValue('u_mask');
+		obj.cidr = grSubnet.getValue("u_splitted_cidr") || grSubnet.u_ip_network.u_cidr.getValue();
+		subnets.push(obj);
+	}
+	data.subnets = subnets;
+	var size_measurement = '';
+	function convertTo(value, from, to, att) {
+		var result = 0;
+
+		if (value == 0 || value < 0.0) return result;
+
+		if (from == "gb" && to == "gb" ){
+			result = value;
+		} 
+
+		if (from == "tb" && to == "gb"   ){
+			result = value * 1000;
+		} 
+
+		if (from == "gb" && to == "tb"  ){
+			result = value / 1000;
+		} 
+
+		return result;
+	}
+
+	// Load hosts list
+	function loadHostList(iqn_hosts) {
+		var hosts_list = [];
+
+		var getHosts = new GlideRecord("cmdb_ci");
+		getHosts.addEncodedQuery(gs.getProperty("EQIX_IDATA_Filter.Server_Classes") + "^install_status=1^u_account=" + account_id + "^NQ" + gs.getProperty("EQIX_IDATA_Filter.Server_Classes_Custom") + "^install_status=1^u_account=" + account_id);
+		getHosts.orderBy("u_portal_display_name");
+		getHosts.query();
+
+		while (getHosts.next()) {
+			var obj = {};
+			obj.id = getHosts.getValue("sys_id");
+			obj.iqn = '';
+			for(var i in iqn_hosts){
+				var iqn_hosts_id = iqn_hosts[i].id;
+				iqn_hosts_id = iqn_hosts_id.toString().replaceAll('-','');
+				if(iqn_hosts_id == obj.id){
+					if (iqn_hosts[i].iqns[0])
+						obj.iqn = iqn_hosts[i].iqns[0];
+					break;
+				}
+			}
+			//var iqn_table = "ref_" + getHosts.sys_class_name;
+			//obj.iqn = getHosts[iqn_table].u_iqn + "";
+			obj.display_value = getHosts.getValue("u_portal_display_name");
+			obj.ip_address = getHosts.getValue("ip_address");
+			obj.ip_list = loadIpList(obj.id + "");
+			hosts_list.push(obj);
+		}
+		data.hosts_list = hosts_list;
+		return;
+	}
+
+	// Load IPs list
+	function loadIpList(host_ci) {
+		var ips_list = [];
+
+		var getIps = GlideRecord("cmdb_rel_ci");
+		//getIps.addEncodedQuery("child.sys_class_name=cmdb_ci_ip_address^child.u_active_flag=true^child.ref_cmdb_ci_ip_address.u_subnetISNOTEMPTY");
+		getIps.addEncodedQuery("child.sys_class_name=cmdb_ci_ip_address^child.u_active_flag=true");
+		getIps.addQuery("parent", host_ci);
+		getIps.query();
+		while(getIps.next()) {
+			var ipCI = new GlideRecordUtil().getCIGR(getIps.child.getValue());
+			var obj = {};
+			obj.id = ipCI.getUniqueValue();
+			obj.display_value = ipCI.getValue("ip_address");
+			obj.subnet = {
+				id: ipCI.getValue("u_subnet"),
+				cidr: ipCI.u_subnet.u_splitted_cidr.getValue(),
+				ip: ipCI.u_subnet.ip_address.getValue(),
+				mask: ipCI.u_subnet.u_mask.getValue()
+			};
+			ips_list.push(obj);
+		}
+
+
+		return ips_list;
+	}
+
+	// Load Volume list
+	function loadProjectList() {
+		data.ms_queue_project_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "getProjects",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url:
+				"/api/projects?customer=" + account_id + "&site=" + input.ibx.ear_id,
+				method: "GET",
+				payload: {}
+			}
+		});
+		return;
+	}
+
+	function saveStorage(input) {
+		if (input.volume.size_measurement == "gb") {
+			input.volume.size_measurement = "Gb";
+		}else {
+			input.volume.size_measurement = "Tb";
+		}
+
+		try {
+			var result;
+
+			if (input.editVolume) {
+				result = updateVolume(input);
+			} else {
+				result = createVolume(input);
+			}
+			return result;
+		} catch (e) {
+			gs.addErrorMessage(e);
+			return false;
+		}
+	}
+
+	/* Server Actions */
+	if (input && input.action == "validateName") {
+		data.result = new EQIX_ID_PortalUtils().validateVolumeName(
+			input.name,
+			account_id
+		);
+		return;
+	}
+
+	if (input && input.action == "getHostName") {
+		data.result = new EQIX_ID_PortalUtils().getHostName(input.host);
+		return;
+	}
+
+	if (input && input.action == "changeMeasurement") {
+
+		var vol = input.volume;
+		var from = input.from;
+		var to = input.to;
+		var total_quota = input.total_quota;
+		var total_use = input.total_use;
+		var available_size = input.available_size;
+		var max_size = input.max_size;
+		var max_allowed = input.max_allowed;
+
+
+		if (from != to) {
+			vol.available_size = convertTo(vol.available_size, from, to, available_size);
+			vol.used_size = convertTo(vol.used_size, from, to, total_use);
+			vol.total_size = convertTo(vol.total_size, from, to, total_quota);
+			vol.max_size = convertTo(vol.max_size, from, to, max_size);
+			vol.max_allowed = convertTo(vol.max_allowed, from, to, max_allowed);
+		}
+		data.volume = vol;
+		return;
+	}
+
+	if (input && input.action == "save") {
+		data.result = saveStorage(input);
+		return;
+	}
+
+	if (input && input.action == "getIQNHosts"){
+		data.ms_queue_hosts_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "getHosts",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url:
+				"/api/hosts?customer=" + account_id + "&page_size=999",
+				method: "GET",
+				payload: {}
+			}
+		});
+		return;
+	}
+
+	if (input && input.action == "getIQNHostsResult") {
+		result = getQueueResponse(input.ms_queue_hosts_sys_id);
+		if (result == null) {
+			return;
+		}
+		data.iqn_hosts = result;
+		loadHostList(data.iqn_hosts.results);
+		return;
+	}
+
+	if (input && input.action == "saveIqn") {
+		var cmdb_ci = input.cmdb_ci;
+		var iqn = input.iqn;
+
+		//Insert save/edit IQN action in the queue
+		data.ms_queue_save_iqn_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "saveIqn",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url: "/api/hosts/" + cmdb_ci + "/",
+				method: "PUT",
+				payload: {
+					iqns: [iqn]
+				}
+			}
+		});
+		// 		}
+		return;
+	}
+	function getNameHosts(ip, account){
+
+		var grCmdbRelCi = new GlideRecord('cmdb_rel_ci');
+		grCmdbRelCi.addEncodedQuery("child.sys_id="+ip+"^child.u_account="+account);
+		grCmdbRelCi.query();
+		var list = [];
+		while (grCmdbRelCi.next()) {
+			list.push(grCmdbRelCi.getValue('parent'));
+		}
+
+		var getHostNames = new GlideRecord("cmdb_ci");
+		getHostNames.addEncodedQuery("sys_idIN"+list.toString());
+		getHostNames.query();
+		var listHostName = [];
+		while(getHostNames.next()){
+			listHostName.push(getHostNames.getValue('u_hostname'));
+		}
+		return listHostName.toString();
+	}
+
+	if (input && input.action == "saveIp") {
+		var host_id = input.host_id;
+		var new_ip = input.new_ip;
+		var new_ip_subnet = input.new_ip_subnet;
+		var ip_sys_id;
+
+		if (!host_id || !new_ip || new_ip == ''){
+			return;
+		}
+
+		var grIPExists = new GlideRecord('cmdb_ci_ip_address');
+		grIPExists.addQuery('ip_address', new_ip);
+		grIPExists.addQuery('u_subnet', new_ip_subnet);
+		grIPExists.addQuery('u_account', data.account_id);
+		grIPExists.query();
+		if (grIPExists.next()){
+			//This IP Already Exists
+			var active = grIPExists.u_active_flag;
+			if (!active){
+				//If it was inactive, just set Active = True
+				ip_sys_id = grIPExists.getValue('sys_id');
+				grIPExists.u_active_flag = true;
+				grIPExists.u_subnet = new_ip_subnet;
+				// 				if (grIPExists.nic.cmdb_ci != host_id){
+				// 					var grNicUpdate = new GlideRecord('cmdb_ci_network_adapter');
+				// 					if(grNicUpdate.get(grIPExists.getValue('nic'))){
+				// 						grNicUpdate.cmdb_ci = host_id;
+				// 						grNicUpdate.update();
+				// 					} else {
+				// 						//IP is inactive, but there is no NIC to associate new Host
+				// 						data.errorMessage = 'IP Address ' + new_ip + ' is pre-allocated to another host';
+				// 						return;
+				// 					}
+				// 				}
+
+				grIPExists.setWorkflow(false);
+				grIPExists.update();
+
+				var grRelCI = new GlideRecord("cmdb_rel_ci");
+				grRelCI.initialize();
+				grRelCI.setValue("child", ip_sys_id);
+				grRelCI.setValue("parent", host_id);
+				grRelCI.setValue("type", "cb5592603751200032ff8c00dfbe5d17");
+				grRelCI.insert();
+
+				data.errorMessage = 'IP address ' + new_ip + ' was inactive and has been reactivated';
+			} else {
+				//Else, do not duplicate, abort action
+				data.errorMessage = 'IP Address ' + new_ip + ' is already in use by another Host ('+getNameHosts(grIPExists.getValue('sys_id'),data.account_id)+')! Please review your Host List.';
+				return;
+			}
+		} else {
+
+			var grIp = new GlideRecord('cmdb_ci_ip_address');
+			grIp.newRecord();
+			grIp.ip_address = new_ip;
+			//grIp.nic = nic_sys_id;
+			grIp.u_subnet = new_ip_subnet;
+			grIp.u_account = account_id;
+			grIp.setWorkflow(false);
+			ip_sys_id = grIp.insert();
+
+			var grRelCI = new GlideRecord("cmdb_rel_ci");
+			grRelCI.initialize();
+			grRelCI.setValue("child", ip_sys_id);
+			grRelCI.setValue("parent", host_id);
+			grRelCI.setValue("type", "cb5592603751200032ff8c00dfbe5d17");
+			grRelCI.insert();
+		}
+
+		var ip_obj = {};
+		ip_obj.id = ip_sys_id;
+		ip_obj.display_value = new_ip;
+		ip_obj.subnet = {
+			id: grIp.getValue("u_subnet"),
+			cidr: grIp.u_subnet.u_splitted_cidr.getValue(),
+			ip: grIp.u_subnet.ip_address.getValue(),
+			mask: grIp.u_subnet.u_mask.getValue()
+		};
+
+		data.new_ip_obj = ip_obj;
+
+		return;
+	}
+
+	if (input && input.action == "load") {
+		// Get current volume
+		if (input.volume && input.volume.id) {
+			//Prepare Edit Modal
+
+			data.volume = {};
+
+			var type = (input.volume.share.type + "").toLowerCase();
+			switch (type) {
+				case "smb":
+					data.volume.type = "file_server_smb";
+					break;
+				case "nfs":
+					data.volume.type = "file_server_nfs";
+					break;
+				case "bucket":
+					data.volume.type = "object";
+					break;
+				case "block":
+					data.volume.type = "block";
+					break;
+				case "iscsi":
+					data.volume.type = "block";
+					break;
+				default:
+					data.volume.type = "file_server_smb";
+					break;
+			}
+
+			//Load Volume Data
+			data.volume.ips = input.volume.authorized_ips || [];
+			data.volume.id = input.volume.id;
+			data.volume.name = input.volume.label_name;
+			//data.volume.hosts = "";
+			data.volume.lun_id = input.lun_id;
+			data.volume.project = {};
+			data.volume.project.sys_id = input.volume.project;
+			data.volume.total_size = 0; //Available if contracted OnDemand
+			data.volume.available_size = 0; //Available to this volume
+			data.volume.used_size = 0; //Previously used
+			data.volume.size = input.volume.size; //Current volume size
+			data.volume.size_measurement = input.volume.size_unit.toLowerCase();
+			if (type == "smb" || type == "iscsi")
+				data.volume.min_size = input.volume.size;
+			else data.volume.min_size = 1;
+			data.volume.max_size = 0;
+			data.volume.max_allowed = 25000;
+		} else if (input.volume) {
+			data.volume = input.volume;
+			if (!data.volume.project){
+				data.volume.project = {};
+				data.volume.project.sys_id = "";
+			}
+		} else {
+			// new volume
+			data.volume = {};
+			data.volume.ips = [];
+			data.volume.name = "";
+			data.volume.hosts = "";
+			data.volume.project = {};
+			data.volume.project.sys_id = "";
+			data.volume.total_size = 0; //Available if contracted OnDemand
+			data.volume.available_size = 0; //Available to this volume
+			data.volume.used_size = 0; //Previously used
+			data.volume.size = 0; //Current volume size
+			data.volume.min_size = 1;
+			data.volume.max_size = 0;
+			data.volume.max_allowed = 25000;
+			data.volume.size_measurement = "gb"; // Set Default mensurement value
+		}
+
+		// Agent Types
+		data.volume_type_list = [
+			{
+				id: "file_server_nfs",
+				title: gs.getMessage("File Storage"),
+				alt_title: gs.getMessage("NFS Share"),
+				description: gs.getMessage("NFS Share")
+			},
+			{
+				id: "file_server_smb",
+				title: gs.getMessage("File Storage"),
+				alt_title: gs.getMessage("SMB Share"),
+				description: gs.getMessage("SMB Share")
+			},
+			{
+				id: "block",
+				title: gs.getMessage("Block Storage"),
+				description: gs.getMessage("iSCSI Volume")
+			},
+			{
+				id: "object",
+				title: gs.getMessage("Object Storage"),
+				description: "Bucket"
+			}
+		];
+
+		data.hosts_list = [];
+		data.ips_list = [];
+		data.project_list = [];
+
+		return;
+	}
+
+	function convert(size_measurement, volume_size){
+		var result= {};
+		if(size_measurement == 'tb'){
+			result.volume_size = volume_size/1000;
+			result.size_measurement = 'Tb';
+		}else {
+			result.volume_size = volume_size;
+			result.size_measurement = 'Tb';
+		}
+
+		return result;
+	}
+
+	function createVolume(input) {
+		var users = [];
+		var hosts = [];
+		var iqns = [];
+		var obj = {};
+		var lun_id;
+
+		if (input.volume.lun_id) {
+			lun_id = input.volume.lun_id;
+		}
+
+		//Get Users Object Array
+		for (var i in input.volume.users) {
+			obj = {};
+			obj.user = input.volume.users[i].id;
+			if(input.volume.users[i].permission){
+				obj.permissions = input.volume.users[i].permission;
+			}else{
+				obj.permissions = 'r';
+			}
+
+			users.push(obj);
+		}
+
+		var ipList = [];
+		//Get Host ID list
+
+		for (var j in input.volume.hosts) {
+			var host = input.volume.hosts[j].id + "";
+			if (host && host != "" && host != "undefined") hosts.push(host);
+			var iqn = input.volume.hosts[j].iqn + "";
+			if (iqn && iqn != "" && iqn != "undefined") iqns.push(iqn);
+			for(var k in input.volume.hosts[j].ip_list) {
+				//if(input.volume.hosts[j].ip_list[k].selected && input.volume.hosts[j].ip_list[k].subnet.cidr)
+				//ipList.push(input.volume.hosts[j].ip_list[k].display_value + "/" + input.volume.hosts[j].ip_list[k].subnet.cidr);
+				if(input.volume.hosts[j].ip_list[k].selected)
+					ipList.push(input.volume.hosts[j].ip_list[k].display_value);
+			}
+		}
+
+		var type = input.volume.type + "";
+		var action = "";
+		var url = "";
+
+		switch (type) {
+			case "file_server_smb":
+				action = "postSmbShare";
+				url = "/api/smb-share/";
+				break;
+			case "file_server_nfs":
+				action = "postNfsShare";
+				url = "/api/nfs-share/";
+				break;
+			case "object":
+				action = "postBuckets";
+				url = "/api/buckets/";
+				break;
+			case "block":
+				action = "postIscsiShare";
+				url = "/api/iscsi-share/";
+				break;
+			default:
+				return;
+		}
+		data.ms_queue_new_volume_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: action,
+			service: "idata",
+			priorization: "high",
+			data: {
+				url: url,
+				method: "POST",
+				payload: {
+					volume: {
+						name: input.volume.name,
+						label_name: input.volume.name,
+						size: input.volume.size,
+						size_unit: input.volume.size_measurement ,
+						readonly: false,
+						project: input.volume.project.sys_id,
+						customer: account_id,
+						hosts: hosts,
+						site: input.ibx.ear_id
+					},
+					smb_users: users,
+					bucket_users: users,
+					lun_id: lun_id,
+					authorized_ips: ipList || [],
+					authorized_networks: [],
+					authorized_hostnames: [],
+					archive: false
+				}
+			}
+		});
+		result = data.ms_queue_new_volume_sys_id;
+		return result;
+	}
+
+	function updateVolume(input) {
+		var users = [];
+		var hosts = [];
+		var iqns = [];
+		var obj = {};
+		var lun_id;
+
+		if (input.volume.lun_id) {
+			lun_id = input.volume.lun_id;
+		}
+		//Get Users Object Array
+		for (var i in input.volume.users) {
+			obj = {};
+			obj.user = input.volume.users[i].id;
+			if(input.volume.users[i].permission){
+				obj.permissions = input.volume.users[i].permission;
+			}else{
+				obj.permissions = "r";
+
+			}
+			users.push(obj);
+		}
+
+		//Get Host ID list
+		var ipList = [];
+		for (var j in input.volume.hosts) {
+			hosts.push(input.volume.hosts[j].id + "");
+			var iqn = input.volume.hosts[j].iqn + "";
+			if (iqn && iqn != "" && iqn != "undefined") iqns.push(iqn);
+			for(var k in input.volume.hosts[j].ip_list) {
+				//if(input.volume.hosts[j].ip_list[k].selected && input.volume.hosts[j].ip_list[k].subnet.cidr)
+				//ipList.push(input.volume.hosts[j].ip_list[k].display_value + "/" + input.volume.hosts[j].ip_list[k].subnet.cidr);
+				if(input.volume.hosts[j].ip_list[k].selected)
+					ipList.push(input.volume.hosts[j].ip_list[k].display_value );
+			}
+		}
+
+
+		var type = input.volume.type + "";
+		var action = "";
+		var url = "";
+
+		switch (type) {
+			case "file_server_smb":
+				action = "putSmbShare";
+				url = "/api/smb-share/" + input.editVolume.share.id + "/";
+				break;
+			case "file_server_nfs":
+				action = "putNfsShare";
+				url = "/api/nfs-share/" + input.editVolume.share.id + "/";
+				break;
+			case "object":
+				action = "putBuckets";
+				url = "/api/buckets/" + input.editVolume.share.id + "/";
+				break;
+			case "block":
+				action = "putIscsiShare";
+				url = "/api/iscsi-share/" + input.editVolume.share.id + "/";
+				break;
+			default:
+				return;
+		}
+
+		data.ms_queue_new_volume_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: action,
+			service: "idata",
+			priorization: "high",
+			data: {
+				url: url,
+				method: "PUT",
+				payload: {
+					volume: {
+						name: input.volume.name,
+						label_name: input.volume.name,
+						size: input.volume.size,
+						//size_unit: "Gb",
+						size_unit: input.volume.size_measurement,
+						readonly: false,
+						project: input.volume.project.sys_id,
+						customer: account_id,
+						hosts: hosts,
+						site: input.ibx.ear_id
+					},
+					smb_users: users,
+					bucket_users: users,
+					lun_id: lun_id,
+					authorized_ips: ipList || [],
+					authorized_networks: [],
+					authorized_hostnames: []
+				}
+			}
+		});
+		result = data.ms_queue_new_volume_sys_id;
+		return result;
+	}
+
+	if (input && input.action == "getSaveVolumeResult") {
+		result = getCompleteQueueResponse(input.ms_queue_new_volume_sys_id);
+		if (result == null) {
+			return;
+		}
+		data.saveVolume = result;
+		return;
+	}
+
+	if (input && input.action == "createProject") {
+		data.ms_queue_new_project_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "postProjects",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url: "/api/projects/",
+				method: "POST",
+				payload: {
+					name: input.project_name,
+					description: input.project_description,
+					customer: account_id,
+					site: input.ibx.ear_id
+				}
+			}
+		});
+		return;
+	}
+
+	if (input && input.action == "getCreateProjectResult") {
+		result = getQueueResponse(input.ms_queue_new_project_sys_id);
+		if (result == null) {
+			return;
+		}
+		data.createProject = result;
+		return;
+	}
+
+	function selectDefaultProject(){
+		//Load Default Project
+		if (data.projects && data.volume) {
+			var projects = data.projects;
+			for (var i in projects) {
+				var project = projects[i];
+				//if (project.name == default_project_name) {
+				try {
+					data.volume.project = {};
+					data.volume.project.name = project.name + "";
+					data.volume.project.sys_id = project.id + "";
+				} catch (e) {
+					gs.addErrorMessage(e);
+				}
+				//}
+			}
+		}
+	}
+
+	if (input && input.action == "getProjects") {
+		data.ms_queue_project_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "getProjects",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url:
+				"/api/projects?customer=" + account_id + "&site=" + input.ibx.ear_id,
+				method: "GET",
+				payload: {}
+			}
+		});
+		return;
+	}
+
+	if (input && input.action == "getProjectsResult") {
+		result = getQueueResponse(input.ms_queue_project_sys_id);
+		if (result == null) {
+			return;
+		}
+		data.projects = result;
+
+		//Do not select Default Volume when current action is Edit Volume
+		if (input.volume && !input.editVolume && data.projects && (!input.volume.project.sys_id || input.volume.project.sys_id == '')){
+			data.volume = input.volume;
+			selectDefaultProject();
+		}
+
+		return;
+	}
+
+	if (input && input.action == "getUsers") {
+		data.ms_queue_users_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "getLdapUser",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url:
+				"/api/ldap-user?customer=" + account_id + "&site=" + input.ibx.ear_id,
+				method: "GET",
+				payload: {}
+			}
+		});
+		return;
+	}
+
+	if (input && input.action == "getUsersResult") {
+		result = getQueueResponse(input.ms_queue_users_sys_id);
+		if (result == null) {
+			return;
+		}
+		var listUserCreated = [];
+		for(var x=0; x < result.length; x++){
+			if(result[x].status == 'Created'){
+				listUserCreated.push(result[x]);
+			}
+		}
+
+		data.users = listUserCreated;
+		//data.users = result;
+		return;
+	}
+
+	if (input && input.action == "getVolume") {
+		var id = input.editVolume.share.id;
+		type = (input.editVolume.share.type + "").toLowerCase();
+		var action = "";
+		var url = "";
+
+		switch (type) {
+			case "smb":
+				action = "getSmbShare";
+				url = "api/smb-share/" + id + "/";
+				break;
+			case "nfs":
+				action = "getNfsShare";
+				url = "api/nfs-share/" + id + "/";
+				break;
+			case "bucket":
+				action = "getBuckets";
+				url = "api/buckets/" + id + "/";
+				break;
+			case "block":
+				action = "getIscsiShare";
+				url = "api/iscsi-share/" + id + "/";
+				break;
+			case "iscsi":
+				action = "getIscsiShare";
+				url = "api/iscsi-share/" + id + "/";
+				break;
+			default:
+				return;
+		}
+
+		data.ms_queue_edit_volume_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: action,
+			service: "idata",
+			priorization: "high",
+			data: {
+				url: url,
+				method: "GET"
+			}
+		});
+		return;
+	}
+
+	if (input && input.action == "getVolumeResult") {
+		result = getQueueResponse(input.ms_queue_edit_volume_sys_id);
+		if (result == null) {
+			return;
+		}
+		data.editVolumeData = result;
+		return;
+	}
+
+	if (input && input.action == "getCustomerMetricsResult") {
+		result = getQueueResponse(input.ms_queue_metrics_sys_id);
+		if (result == null) {
+			return;
+		}
+
+		data.volume = input.volume;
+		data.customerMetrics = {};
+		data.customerMetrics = result;
+
+		data.onDemandActive = false;
+		//Get if onDemand is active for the account, if it is, add the amount to the total_quota attribute on customer_metrics
+		var mainIdataCi = new GlideRecord("u_intelligent_data_virtual_storage");
+		mainIdataCi.addQuery("u_account", account_id);
+		mainIdataCi.addQuery("location", input.ibx.sys_id);
+		mainIdataCi.addQuery("u_active_flag", true);
+
+		mainIdataCi.query();
+		if (mainIdataCi.next()) {
+			if (
+				["activated", "deactivation_requested"].indexOf(
+					mainIdataCi.u_on_demand_status.getValue()
+				) > -1
+			) {
+				data.customerMetrics.total_quota += parseFloat(
+					mainIdataCi.u_on_demand_size_limit.getValue()
+				) * 1000;
+				data.onDemandActive = true;
+			}
+		}
+
+		if (data.volume) {
+			data.volume.customerMetrics = {};
+			data.volume.customerMetrics = data.customerMetrics;
+			return;
+		}
+	}
+
+	if (input && input.action == "getCustomerMetrics") {
+		data.ms_queue_metrics_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "getCustomerMetrics",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url:
+				"/api/customer-metrics/?customer=" +
+				account_id +
+				"&site=" +
+				input.ibx.ear_id,
+				method: "GET",
+				payload: {}
+			}
+		});
+		return;
+	}
+
+	function loadCustomerMetrics() {
+		data.ms_queue_metrics_sys_id = new EQIX_Message_Queue().create({
+			region: "BR",
+			action: "getCustomerMetrics",
+			service: "idata",
+			priorization: "high",
+			data: {
+				url:
+				"/api/customer-metrics/?customer=" +
+				account_id +
+				"&site=" +
+				input.ibx.ear_id,
+				method: "GET",
+				payload: {}
+			}
+		});
+		return;
+	}
+
+	function getQueueResponse(sys_id) {
+		var grUMsQueue = new GlideRecord("u_ms_queue");
+		if (!grUMsQueue.get(sys_id)) {
+			return null;
+		}
+
+		var result = grUMsQueue.getValue("u_response"); //u_response - u_data
+
+		if (!result) {
+			return null;
+		}
+
+		result = JSON.parse(result);
+
+		if (!result.data) {
+			return null;
+		}
+		result = GlideStringUtil.base64Decode(result.data);
+
+		if (!result) {
+			return null;
+		}
+
+		result = JSON.parse(result);
+		postUserLogs(grUMsQueue);
+
+		return result;
+	}
+
+	function postUserLogs(record) {
+		var action = record.getValue("u_action");
+		var editActions = [
+			"putSmbShare",
+			"putNfsShare",
+			"putBuckets",
+			"putIscsiShare"
+		];
+		var postActions = [
+			"postNfsShare",
+			"postSmbShare",
+			"postIscsiShare",
+			"postBuckets"
+		];
+		if (
+			!action ||
+			(action != "postProjects" &&
+			 editActions.indexOf(action) == -1 &&
+			 postActions.indexOf(action) == -1)
+		) {
+			return null;
+		}
+		var data = JSON.parse(GlideStringUtil.base64Decode(record.u_data));
+		var message = "";
+		var infos;
+		var object;
+		if (action == "postProjects") {
+			message = "Project {0} was created";
+			infos = {
+				payload: {
+					customer: data.payload.customer,
+					site: input.ibx.ear_name
+				}
+			};
+			object = data.payload.name;
+		} else {
+			if (editActions.indexOf(action) != -1) {
+				message = "Volume {0} was edited";
+			} else if (postActions.indexOf(action) != -1) {
+				message = "Volume {0} was created";
+			}
+			infos = {
+				payload: {
+					customer: data.payload.volume.customer,
+					site: input.ibx.ear_name
+				}
+			};
+			object = data.payload.volume.name;
+		}
+		new EQIX_Intelligent_Data().postUserLogs(record, infos, message, object);
+	}
+
+	function getCompleteQueueResponse(sys_id) {
+		var grUMsQueue = new GlideRecord("u_ms_queue");
+		if (!grUMsQueue.get(sys_id)) {
+			return null;
+		}
+
+		var result = grUMsQueue.getValue("u_response"); //u_response - u_data
+
+		if (!result) {
+			return null;
+		}
+
+		result = JSON.parse(result);
+		data.dataVolumeMsg = JSON.parse(GlideStringUtil.base64Decode(result.data));
+		if(result.success == "true")
+			postUserLogs(grUMsQueue);
+
+		return result;
+	}
+})();]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>organize.eric</sys_created_by>
+        <sys_created_on>2020-03-11 04:11:22</sys_created_on>
+        <sys_id>ce5a702cdb27c410fddc7bedae961965</sys_id>
+        <sys_mod_count>1110</sys_mod_count>
+        <sys_name>MSP ID Create Volume</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_ce5a702cdb27c410fddc7bedae961965</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:25</sys_updated_on>
+        <template><![CDATA[<!--- New Volume Modal -->
+<div class="modal fade" id="create-volume" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="min-width: 900px !important;min-height: 556px !important;">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="loading || loadingModal"><span class="icon-close-light-eqx-icon"></span></button>
+        <h4 class="modal-title" id="myModalLabel">${{{data.title}}}<span ng-if="data.modal_title">: {{data.modal_title}}</span></h4>
+      </div> 
+
+      <!-- Header Flow -->
+      <div class="modal-body flow" ng-show="data.volume.type">
+        <div class="steps" ng-if="applyErrorCount == 0">
+          <ul>
+            <li>
+              ${Type}
+              <span class="step-indicator step-1 active"></span>
+            </li>
+            <li ng-show="data.volume.type != 'file_server_nfs' && data.volume.type != 'block'">
+              ${Users}
+              <span class="step-indicator step-2" ng-class="{'active': step >= 2}"></span>
+            </li>
+            <li>
+              ${Size}
+              <span class="step-indicator step-3" ng-class="{'active': step >= 3}"></span>
+            </li>
+            <li>
+              ${Project}
+              <span class="step-indicator step-4" ng-class="{'active': step >= 4}"></span>
+            </li>
+            <li>
+              ${Name}
+              <span class="step-indicator step-5" ng-class="{'active': step >= 5}"></span>
+            </li>
+            <li ng-show="data.volume.type == 'file_server_nfs' || data.volume.type == 'block'">
+              ${Hosts}
+              <span class="step-indicator step-6" ng-class="{'active': step >= 6}"></span>
+            </li>
+            <li>
+              ${Confirmation}
+              <span class="step-indicator step-7" ng-class="{'active': step >= 7}"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <!-- END Header Flow -->
+
+      <!-- Loading content -->
+      <div class="modal-body" ng-show="loadingModal">
+        <div class="loading-data">
+          <div class="lds-css"><div style="width:100%;height:100%" class="lds-rolling"><div></div></div></div>
+        </div>
+      </div>
+      <!-- End Loading content -->
+
+      <!-- Start Modal BODY -->
+      <div class="modal-body"  ng-show="!loadingModal">
+
+        <div class="alert-message alert" ng-show="c.selectedHosts.length < 1 && step == 6 && (data.volume.type == 'file_server_nfs' || data.volume.type == 'block')">
+          <i class="fa fa-warning" style="color: #F69F2A !important;"></i> ${You need to select a host to complete volume configuration.}
+        </div>
+
+        <div class="alert-message alert" ng-show="step == 6 && data.volume.type == 'block' && c.selectedHosts.length > 1">
+          <i class="fa fa-warning" style="color: #F69F2A !important;"></i> ${When attaching to multiple hosts, they must be configured in cluster mode and run the same OS}
+        </div>
+
+        <div class="alert-message caution" ng-show="step > 1 && data.errorMessage && data.errorMessage != '' && !loading">
+          <i class="fa fa-exclamation-triangle"></i> ${{{data.errorMessage}}}
+        </div>
+
+        <!--- Step 1 Beginning -->
+        <form name="step1_form" class="content" ng-show="applyErrorCount == 0 && step == 1">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 min-height">
+              <span class="step-title">
+                ${Select the type of volume that you would like to create}:
+              </span>
+              <br>
+              <div class="volume-options">
+                <div class="volume-options__option" ng-repeat="item in data.volume_type_list" ng-class="{active: data.volume.type == item.id}" ng-click="selectVolumeType(item.id, item.alt_title || item.title)">
+                  <label for="">
+                    <span>
+                      {{item.title}}
+                      <small class="text-muted block light">
+                        {{item.description}}
+                      </small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!--- Step 1 End -->
+
+        <!--- Step 2 Beginning -->
+        <form name="step2_form" class="content" ng-show="applyErrorCount == 0 && step == 2">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 min-height">
+              <span class="step-title">
+                ${Which users are allowed to connect to it?}
+              </span>
+              <div class="users">
+                <select id="select-users" multiple="multiple" ng-model="c.selectedUser" ng-change="c.changed()" name="users[]"> <!-- ng-disabled="data.loading" -->
+                  <option ng-repeat="user in data.users" value="{{user.id}}">{{user.username}}</option>
+                </select>
+
+                <table class="table">
+                  <tr>
+                    <th>${Username}</th>
+                    <th colspan=2>${Permissions}</th>
+                  </tr>
+                  <tr ng-repeat="user in c.selectedUsers">
+                    <td>{{user.username}}</td>
+                    <td>
+                      <div class="filters" id="filters">
+                        <div class="filter-row">
+                          <div class="row">
+                            <div class="col-md-12" style="margin-top: 8px;">
+                              <div class="filter-options filter-buttons ng-scope" style="float:left;">
+                                <input type="checkbox" id="read-{{user.username}}" ng-init="data.userPermission.read[user.username] = true" ng-model="data.userPermission.read[user.username]" ng-change="updatePermissions(user.username, 'read')" role="checkbox" aria-invalid="false">
+                                <label for="read-{{user.username}}" class="button light ng-binding">${read}</label>
+                              </div>
+                              <div class="filter-options filter-buttons ng-scope" style="float:left;" ng-if="!vrCreateVolume">
+                                <input type="checkbox" id="write-{{user.username}}"  ng-model="data.userPermission.write[user.username]" ng-change="updatePermissions(user.username, 'write')" role="checkbox" aria-invalid="false">
+                                <label for="write-{{user.username}}" class="button light ng-binding">${write}</label>
+                              </div>
+                              <div class="filter-options filter-buttons ng-scope" style="float:left;" ng-if="vrCreateVolume">
+                                <input type="checkbox" id="write-{{user.username}}" ng-init="data.userPermission.write[user.username] = false" ng-model="data.userPermission.write[user.username]" ng-change="updatePermissions(user.username, 'write')" role="checkbox" aria-invalid="false">
+                                <label for="write-{{user.username}}" class="button light ng-binding">${write}</label>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span ng-click="c.removeSelectedValue(user.id)"><i class="fa fa-times-circle" style="font-size: 15px; color: gray;"></i></span>
+                    </td>
+                  </tr>
+                </table>
+                <!--button type="button" class="btn btn-info" ng-show="!loading" ng-click="fillEditVolumeUsers()">${Reload Users list}</button-->
+              </div>
+            </div>
+          </div>
+        </form>
+        <!--- Step 2 End -->
+
+        <!--- Step 3 Beginning -->
+        <form name="data.step3_form" class="content step3_form" ng-show="applyErrorCount == 0 && step == 3">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 min-height">
+              <div class="alert-message caution" ng-show="data.step3_form.volume_size.$error.max && !data.onDemandActive && !loading">
+                <i class="fa fa-warning" style="color: #F69F2A !important;"></i> <a ng-click="redirectOnDemand()" style="color: #000 !important;">${You don't have free space. Would you like to enable on-demand?}</a>
+              </div>
+              <div class="alert-message caution" ng-show="maxAllowedFlag && !loading">
+                <i class="fa fa-warning" style="color: #F69F2A !important;"></i><a style="color: #000 !important;">${Maximum allowed size per volume: 25.000 GB}</a>
+              </div>
+              <div class="alert-message caution" ng-show="maxAllowedFlagTB && !loading">
+                <i class="fa fa-warning" style="color: #F69F2A !important;"></i><a style="color: #000 !important;">${Maximum allowed size per volume: 25 TB}</a>
+              </div>
+              <span class="step-title">
+                <p>
+                  ${Which size?}
+                </p>
+                {{getAlocationUsage()}} {{data.measurement}} ${of} {{data.volume.total_size}} {{data.measurement}} ${used}
+                <br/>
+                <!--div class="progress" style="width:40%;"-->
+                <!--div class="progress-bar progress-bar-striped active" role="progressbar" style="width:{{data.volume.used_size/data.volume.total_size*100}}%; height:70%; background-color:#3BB2FF;"></div-->
+                <uib-progressbar value="getAlocationUsage(true)" 
+                                 class="progress-striped" 
+                                 type="info" 
+                                 style="background-color:#3BB2FF;">
+                </uib-progressbar>
+              </span>
+              <div class="form-group" style="margin-top:3%;">
+                <label style="min-width: 140px;">${Volume Size}</label>
+                <input type="number" class="form-control" ng-model="data.volume.size" ng-required="true" ng-max="data.volume.max_size" ng-min="data.volume.min_size" ng-change="verifyMaxAllowed()" name="volume_size" ng-disabled="editVolume && editVolume.display_values.type == 'Block'"/>
+              </div>
+              <div class="measurement">
+                <div class="btn btn-filter m-r-xs" ng-class="{active: data.volume.size_measurement == 'gb'}" ng-click="switchSizeMeasurement('gb')" ng-disabled="data.loadingGB || (editVolume && editVolume.display_values.type == 'Block')" ng-if="!data.loadingGB"> <!-- || data.step3_form.volume_size.$invalid -->
+                  GB
+                </div>
+                <div class="btn btn-filter" ng-class="{active:data.volume.size_measurement == 'tb'}" ng-click="switchSizeMeasurement('tb')" ng-disabled="data.loadingTB || (editVolume && editVolume.display_values.type == 'Block')" ng-if="!data.loadingTB" > <!-- || data.step3_form.volume_size.$invalid -->
+                  TB
+                </div>
+              </div>
+              <span class="error" ng-if="data.step3_form.volume_size.$error.required && data.step3_form.volume_size.$dirty">* ${Volume size is required!}</span>
+              <span class="error" ng-if="data.step3_form.volume_size.$error.min && data.step3_form.volume_size.$dirty">* ${Size can't be less than} {{data.volume.min_size}}! <span ng-if="data.volume.type == 'block'">${The Block storage protocol does not allow reduction}</span></span>
+              <span class="error" ng-if="data.step3_form.volume_size.$error.max && data.step3_form.volume_size.$dirty && data.onDemandActive">* ${Size can't be more than} {{data.volume.max_size}}!</span>
+              <div ng-if="editVolume && editVolume.display_values.type == 'Block'">
+                <h5>Expansão e Redução volume block: </h5>
+                <p>Devido a particularidades necessarias no sistema operacional sobre o Filesystem montado em volumes do tipo Block (iSCSI), o processo de expansão / redução não é permitido pelo portal de autoserviço. Recomendamos a utilização dos serviços de suporte Equinix atraves do 0800 e/ou abertura de chamado por este portal, e caso voçê esteja familiarizado com procedimentos de expansão/redução em filesystens, executar:</p>
+                <ul>
+                  <li>Criar novo volume block (iSCSI) no portal;</li>
+                  <li>Apresentar novo volume block (iSCSI) ao mesmo host;</li>
+                  <li>Reconhecer novo volume block (iSCSI) no host;</li>
+                  <li>Através das ferramentas de sistema operacional, expandir filesystem existente com novo volume apresentado.</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!--- Step 3 End -->
+
+        <!--- Step 4 Beginning -->
+        <form name="data.step4_form" class="content step4_form" ng-show="applyErrorCount == 0 && step == 4">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 min-height">
+              <span class="step-title">
+                ${Pick an existing project}
+              </span>
+              <div class="form-group">
+                <!--label class="block"> ${Project}</label-->
+                <div class="SumoSelect" tabindex="0" role="button" aria-expanded="false">
+                  <select name="volume_project" class="form-control" id="volume_project" ng-model="data.volume.project.sys_id" ng-required="!data.addNewProject" equix-sumoselect="data.projects" placeholder="${Select}" reload-event="'reloadProjectSelector'">
+                    <option disabled value="">-</option>
+                    <option ng-repeat="item in data.projects track by $index" value="{{item.id}}">{{item.name}}</option>
+                  </select>
+                </div>  
+              </div>
+              <a ng-if="!data.addNewProject" class="pointer" ng-click="showNewProjectForm()">${Not found? Register a new project}</a>
+              <div ng-if="data.addNewProject" class="new-project-title">${Create a new project}</div>
+              <div class="panel new-project-panel" ng-if="data.addNewProject">
+                <div class="form-group">
+                  <label title="Special characters and spaces are not accepted, only letters, numbers and underscores"><span>*</span>${Project name}</label>
+                  <input name="project_name" class="form-control" title="Special characters and spaces are not accepted, only letters, numbers and underscores" pattern="[A-Za-z0-9_]{1,255}" ng-model="data.volume.project.name" ng-required="true"/>
+                </div>
+                <div class="form-group">
+                  <label>${Description}</label>
+                  <textarea name="project_description" class="form-control" ng-model="data.volume.project.description"></textarea>
+                  <a ng-click="data.addNewProject = !data.addNewProject" style="float:right;">${Cancel}</a>
+                  <!--button type="button" class="btn btn-info" ng-click="c.createProject()">Create project</button-->
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+        <!--- Step 4 End -->
+
+        <!--- Step 5 Beginning *NAME -->
+        <form name="data.step5_form" class="content step5_form form-validation" ng-show="applyErrorCount == 0 && step == 5">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 min-height">
+
+              <span class="step-title">
+                ${How do you want to identify it?}
+              </span>
+
+              <div class="form-group">
+                <input name="volume_name" class="form-control" ng-model="data.volume.name" ng-change="validateVolumeName()" ng-required="true" pattern="[A-Za-z0-9_]{1,100}" placeholder="${Name of your volume}" title="Special characters and spaces are not accepted, only letters, numbers and underscores" />
+                <span class="error" ng-if="data.step5_form.volume_name.$error.required && data.step5_form.volume_name.$dirty"> ${Volume name is required!}</span>
+                <span class="error" ng-if="data.step5_form.volume_name.$error.unique && data.step5_form.volume_name.$dirty"> ${The volume name must be unique!}</span>
+                <div ng-show="data.volume.type == 'block'">
+                  <br/>
+                  <br/>
+                  <label>LUN ID</label>
+                  <input name="volume_lun_id" class="form-control" ng-model="data.volume.lun_id" pattern="[0-9]{1,3}" title="LUN ID: optional, max size 3, integer, values from 1 to 999" />
+                <p  ng-show="msg_lunID"  class="ng-scope" style="color: #000;margin-top: 5px;">
+                ${If the LUN ID is changed, the disk will lose connection with the host, making it essential to perform a new scan on the volume.}
+              </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </form>
+        <!--- Step 5 End -->
+
+        <!--- Step 6 Beginning *HOSTs -->
+        <form name="step6_form" class="content" ng-show="applyErrorCount == 0 && step == 6">
+          <div class="row">
+            <div class="col-sm-12 col-md-12 min-height">
+              <span class="step-title">
+                ${Which hosts will be connected to it?}
+              </span>
+              <div class="users">
+                <select id="select-hosts" multiple="multiple" ng-model="c.selectedHost" ng-change="c.hostChanged()" name="hosts[]" ng-disabled="data.loading">
+                  <option ng-repeat="host in data.hosts_list" value="{{host.id}}">{{host.display_value}}</option>
+                </select>
+
+                <table class="table">
+                  <tr>
+                    <th>Hostname</th>
+                    <th colspan=2 ng-show="data.volume.type != 'block'">${IP Address}</th>
+                    <th colspan=2 ng-show="data.volume.type == 'block'">IQN</th>
+                  </tr>
+                  <tr ng-repeat="host in c.selectedHosts">
+                    <td>{{host.display_value}}</td>
+                    <td>
+                      <div class="filters" id="filters">
+                        <div class="filter-row">
+                          <div class="row">
+                            <div class="col-md-12" style="margin-top: 8px;">
+
+                              <div ng-show="data.volume.type != 'block'">
+                                <!--div class="filter-options filter-buttons ng-scope" style="float:left;" ng-if="host.ip_address">
+<input type="checkbox" id="read-{{host.id}}" ng-init="data.userPermission.read[host.id] = true" ng-model="data.userPermission.read[host.id]" role="checkbox" aria-invalid="false">
+<label for="read-{{host.id}}" class="button light ng-binding">{{host.ip_address}}</label>
+</div-->
+
+                                <div ng-repeat="ip in host.ip_list" class="filter-options filter-buttons ng-scope" style="float:left;">
+                                  <input type="checkbox" id="read-{{ip.id}}" ng-init="data.selectedHosts[host.id].selectedIps[ip.id] = false" ng-model="data.selectedHosts[host.id].selectedIps[ip.id]" role="checkbox" aria-invalid="false">
+                                  <label for="read-{{ip.id}}" class="button light ng-binding">{{ip.display_value}}</label>
+                                </div>
+
+                                <!-- Insert New IP section-->
+                                <div ng-show="editIp[ip.id]" style="clear: both; width: 400px;">
+                                  <div style="height:10px;"></div>
+
+                                  <select ng-model="new_ip_subnet" name="new_ip_subnet" ng-disabled="data.loading">
+                                    <option ng-repeat="subnet in data.subnets" value="{{subnet.id}}">{{subnet.ip}} - {{subnet.mask}}</option>
+                                  </select>
+
+                                  <input type="text" name="new_ip_address" placeholder="${IP Address}" ng-model="new_ip" aria-invalid="false" pattern="((^|\.)((25[0-5])|(2[0-4]\d)|(1\d\d)|([1-9]?\d))){4}$" style="width: 75%;">
+
+                                  <a ng-click="saveIp(host.id, new_ip, new_ip_subnet, ip.id); editIp[ip.id] = !editIp[ip.id];" style="color:lightblue; font-weight:bold; margin-left:2%;">${Save}</a>
+                                  <a ng-click=" editIp[ip.id] = !editIp[ip.id];" style="color:red; font-weight:bold; margin-left:2%;">${Cancel}</a>
+                                </div>
+
+                                <div ng-show="!editIp[ip.id]" style="clear: both; width: 400px;">
+                                  <div style="height:10px;"></div>
+                                  <a ng-click="editIp[ip.id] = !editIp[ip.id]" style="color:#009aff; font-weight:bold;">${Click to define IP*(s)}*</a>
+                                </div>
+
+                              </div>
+
+                              <div ng-show="data.volume.type == 'block'" style="width: 100% !important;">
+                                <div ng-show="editIqn[host.id]">
+                                  <input type="text" id="iqn-{{host.id}}" ng-model="host.iqn" aria-invalid="false" style="width: 75%;">
+                                  <a ng-click="saveIqn(host.id, host.iqn); editIqn[host.id] = !editIqn[host.id]; host.old_iqn = host.iqn;" style="color:lightblue; font-weight:bold; margin-left:2%;">${Save}</a>
+                                  <a ng-click=" editIqn[host.id] = !editIqn[host.id]; host.iqn = host.old_iqn;" style="color:red; font-weight:bold; margin-left:2%;">${Cancel}</a>
+                                </div>
+                                <div ng-show="!editIqn[host.id]">
+                                  <span>{{host.iqn}}</span>
+                                  <a ng-click="editIqn[host.id] = !editIqn[host.id]" style="color:lightblue; font-weight:bold; margin-left:2%;">${Click to define IQN}</a>
+                                </div>
+                              </div>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <span ng-click="c.removeHostSelectedValue(host.id)"><i class="fa fa-times-circle" style="font-size: 15px; color: gray;"></i></span>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <!--a ng-if="!data.addNewHost && data.volume.type == 'block'" class="pointer" ng-click="showNewHostForm()">${Not found? Add a new host}</a>
+<div class="panel new-host" ng-if="data.addNewHost">                
+<sp-widget ng-hide="loadingHost" widget="data.addHostWidget"></sp-widget>
+</div-->
+            </div>
+          </div>
+        </form>
+        <!--- Step 6 End -->
+
+        <!--- Step 7 Beginning -->
+        <div class="content text-center activation-step" ng-show="applyErrorCount == 0 && step == 7" style="margin-top: -34px;">
+          <span class="step-title">
+            ${Verify your volume settings}
+          </span>
+
+          <p class="progress-message"  ng-if="data.volume.type != 'file_server_nfs' && data.volume.type != 'block'">
+            <span class="field-label">${Name}</span>
+            <br/>
+            <span>{{data.volume.name}}</span>
+            <br/>
+            <br/>
+            <span class="field-label">${Size}</span>
+            <br/>
+            <span>{{data.volume.size}} {{data.measurement}}</span>
+            <br/>
+            <br/>
+            <span class="field-label">${Type}</span>
+            <br>
+            <span>{{type}}</span>
+            <br>
+            <br>
+            <span class="field-label">${Project}</span>
+            <br/>
+            <span>{{data.volume.project.name}}</span>
+            <br/>
+            <br/>
+            <span class="field-label">${Users}</span>
+            <br/>
+            <span ng-repeat="user in data.volume.users">{{user.username}}<br/></span>
+          </p>
+
+          <p class="progress-message"  ng-if="data.volume.type == 'file_server_nfs' || data.volume.type == 'block'">
+            <span class="field-label">${Name}</span>
+            <br/>
+            <span>{{data.volume.name}}</span>
+            <br/>
+            <br/>
+            <span class="field-label">${Size}</span>
+            <br/>
+            <span>{{data.volume.size}} {{data.measurement}}</span>
+            <br/>
+            <br/>
+            <span class="field-label">${Type}</span>
+            <br>
+            <span>{{type}}</span>
+            <br>
+            <br>
+            <span class="field-label">${Project}</span>
+            <br/>
+            <span>{{data.volume.project.name}}</span>
+            <br/>
+            <br/>
+            <span class="field-label" ng-show="data.volume.type == 'file_server_nfs'">${IPs}</span>
+            <span class="field-label" ng-show="data.volume.type == 'block'">${Hosts}</span>
+            <br/>
+            <span ng-repeat="host in c.selectedHosts" ng-show="data.volume.type == 'file_server_nfs'"><b>{{host.display_value}}</b>: <span ng-repeat="ip in host.selected_ips"><span ng-if="ip != host.selected_ips[0]"><br/></span>{{ip}}</span> <span ng-if="!host.selected_ips || host.selected_ips.length <= 0" style="color:red;">${No IP selected}</span> <br/><br/></span>
+            <span ng-repeat="host in c.selectedHosts" ng-show="data.volume.type == 'block'">{{host.display_value}} ({{host.iqn}})<br/></span>
+          </p>
+
+
+        </div>
+        <!--- Step 7 End -->
+
+        <!--- Step 8 Beginning -->
+        <div class="content text-center activation-step" ng-show="applyErrorCount == 0 && step == 8">
+          <i class="icon-check-eqx-icon"></i>
+          <div>
+            <span ng-if="!editVolume" class="step-title">${Your volume creation was requested successfully}</span>
+            <span ng-if="editVolume" class="step-title">${Your volume edition was requested successfully}</span>
+            <p>
+              <span>${Operation successful. Please note that changes can take up to 5 minutes to be reflected on the portal list.}</span>
+				<br />
+              <span>${You can track the status on the volumes list}</span>
+            </p>
+          </div>
+          <button type="button" class="btn btn-info" ng-if="!loading" data-dismiss="modal">${Close}</button>
+        </div>
+        <!--- Step 8 End -->
+
+        <!--- ERROR Step Beginning -->
+        <div class="content text-center error" ng-if="applyErrorCount != 0">
+          <div class="col-sm-12 col-md-12 text-center"> 
+            <i class="fa fa-times-circle fa-3x text-danger" aria-hidden="true"></i> 
+            <div class="text-center m-t-lg ng-scope" style="color: #000;width: 62%;margin-left: 20%;"> 
+              <h3>
+                ${Unable to Create Volume}  
+              </h3>
+              ${We identified an error while performing the action. Please, before trying again, make sure the error below can be corrected.}
+              <br>
+            </div>
+
+            <div id="boxError">
+              <p  class="text-center m-t-lg ng-scope" style="padding: 7% 3%; color: #000;">
+                {{msgErroEAR}}
+              </p>
+            </div>
+            <br>
+
+            <button type="button" class="btn btn-info" ng-if="!loading" data-dismiss="modal">${Close}</button>
+
+          </div>
+
+          <!-- equix-friendly-error error-count="applyErrorCount" retry-action="applyRetry" retry-limit="1" loading="loading" embeded="true" alt-id="'volume-embeded-friendly-error'"></equix-friendly-error-->          
+        </div>
+        <!--- ERROR Step End -->
+        <span ng-if="step == 2" style="margin-top: 8px; font-size: small;"><a ng-click="redirectCreateUser()">${Create new users}</a></span>
+        <span ng-if="step == 6 && data.volume.type == 'file_server_nfs'" style="float: left; margin-top: -11px; font-size: small;">${Missing IP Address?} <a ng-click="redirectToHostTicket()">${Click here to open a support ticket}</a></span>
+      </div>
+      <!-- END Modal BODY -->
+      <div class="modal-footer"  style="background-color: #F7F7F7; padding: 9px;" ng-show="applyErrorCount == 0 && step == 7">
+        <button type="button" class="btn " ng-if="!loading" ng-click="previousStep()" id="btnBack">${Back}</button>
+        <button type="button" class="btn" ng-if="!loading" data-dismiss="modal" id="btnCancel" style="float: left;">${Cancel}</button>
+        <button type="button" class="btn btn-info" ng-if="!loading && applyErrorCount == 0 && editVolume" ng-click="apply()" ng-disabled="!isStepValid()">${Update Volume}</button>
+        <button type="button" class="btn btn-info" ng-if="!loading && applyErrorCount == 0 && !editVolume" ng-click="apply()" ng-disabled="!isStepValid()">${Activate Volume}</button>
+        <button type="button" class="btn btn-info m-r" ng-if="loading && applyErrorCount == 0" ng-disabled="true">${Loading...} <i class="fa fa-refresh fa-spin fa-fw" aria-hidden="true"></i></button>
+      </div>
+
+      <div class="modal-footer" ng-if="step < 7" ng-show="!loadingModal" style="padding: 9px; background-color: #F7F7F7;">
+        <!--span ng-if="step == 6 && data.volume.type == 'block' && c.selectedHosts.length > 1" style="float: left; margin-top: 8px; font-size: small; text-align:left;">${When attaching to multiple hosts, they must be configured in cluster mode}<br/>${and run the same OS}</span-->
+
+        <button type="button" class="btn m-r-xs" ng-if="step > 1 && !loading" ng-click="previousStep()" id="btnBack">${Back}</button>
+        <button type="button" class="btn " ng-if="!loading" data-dismiss="modal" style="float: left;" id="btnCancel">${Cancel}</button>
+        <button type="button" class="btn btn-info m-r" ng-if="!loading && applyErrorCount == 0" ng-click="nextStep()" ng-disabled="!isStepValid()">${Next}</button><!-- step != 5 && -->
+        <!--button type="button" class="btn btn-info m-r" ng-if="step == 5 && !loading && applyErrorCount == 0" ng-click="apply()" ng-disabled="!isStepValid()">${Next}</button-->
+        <button type="button" class="btn btn-info m-r" ng-if="loading && applyErrorCount == 0" ng-disabled="true">${Loading...} <i class="fa fa-refresh fa-spin fa-fw" aria-hidden="true"></i></button>
+      </div>
+    </div>
+  </div>
+</div>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137b25400000001</claim_timestamp>
+        <metadata_update_name>sp_widget_ce5a702cdb27c410fddc7bedae961965</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:04:25</sys_created_on>
+        <sys_id>8ce6a8d587b5c7904d820e96cebb3576</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:04:25</sys_updated_on>
+    </sys_claim>
+</record_update>

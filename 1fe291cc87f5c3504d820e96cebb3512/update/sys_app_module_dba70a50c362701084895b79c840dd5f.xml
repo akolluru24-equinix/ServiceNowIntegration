@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_app_module">
+    <sys_app_module action="INSERT_OR_UPDATE">
+        <active>false</active>
+        <application display_value="Customer Service">99e97177c342310015519f2974d3aebd</application>
+        <assessment/>
+        <content_page/>
+        <device_type/>
+        <filter/>
+        <hint>Manage Account Access</hint>
+        <homepage/>
+        <image/>
+        <link_type>LIST</link_type>
+        <map_page/>
+        <mobile_title>Manage Account Access</mobile_title>
+        <mobile_view_name>Mobile</mobile_view_name>
+        <name>sn_csm_account_access</name>
+        <order>2150</order>
+        <override_menu_roles>false</override_menu_roles>
+        <query/>
+        <report/>
+        <require_confirmation>true</require_confirmation>
+        <roles>sn_customerservice_manager,admin,sn_customerservice_agent,sn_customerservice.sn_customer_menu_viewer</roles>
+        <route/>
+        <screen/>
+        <survey/>
+        <survey_overwrite>false</survey_overwrite>
+        <sys_class_name>sys_app_module</sys_class_name>
+        <sys_created_by>admin</sys_created_by>
+        <sys_created_on>2021-09-08 10:40:48</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>dba70a50c362701084895b79c840dd5f</sys_id>
+        <sys_mod_count>4</sys_mod_count>
+        <sys_name>Manage Account Access</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Customer Service Base Entities" source="com.snc.cs_base">e6d8e4f34f5e8300f5e08e1f0210c73f</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_app_module_dba70a50c362701084895b79c840dd5f</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:10</sys_updated_on>
+        <timeline_page/>
+        <title>Manage Account Access</title>
+        <uncancelable>false</uncancelable>
+        <ux_list/>
+        <view_name/>
+        <window_name/>
+    </sys_app_module>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a01530000001</claim_timestamp>
+        <metadata_update_name>sys_app_module_dba70a50c362701084895b79c840dd5f</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:10</sys_created_on>
+        <sys_id>bd96e45587b5c7904d820e96cebb3592</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:10</sys_updated_on>
+    </sys_claim>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137a01510000001</claim_timestamp>
+        <metadata_update_name>sys_app_module_dba70a50c362701084895b79c840dd5f</metadata_update_name>
+        <previous_claim_app_version/>
+        <previous_claim_name>com.snc.cs_base</previous_claim_name>
+        <previous_claim_scope>com.snc.cs_base</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:10</sys_created_on>
+        <sys_id>f196e45587b5c7904d820e96cebb3593</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:10</sys_updated_on>
+    </sys_claim>
+</record_update>

@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update table="sp_widget">
+    <sp_widget action="INSERT_OR_UPDATE">
+        <category>custom</category>
+        <client_script><![CDATA[api.controller = function($scope, $rootScope) {
+    /* widget controller */
+    var c = this;
+    c.currentItem = null;
+    c.currentSection = 0;
+
+	$scope.server.update().then(function(resp) {
+		if (resp.sectionList[0].itemList.length > 0) {
+			//$scope.showProduct(true, 0) /* MSPI-2236 by Rogério */
+			$rootScope.$broadcast('upgradeAvailable', true);
+		}
+	})
+
+    $scope.showProduct = function(upgradeAvailable, index) {
+        var selectedItem = upgradeAvailable ? $scope.data.sectionList[0].itemList[index] : $scope.data.sectionList[1].itemList[index];
+        c.currentItem = index;
+        c.currentSection = upgradeAvailable ? 0 : 1;
+        $scope.setSubTitleToTrackerOderWidget();
+        $rootScope.$broadcast('addNewBreadcrumb', {
+            sys_id: '',
+            label: selectedItem.name,
+            url: ""
+        });
+        $rootScope.$broadcast('SelectTrackOrder', selectedItem);
+    };
+
+    $scope.setSubTitleToTrackerOderWidget = function() {
+        var subTitle = '${Select the item you wish to see details and/or modify.}';
+        var subTitle2 = '${Modifications not allowed for Reseller accounts.}';
+        if (!$scope.data.sectionList[0].itemList.length > 0) {
+            subTitle = '${Select the item you wish to see more details.}';
+        }
+        if (subTitle == '${Select the item you wish to see details and/or modify.}') {
+            $rootScope.$broadcast('setSubTitle', subTitle);
+            $rootScope.$broadcast('setSubTitle2', subTitle2);
+        } else {
+            $rootScope.$broadcast('setSubTitle', subTitle);
+        }
+    };
+
+    identifyPageTracking(c.data.pageTitle, 'Asset Inventory', c.data.trackingEnabled, c.data.categoriesTrackingEnabled);
+
+    $scope.track = function(event, properties) {
+        properties.category = c.data.pageTitle;
+        createTracking(event, properties, c.data.trackingEnabled, c.data.categoriesTrackingEnabled);
+    };
+
+};]]></client_script>
+        <controller_as>c</controller_as>
+        <css>.sidebar {
+  height: 100vh;
+	box-shadow: 0.3rem 0 0.4rem 0.1rem rgba(42, 48, 60, 0.1);
+  border-left: none;
+  border-top-right-radius: var(--eq-border-radius-regular);
+}
+
+.item-list {
+  overflow-y: auto;
+  height: calc(100vh - #{$navbar-height__header} - #{$navbar-height__menu} - 3px - 10px - 42px - 40px)
+}
+.item {
+  border-left: solid 4px transparent;
+  color: var(--eq-color-blue-900);
+  font-family: var(--eq-typography-body-font-family);
+  font-weight: var(--eq-typography-body-font-weight);
+  font-size: var(--eq-typography-body-font-size);
+  letter-spacing: var(--eq-typography-body-letter-spacing);
+  word-spacing: var(--eq-typography-body-paragraph-spacing);
+}
+.item:hover {
+  background-color: var(--eq-color-blue-50);
+  color: var(--eq-color-primary-active);
+}
+.item.active {
+  color: var(--eq-color-primary-base);
+  border-left-color: var(--eq-color-primary-base);
+  font-family: var(--eq-typography-body-bold-font-family);
+  font-weight: var(--eq-typography-body-bold-font-weight);
+  font-size: var(--eq-typography-body-bold-font-size);
+  letter-spacing: var(--eq-typography-body-bold-letter-spacing);
+  word-spacing: var(--eq-typography-body-bold-paragraph-spacing);
+}
+</css>
+        <data_table>sp_instance</data_table>
+        <demo_data/>
+        <description/>
+        <docs/>
+        <field_list/>
+        <has_preview>true</has_preview>
+        <id>msp_sp_track_order_filter2</id>
+        <internal>false</internal>
+        <link><![CDATA[function link(scope, element, attrs, controller) { 
+
+ }]]></link>
+        <name>MSP SP Track Order Filter2</name>
+        <option_schema/>
+        <public>false</public>
+        <roles>snc_external,snc_internal</roles>
+        <script><![CDATA[(function() {
+
+	data.trackingEnabled = gs.getProperty('EQIX_ANALYTICS_SEGMENT_ENABLED'); //Tracking to analytics
+	data.categoriesTrackingEnabled = gs.getProperty('EQIX_ANALYTICS_CATEGORIES_ENABLED'); //This is to validate if it is Enabled
+	data.pageTitle = 'Asset Inventory';
+
+	data.environment = gs.getProperty('glide.servlet.uri').includes("https://equinixcsm.service-now.com/") ? false : true;
+	//
+	data.sectionList = [
+		{
+			name: gs.getMessage(''),
+			itemList: []
+		},
+		{
+			name: gs.getMessage('All-Assets'),
+			itemList: []
+		}
+	];
+	data.load = false;
+	var servCount = '';
+	var servName = '';
+	var macdAvailable = false;
+	var _ = new EQIX_Lodash();
+
+	new EQIX_Reseller_Account().initialize();
+	var customerPermission = new EQIX_Customer_Permissions();
+	var account = customerPermission.getActiveAccountSysId();
+	data.productsPathIMG = gs.getProperty('EQIX.MSP.Sidebar.IconsNames');
+	var productIcons = JSON.parse(gs.getProperty('EQIX.MSP.Sidebar.IconsNames'));
+	var grAccount = new GlideRecord("customer_account");
+
+	grAccount.get(account);
+	var operatingUnit = grAccount.getValue('u_operating_unit');
+
+	var grCoreCountry = new GlideRecord("core_country");
+	grCoreCountry.addQuery("iso3166_2", operatingUnit);
+	grCoreCountry.query();
+
+	var country_sys_id = '';
+	if(grCoreCountry.next()){
+		country_sys_id = grCoreCountry.getValue("sys_id");
+	}
+
+	var query = "account.sys_id="+account+"^active=true^u_siebel_asset_status=Active^u_product.u_part_numberISNOTEMPTY";
+	if (input) {
+		data.itemlist = [];
+		generateListFilter(true);
+		generateListFilter(false);
+	}
+
+	function generateListFilter(macdAvailable) {
+		var countID = 0;
+		var isReseller = new EQIX_Reseller_Account().verifyIfResellerAccount();
+		var isResellerSubAccount = new EQIX_Reseller_Account().verifyIfResellerSubAccount();
+
+		var agg = new GlideAggregate('sn_customerservice_contract_item');
+		agg.addEncodedQuery("^u_product.cmdb_model_categoryLIKE"+gs.getProperty('Model_Category_Bundle')+"^ORu_product.cmdb_model_categoryISEMPTY");
+
+		if(macdAvailable && (!isReseller && !isResellerSubAccount)) {
+			agg.addEncodedQuery(query + "^u_product.u_macd_self_service=" + macdAvailable + "^u_product.u_macd_operating_unitLIKE"+country_sys_id);
+		} else if(!isReseller && !isResellerSubAccount) {
+			agg.addEncodedQuery(query + "^u_product.u_part_number!=MSPACKAGE.PROD^u_product.u_macd_self_service=" + macdAvailable );
+		} else {
+			agg.addEncodedQuery(query + "^u_product.u_part_number!=MSPACKAGE.PROD");
+		}
+		
+		agg.addAggregate('COUNT', 'u_product');
+		agg.orderBy('u_product');
+		agg.query();
+
+		while (agg.next()) {
+			var item = {};
+			servCount = agg.getAggregate('COUNT', 'u_product');
+			servName = agg.getDisplayValue('u_product');
+			var product_sysID = agg.getValue('u_product');
+			item.contractPOF_sys_id = valuesPof(product_sysID);
+			item.addToList = checkIfPOFHasPOEMACDLikeTrue(agg.getValue('u_product'));
+			item.name = servName;
+			item.count = servCount;
+			item.id = countID;
+			item.macdAvailable = macdAvailable;
+			item.partNumber = getPartNumber(product_sysID);
+			item.icon = 'managed_backup.png';
+			item.name = servName;
+			var uiMessage = "PN_"+ servName;
+			item.tName = translateProductName(uiMessage,servName);
+
+			var matchedIcons = productIcons.filter(function(element){
+				return element.partNumber == item.partNumber
+			})
+			
+			if(matchedIcons.length > 0) item.icon = matchedIcons[0].img;
+
+			if (macdAvailable && !isReseller && data.environment == true) {
+				data.sectionList[0].itemList.push(item);
+			} else {
+				if (item.addToList && !hasItAlreadyBeenAdded(item.name)) {
+					data.sectionList[1].itemList.push(item);	
+				}
+			}
+			countID++;
+		}
+		checkWhetherToShowTheContent();
+	}
+	
+	function checkWhetherToShowTheContent() {
+		if(data.sectionList[0].itemList.length > 0 || data.sectionList[1].itemList.length > 0) {
+			data.showContent = true;
+		} else {
+			data.showContent = false;
+		}
+	}
+	
+	function hasItAlreadyBeenAdded(_name) {
+		var checkItem = _.find(data.sectionList[1].itemList, function(item) { return item.name == _name; });
+		var response = checkItem == undefined ? false : true;
+		return response;
+	}
+
+	function checkIfPOFHasPOEMACDLikeTrue(_productPOFSySID) {
+		var response = false;
+		var grSCCI = new GlideAggregate('sn_customerservice_contract_item');
+		grSCCI.addEncodedQuery("account.sys_id=" + account + "^u_product.cmdb_model_categoryLIKE" + gs.getProperty('Model Category POE') + "^u_product.u_macd_self_service=true" + "^parent.u_product.sys_id=" + _productPOFSySID);
+		grSCCI.addAggregate("COUNT");
+		grSCCI.query();
+		grSCCI.next();
+		response = checkTotalCount(grSCCI)
+		return response
+	}
+
+	function checkTotalCount(_grCM2MC) {
+		try {
+			return Number(_grCM2MC.getAggregate("COUNT")) > 0 ? true : false;
+		} catch (err) {
+			return false;
+		}
+	}
+
+	data.load = false;
+
+	function translateProductName(PN_product, productName){
+		var uiMsg = gs.getMessage(PN_product);
+		if(uiMsg.includes("PN_")){
+			return productName;
+		}
+		else{
+			return uiMsg;
+		}
+	}
+
+	function valuesPof(product_sysID){
+		var grPofCountract  = new GlideRecord('sn_customerservice_contract_item');
+		grPofCountract.addEncodedQuery(query+'^u_product='+product_sysID);
+		grPofCountract.orderBy('u_product');
+		grPofCountract.query();
+		var list = []
+		while(grPofCountract.next()){
+			list.push(grPofCountract.getValue("sys_id"));
+		}
+		return list;
+	}
+
+	function getPartNumber(productSysID) {
+		var response = "BAK00001.PROD";
+		var grUMS = new GlideRecord('u_managed_service');
+		grUMS.addEncodedQuery("sys_id=" + productSysID);
+		grUMS.query();
+		if (grUMS.next()) response = grUMS.getValue('u_part_number');
+		return response;
+	}  
+
+})();
+]]></script>
+        <servicenow>false</servicenow>
+        <sys_class_name>sp_widget</sys_class_name>
+        <sys_created_by>chpiao@equinix.com</sys_created_by>
+        <sys_created_on>2022-08-17 13:13:54</sys_created_on>
+        <sys_id>0bb305b6dbd191508ff3fb2439961990</sys_id>
+        <sys_mod_count>180</sys_mod_count>
+        <sys_name>MSP SP Track Order Filter2</sys_name>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sp_widget_0bb305b6dbd191508ff3fb2439961990</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:51</sys_updated_on>
+        <template><![CDATA[<div class="ff" style="background: #FFF; height: 100vh; width: 100vw;" ng-show="!data.showContent">
+	<div class="d-flex" style="align-items: center; justify-content: center; height: 100%;">
+    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;  gap: 24px;">
+      <eq-icon name="inventory" type="outline" style="--size: 100px; --fill: #96A1B5;"></eq-icon>
+      <div class="d-flex flex-column" style="align-items: center; justify-content: center;">
+        <span style="font-size: var(--eq-typography-h3-font-size); color: var(--eq-color-grey-500); font-weight: 700; line-height: var(--eq-typography-h3-line-height);">${Welcome to Asset Inventory}</span>
+      	<span style="color: var(--eq-color-grey-900); font-size: var(--eq-body-large-font-size); font-weight: var(--eq-body-large-font-weight); line-height: var(--eq-body-large-line-height);">${Your purchased products will appear here.}</span>
+      </div>
+    </div>
+  </div>
+</div>
+<div style="border-left: none;" class="msp-portal-sidebar-height sidebar ff" ng-show="data.showContent">
+  <div class="d-flex align-items-center ff" style="height: var(--eq-spacing-xx-large-tight); border-top-left-radius: var(--eq-border-radius-regular); border-top-right-radius: var(--eq-border-radius-regular);">
+    <span class="color-gray-400 ff fw-normal fs-x-small" style="margin-left: 24px !important;"><!--${MY SERVICES (AVAILABLE FOR UPGRADE)}-->${All}</span>
+  </div>
+  <div aria-label="${Track Order menu}" class="item-list">
+    <div ng-repeat="(sectionIndex, section) in data.sectionList" class="m-t-x-small " ng-show="section.itemList.length > 0">
+      <div ng-if="section.name" class="color-gray-400 typo-label p-x-medium p-y-medium-tight" style="padding: 0px 24px !important; border-top: 1px solid #E7E9EE; padding-top: 18px !important;">
+        <!--{{section.name}}-->
+      </div>
+      <div ng-repeat="(itemIndex, item) in section.itemList" class="item p-x-medium m-t-small item d-flex position-relative flex-column"
+           ng-class="sectionIndex == c.currentSection && c.currentItem === itemIndex && 'active'"
+           ng-click="showProduct(sectionIndex == 0, itemIndex);track('view asset group',{'group':item.name})"
+           style="padding-top: 10px; padding-bottom: 10px; padding-left: 24px !important; padding-right: 24px !important;">
+        <div class="indicator">
+
+        </div>
+        <div class="d-flex justify-content-between">
+          <div class="d-flex align-items-center">
+            <img src="{{item.icon}}" style="width: 16px; height: 16px" />
+            <!-- <i class="eq-icon eq-icon-data-backup-restore"></i> -->
+            <div style="margin-left: 10px; " title="{{item.tName}}" >
+              {{item.tName | limitTo: (item.tName.length > 40 ? 35 : item.tName.length) }} <span ng-if="item.tName.length > 40">... </span>
+            </div>
+          </div>
+
+          <div style="mmargin-right: auto;">
+            {{item.count}}
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div>]]></template>
+    </sp_widget>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f137aa0670000001</claim_timestamp>
+        <metadata_update_name>sp_widget_0bb305b6dbd191508ff3fb2439961990</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 13:03:51</sys_created_on>
+        <sys_id>7bb6289587b5c7904d820e96cebb356f</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 13:03:51</sys_updated_on>
+    </sys_claim>
+</record_update>

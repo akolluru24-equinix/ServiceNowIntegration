@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><record_update sys_domain="global" table="sys_script">
+    <sys_script action="INSERT_OR_UPDATE">
+        <abort_action>false</abort_action>
+        <access>package_private</access>
+        <action_delete>false</action_delete>
+        <action_insert>false</action_insert>
+        <action_query>false</action_query>
+        <action_update>false</action_update>
+        <active>true</active>
+        <add_message>false</add_message>
+        <advanced>true</advanced>
+        <change_fields>false</change_fields>
+        <client_callable>false</client_callable>
+        <collection>change_request</collection>
+        <condition/>
+        <description>Increase end reach time to 10min </description>
+        <execute_function>false</execute_function>
+        <filter_condition table="change_request">stateIN-1,0,3,4^EQ<item display_value="-1,0,3,4" endquery="false" field="state" goto="false" newquery="false" operator="IN" or="false" value="-1,0,3,4"/>
+            <item endquery="true" field="" goto="false" newquery="false" operator="=" or="false" value=""/>
+        </filter_condition>
+        <is_rest>false</is_rest>
+        <message/>
+        <name>Calculate delayedTime</name>
+        <order>100</order>
+        <priority>100</priority>
+        <rest_method/>
+        <rest_method_text/>
+        <rest_service/>
+        <rest_service_text/>
+        <rest_variables/>
+        <role_conditions/>
+        <script><![CDATA[(function executeRule(current, previous /*null when async*/ ) {
+
+    // Add your code here
+    var time = new GlideDateTime();
+    g_scratchpad.delayedStartTime = false;
+    g_scratchpad.delayedEndTime = false;
+
+    var delayStartTime = gs.dateDiff(current.start_date, current.work_start, true);
+    if (delayStartTime > 600) {
+        g_scratchpad.delayedStartTime = true;
+    }
+    var delayEndTime = gs.dateDiff(current.end_date, time, true);    
+    if (delayEndTime > -600) {
+        g_scratchpad.delayedEndTime = true;
+    }
+})(current, previous);]]></script>
+        <sys_class_name>sys_script</sys_class_name>
+        <sys_created_by>runkumar@equinix.com</sys_created_by>
+        <sys_created_on>2023-11-29 08:42:06</sys_created_on>
+        <sys_domain>global</sys_domain>
+        <sys_domain_path>/</sys_domain_path>
+        <sys_id>b13757611bbeb5505c2e32231b4bcbd8</sys_id>
+        <sys_mod_count>8</sys_mod_count>
+        <sys_name>Calculate delayedTime</sys_name>
+        <sys_overrides/>
+        <sys_package display_value="Global" source="global">global</sys_package>
+        <sys_policy/>
+        <sys_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</sys_scope>
+        <sys_update_name>sys_script_b13757611bbeb5505c2e32231b4bcbd8</sys_update_name>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:18</sys_updated_on>
+        <template/>
+        <when>before_display</when>
+    </sys_script>
+    <sys_translated_text action="delete_multiple" query="documentkey=b13757611bbeb5505c2e32231b4bcbd8"/>
+    <sys_claim action="INSERT_OR_UPDATE">
+        <claim_owner_scope display_value="GobalAPP">1fe291cc87f5c3504d820e96cebb3512</claim_owner_scope>
+        <claim_timestamp>19f1374a3390000001</claim_timestamp>
+        <metadata_update_name>sys_script_b13757611bbeb5505c2e32231b4bcbd8</metadata_update_name>
+        <previous_claim_app_version>1.0.1</previous_claim_app_version>
+        <previous_claim_name>GobalAPP</previous_claim_name>
+        <previous_claim_scope>1fe291cc87f5c3504d820e96cebb3512</previous_claim_scope>
+        <sys_created_by>oneto@equinix.com</sys_created_by>
+        <sys_created_on>2026-06-29 12:57:18</sys_created_on>
+        <sys_id>f73520998775c7904d820e96cebb3596</sys_id>
+        <sys_mod_count>0</sys_mod_count>
+        <sys_updated_by>oneto@equinix.com</sys_updated_by>
+        <sys_updated_on>2026-06-29 12:57:18</sys_updated_on>
+    </sys_claim>
+</record_update>
