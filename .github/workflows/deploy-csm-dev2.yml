@@ -6,9 +6,6 @@ on:
   push:
     branches: [main]
   workflow_dispatch: {}
-    # Allows manually triggering this workflow from the Actions tab,
-    # without needing a push to main. Useful for re-running a deploy
-    # or testing the pipeline itself.
 
 jobs:
   publish:
@@ -16,6 +13,15 @@ jobs:
     outputs:
       version: ${{ steps.publish_app.outputs.newVersion }}
     steps:
+      - name: Prepare Dev1 instance host
+        id: prep_dev1
+        run: |
+          HOST="${{ secrets.SN_DEV1_INSTANCE_URL }}"
+          HOST="${HOST#https://}"
+          HOST="${HOST#http://}"
+          HOST="${HOST%/}"
+          echo "host=$HOST" >> $GITHUB_OUTPUT
+
       - name: Publish Application from Dev1
         id: publish_app
         uses: ServiceNow/sncicd-publish-app@2.0.1
@@ -25,7 +31,7 @@ jobs:
         env:
           nowUsername: ${{ secrets.SN_DEV1_USERNAME }}
           nowPassword: ${{ secrets.SN_DEV1_PASSWORD }}
-          nowSourceInstance: ${{ secrets.SN_DEV1_INSTANCE_URL }}
+          nowSourceInstance: ${{ steps.prep_dev1.outputs.host }}
           appSysID: ${{ secrets.SN_APP_SYSID }}
 
   install-dev2:
@@ -33,6 +39,15 @@ jobs:
     needs: publish
     runs-on: ubuntu-latest
     steps:
+      - name: Prepare Dev2 instance host
+        id: prep_dev2
+        run: |
+          HOST="${{ secrets.SN_DEV2_INSTANCE_URL }}"
+          HOST="${HOST#https://}"
+          HOST="${HOST#http://}"
+          HOST="${HOST%/}"
+          echo "host=$HOST" >> $GITHUB_OUTPUT
+
       - name: Install on Dev2 (testing only)
         uses: ServiceNow/sncicd-install-app@1.0.0
         with:
@@ -40,6 +55,6 @@ jobs:
         env:
           nowUsername: ${{ secrets.SN_DEV2_USERNAME }}
           nowPassword: ${{ secrets.SN_DEV2_PASSWORD }}
-          nowInstallInstance: ${{ secrets.SN_DEV2_INSTANCE_URL }}
+          nowInstallInstance: ${{ steps.prep_dev2.outputs.host }}
           appSysID: ${{ secrets.SN_APP_SYSID }}
           appScope: ${{ secrets.SN_APP_SCOPE }}
